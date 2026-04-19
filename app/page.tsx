@@ -1,5 +1,6 @@
 import Link from 'next/link';
 import type { Metadata } from 'next';
+import HomeNav from './HomeNav';
 
 export const metadata: Metadata = {
   title: 'Attentiq — Analyse TikTok par IA',
@@ -11,17 +12,7 @@ export default function HomePage() {
   return (
     <main className="min-h-screen bg-gradient-to-br from-slate-950 via-brand-950 to-slate-900 text-white">
       {/* Nav */}
-      <nav className="flex items-center justify-between px-6 py-5 max-w-6xl mx-auto">
-        <span className="text-xl font-bold tracking-tight text-white">
-          Attentiq
-        </span>
-        <Link
-          href="/analyze"
-          className="text-sm font-medium text-brand-300 hover:text-white transition-colors"
-        >
-          Analyser une vidéo →
-        </Link>
-      </nav>
+      <HomeNav />
 
       {/* Hero */}
       <section className="flex flex-col items-center justify-center text-center px-6 pt-20 pb-32 max-w-4xl mx-auto">

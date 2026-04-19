@@ -170,6 +170,23 @@ export default function AnalyzePage() {
         </Link>
       </nav>
 
+      {/* Credit warning banner — shown to premium users when credit is critically low */}
+      {isPremium && (
+        <div className="max-w-4xl mx-auto px-6 mb-2">
+          <Link
+            href="/recharge"
+            className="flex items-center justify-between gap-4 bg-amber-500/15 border border-amber-500/50 hover:border-amber-400/70 rounded-xl px-5 py-3 transition-colors group"
+          >
+            <span className="text-amber-300 font-semibold text-sm">
+              ⚠️ Crédit faible — Recharge maintenant pour éviter toute interruption de service
+            </span>
+            <span className="text-amber-400 text-sm font-bold shrink-0 group-hover:translate-x-0.5 transition-transform">
+              Recharger →
+            </span>
+          </Link>
+        </div>
+      )}
+
       <div className="max-w-2xl mx-auto px-6 pt-16 pb-24">
         <h1 className="text-4xl font-extrabold text-center mb-3">
           Analyser une vidéo TikTok
