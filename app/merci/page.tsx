@@ -1,12 +1,28 @@
-import Link from 'next/link';
-import type { Metadata } from 'next';
+'use client';
 
-export const metadata: Metadata = {
-  title: 'Merci pour votre achat !',
-  description: 'Votre commande a bien été reçue. Vous allez recevoir votre rapport Attentiq très prochainement.',
-};
+import Link from 'next/link';
+import { useEffect, useState } from 'react';
+import { setPremiumCookie } from '@/lib/premium';
 
 export default function MerciPage() {
+  const [premiumReady, setPremiumReady] = useState(false);
+
+  useEffect(() => {
+    async function activatePremium() {
+      try {
+        // Set the httpOnly cookie server-side
+        await fetch('/api/set-premium', { method: 'POST' });
+      } catch (err) {
+        console.error('Failed to set premium via API:', err);
+      } finally {
+        // Always set the client-readable cookie as a fallback
+        setPremiumCookie();
+        setPremiumReady(true);
+      }
+    }
+    activatePremium();
+  }, []);
+
   return (
     <main className="min-h-screen bg-gradient-to-br from-slate-950 via-brand-950 to-slate-900 text-white flex flex-col">
       {/* Nav */}
@@ -74,13 +90,20 @@ export default function MerciPage() {
             </ol>
           </div>
 
+          {/* Premium unlock indicator */}
+          {premiumReady && (
+            <div className="bg-green-900/20 border border-green-700/40 rounded-xl px-4 py-3 mb-6 text-green-300 text-sm text-center">
+              ✅ Accès premium activé — votre rapport complet est disponible.
+            </div>
+          )}
+
           {/* Actions */}
           <div className="flex flex-col sm:flex-row gap-4 justify-center">
             <Link
               href="/analyze"
               className="inline-flex items-center justify-center gap-2 bg-brand-600 hover:bg-brand-500 text-white font-semibold px-6 py-3 rounded-xl transition-all duration-200 hover:-translate-y-0.5"
             >
-              Analyser une autre vidéo
+              🔓 Voir mon rapport complet
             </Link>
             <Link
               href="/"
