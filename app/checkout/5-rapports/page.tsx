@@ -4,7 +4,7 @@ import { PRICING_PLANS } from '@/lib/constants';
 import CheckoutButton from './CheckoutButton';
 
 export const metadata: Metadata = {
-  title: '5 Rapports — 99€',
+  title: '5 Rapports — 49€/mois',
   description:
     'Analysez 5 vidéos TikTok et optimisez votre stratégie de contenu. Rapports complets, comparaison entre vidéos, support prioritaire.',
 };
@@ -52,7 +52,7 @@ export default function Checkout5RapportsPage() {
             </div>
             <p className="text-slate-400 text-sm">{plan.description}</p>
             <p className="text-brand-400 text-xs mt-2 font-medium">
-              Soit {(plan.price / 5).toFixed(2)}{plan.currency} par rapport — économisez 32%
+              Soit {(plan.price / 5).toFixed(2)}{plan.currency} par rapport — économisez 48%
             </p>
           </div>
 
