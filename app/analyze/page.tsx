@@ -2,6 +2,7 @@
 
 import { useState, useEffect, useRef, useCallback } from 'react';
 import Link from 'next/link';
+import { useSearchParams, useRouter } from 'next/navigation';
 import {
   analyzeVideo,
   getJobStatus,
@@ -21,7 +22,7 @@ const STATUS_LABELS: Record<JobStatus, string> = {
   pending: 'En attente…',
   processing: 'Analyse en cours…',
   completed: 'Analyse terminée !',
-  failed: 'Échec de l\'analyse',
+  failed: "Échec de l'analyse",
 };
 
 const STATUS_COLORS: Record<JobStatus, string> = {
@@ -36,9 +37,16 @@ const STATUS_COLORS: Record<JobStatus, string> = {
 // ---------------------------------------------------------------------------
 
 export default function AnalyzePage() {
-  const [url, setUrl] = useState('');
+  const searchParams = useSearchParams();
+  const router = useRouter();
+
+  const initialJobId = searchParams.get('jobId');
+  const initialVideoUrl = searchParams.get('videoUrl');
+
+  const [url, setUrl] = useState(initialVideoUrl ?? '');
   const [urlError, setUrlError] = useState('');
-  const [jobId, setJobId] = useState<string | null>(null);
+  const [jobId, setJobId] = useState<string | null>(initialJobId);
+  const [videoUrl, setVideoUrl] = useState<string>(initialVideoUrl ?? '');
   const [jobData, setJobData] = useState<JobStatusResponse | null>(null);
   const [submitting, setSubmitting] = useState(false);
   const [submitError, setSubmitError] = useState('');
@@ -54,6 +62,21 @@ export default function AnalyzePage() {
   useEffect(() => {
     setIsPremium(getPremiumFromCookie());
   }, []);
+
+  // -------------------------------------------------------------------------
+  // Sync URL params into state
+  // -------------------------------------------------------------------------
+
+  useEffect(() => {
+    if (initialVideoUrl) {
+      setUrl(initialVideoUrl);
+      setVideoUrl(initialVideoUrl);
+    }
+
+    if (initialJobId) {
+      setJobId(initialJobId);
+    }
+  }, [initialJobId, initialVideoUrl]);
 
   // -------------------------------------------------------------------------
   // Polling
@@ -86,14 +109,13 @@ export default function AnalyzePage() {
   useEffect(() => {
     if (!jobId) return;
 
-    // Immediate first poll
-    poll(jobId);
+    pollAttempts === 0 && poll(jobId);
 
     pollingRef.current = setInterval(() => {
       if (pollAttempts >= POLLING_MAX_ATTEMPTS) {
         stopPolling();
         setSubmitError(
-          'L\'analyse prend trop de temps. Veuillez réessayer plus tard.'
+          "L'analyse prend trop de temps. Veuillez réessayer plus tard."
         );
         return;
       }
@@ -119,16 +141,23 @@ export default function AnalyzePage() {
       return;
     }
     if (!isTikTokUrl(trimmed)) {
-      setUrlError('L\'URL doit provenir de tiktok.com.');
+      setUrlError("L'URL doit provenir de tiktok.com.");
       return;
     }
 
     setSubmitting(true);
     try {
       const res = await analyzeVideo(trimmed);
+
       setJobId(res.job_id);
+      setVideoUrl(trimmed);
       setJobData({ job_id: res.job_id, status: res.status });
       setPollAttempts(0);
+
+      const params = new URLSearchParams();
+      params.set('jobId', res.job_id);
+      params.set('videoUrl', trimmed);
+      router.replace(`/analyze?${params.toString()}`);
     } catch (err) {
       setSubmitError(
         err instanceof Error ? err.message : 'Erreur lors de la soumission.'
@@ -143,9 +172,12 @@ export default function AnalyzePage() {
     setUrl('');
     setUrlError('');
     setJobId(null);
+    setVideoUrl('');
     setJobData(null);
     setSubmitError('');
     setPollAttempts(0);
+    setIsPremium(getPremiumFromCookie());
+    router.replace('/analyze');
   };
 
   // -------------------------------------------------------------------------
@@ -154,7 +186,6 @@ export default function AnalyzePage() {
 
   return (
     <main className="min-h-screen bg-gradient-to-br from-slate-950 via-brand-950 to-slate-900 text-white">
-      {/* Nav */}
       <nav className="flex items-center justify-between px-6 py-5 max-w-4xl mx-auto">
         <Link
           href="/"
@@ -175,10 +206,10 @@ export default function AnalyzePage() {
           Analyser une vidéo TikTok
         </h1>
         <p className="text-slate-400 text-center mb-10">
-          Collez l&apos;URL d&apos;une vidéo TikTok pour obtenir votre analyse d&apos;attention.
+          Collez l&apos;URL d&apos;une vidéo TikTok pour obtenir votre analyse
+          d&apos;attention.
         </p>
 
-        {/* Form */}
         {!jobId && (
           <form onSubmit={handleSubmit} className="space-y-4">
             <div>
@@ -226,28 +257,24 @@ export default function AnalyzePage() {
                   Soumission…
                 </span>
               ) : (
-                'Lancer l\'analyse'
+                "Lancer l'analyse"
               )}
             </button>
           </form>
         )}
 
-        {/* Job status */}
         {jobData && (
           <div className="mt-8 space-y-6">
             <StatusCard jobData={jobData} />
 
-            {/* Results */}
             {jobData.status === 'completed' && jobData.result && (
               <ResultCard result={jobData.result} isPremium={isPremium} />
             )}
 
-            {/* Paywall — shown to free users after analysis completes */}
             {jobData.status === 'completed' && jobData.result && !isPremium && (
-              <PremiumPaywall />
+              <PremiumPaywall jobId={jobId ?? ''} videoUrl={videoUrl} />
             )}
 
-            {/* Reset */}
             {(jobData.status === 'completed' || jobData.status === 'failed') && (
               <button
                 onClick={handleReset}
@@ -307,7 +334,6 @@ function StatusCard({ jobData }: { jobData: JobStatusResponse }) {
         </span>
       </div>
 
-      {/* Progress bar */}
       {isProcessing && (
         <div className="w-full bg-white/10 rounded-full h-2 overflow-hidden">
           <div
@@ -329,7 +355,6 @@ function StatusCard({ jobData }: { jobData: JobStatusResponse }) {
 }
 
 function getShortSummary(summary: string): string {
-  // Return at most the first 2 sentences
   const sentences = summary.match(/[^.!?]+[.!?]+/g) ?? [];
   if (sentences.length === 0) return summary;
   return sentences.slice(0, 2).join(' ').trim();
@@ -352,7 +377,6 @@ function ResultCard({
 
   return (
     <div className="bg-white/5 border border-white/10 rounded-2xl p-6 space-y-6">
-      {/* Title & duration — always visible */}
       {result.title && (
         <div>
           <p className="text-xs text-slate-500 uppercase tracking-widest mb-1">
@@ -367,15 +391,15 @@ function ResultCard({
         </div>
       )}
 
-      {/* Summary — short (2 sentences) for free, full for premium */}
       <div>
         <p className="text-xs text-slate-500 uppercase tracking-widest mb-2">
           Résumé
         </p>
-        <p className="text-slate-300 text-sm leading-relaxed">{displayedSummary}</p>
+        <p className="text-slate-300 text-sm leading-relaxed">
+          {displayedSummary}
+        </p>
       </div>
 
-      {/* Recommendations — premium only */}
       {isPremium && result.recommendations.length > 0 && (
         <div>
           <p className="text-xs text-slate-500 uppercase tracking-widest mb-3">
@@ -383,7 +407,10 @@ function ResultCard({
           </p>
           <ul className="space-y-2">
             {result.recommendations.map((rec, i) => (
-              <li key={i} className="flex items-start gap-2 text-sm text-slate-300">
+              <li
+                key={i}
+                className="flex items-start gap-2 text-sm text-slate-300"
+              >
                 <span className="text-brand-400 mt-0.5 shrink-0">✓</span>
                 {rec}
               </li>
@@ -392,7 +419,6 @@ function ResultCard({
         </div>
       )}
 
-      {/* Peak moments — premium only */}
       {isPremium && result.peak_moments.length > 0 && (
         <div>
           <p className="text-xs text-slate-500 uppercase tracking-widest mb-3">
@@ -412,7 +438,6 @@ function ResultCard({
         </div>
       )}
 
-      {/* Drop moments — max 3 for free, all for premium */}
       {displayedDropMoments.length > 0 && (
         <div>
           <p className="text-xs text-slate-500 uppercase tracking-widest mb-3">
@@ -431,7 +456,8 @@ function ResultCard({
           </div>
           {!isPremium && result.drop_moments.length > 3 && (
             <p className="text-slate-500 text-xs mt-2">
-              + {result.drop_moments.length - 3} autres moments masqués — passez à la version premium
+              + {result.drop_moments.length - 3} autres moments masqués —
+              passez à la version premium
             </p>
           )}
         </div>
