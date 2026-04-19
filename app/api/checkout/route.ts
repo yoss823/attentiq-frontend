@@ -8,15 +8,61 @@ const stripe = new Stripe(process.env.STRIPE_SECRET_KEY!, {
 export async function POST(request: NextRequest) {
   try {
     const body = await request.json();
-    const { priceId, successUrl, cancelUrl } = body as {
-      priceId: string;
+    const { priceId, successUrl, cancelUrl, intent, amount } = body as {
+      priceId?: string;
       successUrl: string;
       cancelUrl: string;
+      intent?: string;
+      amount?: number;
     };
 
-    if (!priceId || !successUrl || !cancelUrl) {
+    if (!successUrl || !cancelUrl) {
       return NextResponse.json(
-        { error: 'Missing required fields: priceId, successUrl, cancelUrl' },
+        { error: 'Missing required fields: successUrl, cancelUrl' },
+        { status: 400 }
+      );
+    }
+
+    // -----------------------------------------------------------------------
+    // Recharge flow — flexible one-time payment via price_data
+    // -----------------------------------------------------------------------
+    if (intent === 'recharge') {
+      if (!amount || amount < 100) {
+        return NextResponse.json(
+          { error: 'Invalid amount: must be at least 100 (cents)' },
+          { status: 400 }
+        );
+      }
+
+      const session = await stripe.checkout.sessions.create({
+        mode: 'payment',
+        line_items: [
+          {
+            quantity: 1,
+            price_data: {
+              currency: 'eur',
+              unit_amount: amount,
+              product_data: {
+                name: 'Recharge de crédit Attentiq',
+                description:
+                  'Recharge ponctuelle pour maintenir le service opérationnel.',
+              },
+            },
+          },
+        ],
+        success_url: successUrl,
+        cancel_url: cancelUrl,
+      });
+
+      return NextResponse.json({ sessionId: session.id });
+    }
+
+    // -----------------------------------------------------------------------
+    // Standard flow — existing price-ID based checkout
+    // -----------------------------------------------------------------------
+    if (!priceId) {
+      return NextResponse.json(
+        { error: 'Missing required field: priceId' },
         { status: 400 }
       );
     }
