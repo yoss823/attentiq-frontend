@@ -10,6 +10,7 @@ import {
   type JobStatus,
 } from '@/lib/api';
 import { POLLING_INTERVAL_MS, POLLING_MAX_ATTEMPTS } from '@/lib/constants';
+import PremiumPaywall from './PremiumPaywall';
 
 // ---------------------------------------------------------------------------
 // Status helpers
@@ -41,6 +42,7 @@ export default function AnalyzePage() {
   const [submitting, setSubmitting] = useState(false);
   const [submitError, setSubmitError] = useState('');
   const [pollAttempts, setPollAttempts] = useState(0);
+  const [isPremium] = useState(false); // TODO: wire to auth/subscription check
 
   const pollingRef = useRef<ReturnType<typeof setInterval> | null>(null);
 
@@ -228,26 +230,12 @@ export default function AnalyzePage() {
 
             {/* Results */}
             {jobData.status === 'completed' && jobData.result && (
-              <ResultCard result={jobData.result} />
+              <ResultCard result={jobData.result} isPremium={isPremium} />
             )}
 
-            {/* Upsell after completion */}
-            {jobData.status === 'completed' && (
-              <div className="bg-gradient-to-r from-brand-800/60 to-purple-800/60 border border-brand-600/40 rounded-2xl p-6 text-center">
-                <p className="text-white font-semibold text-lg mb-2">
-                  Vous voulez aller plus loin ?
-                </p>
-                <p className="text-slate-300 text-sm mb-4">
-                  Obtenez un rapport PDF complet avec des recommandations
-                  détaillées pour seulement 29€.
-                </p>
-                <Link
-                  href="/checkout/rapport-complet"
-                  className="inline-flex items-center gap-2 bg-brand-600 hover:bg-brand-500 text-white font-semibold px-6 py-3 rounded-xl transition-all"
-                >
-                  Obtenir le rapport complet — 29€
-                </Link>
-              </div>
+            {/* Paywall — shown to free users after analysis completes */}
+            {jobData.status === 'completed' && jobData.result && !isPremium && (
+              <PremiumPaywall />
             )}
 
             {/* Reset */}
@@ -331,13 +319,31 @@ function StatusCard({ jobData }: { jobData: JobStatusResponse }) {
   );
 }
 
+function getShortSummary(summary: string): string {
+  // Return at most the first 2 sentences
+  const sentences = summary.match(/[^.!?]+[.!?]+/g) ?? [];
+  if (sentences.length === 0) return summary;
+  return sentences.slice(0, 2).join(' ').trim();
+}
+
 function ResultCard({
   result,
+  isPremium,
 }: {
   result: NonNullable<JobStatusResponse['result']>;
+  isPremium: boolean;
 }) {
+  const displayedSummary = isPremium
+    ? result.summary
+    : getShortSummary(result.summary);
+
+  const displayedDropMoments = isPremium
+    ? result.drop_moments
+    : result.drop_moments.slice(0, 3);
+
   return (
     <div className="bg-white/5 border border-white/10 rounded-2xl p-6 space-y-6">
+      {/* Title & duration — always visible */}
       {result.title && (
         <div>
           <p className="text-xs text-slate-500 uppercase tracking-widest mb-1">
@@ -352,14 +358,16 @@ function ResultCard({
         </div>
       )}
 
+      {/* Summary — short (2 sentences) for free, full for premium */}
       <div>
         <p className="text-xs text-slate-500 uppercase tracking-widest mb-2">
           Résumé
         </p>
-        <p className="text-slate-300 text-sm leading-relaxed">{result.summary}</p>
+        <p className="text-slate-300 text-sm leading-relaxed">{displayedSummary}</p>
       </div>
 
-      {result.recommendations.length > 0 && (
+      {/* Recommendations — premium only */}
+      {isPremium && result.recommendations.length > 0 && (
         <div>
           <p className="text-xs text-slate-500 uppercase tracking-widest mb-3">
             Recommandations
@@ -375,7 +383,8 @@ function ResultCard({
         </div>
       )}
 
-      {result.peak_moments.length > 0 && (
+      {/* Peak moments — premium only */}
+      {isPremium && result.peak_moments.length > 0 && (
         <div>
           <p className="text-xs text-slate-500 uppercase tracking-widest mb-3">
             Moments forts 🔥
@@ -394,13 +403,14 @@ function ResultCard({
         </div>
       )}
 
-      {result.drop_moments.length > 0 && (
+      {/* Drop moments — max 3 for free, all for premium */}
+      {displayedDropMoments.length > 0 && (
         <div>
           <p className="text-xs text-slate-500 uppercase tracking-widest mb-3">
             Moments de décrochage 📉
           </p>
           <div className="flex flex-wrap gap-2">
-            {result.drop_moments.map((m) => (
+            {displayedDropMoments.map((m) => (
               <span
                 key={m.second}
                 className="bg-red-900/40 border border-red-700/40 text-red-300 text-xs px-3 py-1 rounded-full"
@@ -410,6 +420,11 @@ function ResultCard({
               </span>
             ))}
           </div>
+          {!isPremium && result.drop_moments.length > 3 && (
+            <p className="text-slate-500 text-xs mt-2">
+              + {result.drop_moments.length - 3} autres moments masqués — passez à la version premium
+            </p>
+          )}
         </div>
       )}
     </div>
