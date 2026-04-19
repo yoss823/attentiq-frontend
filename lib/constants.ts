@@ -15,7 +15,7 @@ export const PRICING_PLANS: PricingPlan[] = [
   {
     id: 'rapport-complet',
     name: 'Rapport Complet',
-    price: 29,
+    price: 19,
     currency: '€',
     period: null,
     description: 'Un rapport approfondi pour une vidéo de votre choix.',
@@ -33,9 +33,9 @@ export const PRICING_PLANS: PricingPlan[] = [
   {
     id: '5-rapports',
     name: '5 Rapports',
-    price: 99,
+    price: 49,
     currency: '€',
-    period: null,
+    period: 'mois',
     description: 'Analysez 5 vidéos et optimisez votre stratégie de contenu.',
     features: [
       '5 analyses complètes',
@@ -52,7 +52,7 @@ export const PRICING_PLANS: PricingPlan[] = [
   {
     id: 'illimite',
     name: 'Illimité',
-    price: 199,
+    price: 99,
     currency: '€',
     period: 'mois',
     description: 'Analyses illimitées pour les créateurs et agences sérieux.',

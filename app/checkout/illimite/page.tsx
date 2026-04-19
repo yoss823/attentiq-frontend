@@ -4,7 +4,7 @@ import { PRICING_PLANS } from '@/lib/constants';
 import CheckoutButton from './CheckoutButton';
 
 export const metadata: Metadata = {
-  title: 'Illimité — 199€/mois',
+  title: 'Illimité — 99€/mois',
   description:
     'Analyses TikTok illimitées pour les créateurs et agences sérieux. API access, tableau de bord analytique, support dédié.',
 };
