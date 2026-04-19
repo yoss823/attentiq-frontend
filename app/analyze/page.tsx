@@ -239,13 +239,13 @@ export default function AnalyzePage() {
                 </p>
                 <p className="text-slate-300 text-sm mb-4">
                   Obtenez un rapport PDF complet avec des recommandations
-                  détaillées pour seulement 29€.
+                  détaillées pour seulement 19€.
                 </p>
                 <Link
                   href="/checkout/rapport-complet"
                   className="inline-flex items-center gap-2 bg-brand-600 hover:bg-brand-500 text-white font-semibold px-6 py-3 rounded-xl transition-all"
                 >
-                  Obtenir le rapport complet — 29€
+                  Obtenir le rapport complet — 19€
                 </Link>
               </div>
             )}
