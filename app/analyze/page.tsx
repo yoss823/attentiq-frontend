@@ -10,6 +10,7 @@ import {
   type JobStatus,
 } from '@/lib/api';
 import { POLLING_INTERVAL_MS, POLLING_MAX_ATTEMPTS } from '@/lib/constants';
+import { getPremiumFromCookie } from '@/lib/premium';
 import PremiumPaywall from './PremiumPaywall';
 
 // ---------------------------------------------------------------------------
@@ -42,9 +43,17 @@ export default function AnalyzePage() {
   const [submitting, setSubmitting] = useState(false);
   const [submitError, setSubmitError] = useState('');
   const [pollAttempts, setPollAttempts] = useState(0);
-  const [isPremium] = useState(false); // TODO: wire to auth/subscription check
+  const [isPremium, setIsPremium] = useState(false);
 
   const pollingRef = useRef<ReturnType<typeof setInterval> | null>(null);
+
+  // -------------------------------------------------------------------------
+  // Premium state — read from cookie on mount
+  // -------------------------------------------------------------------------
+
+  useEffect(() => {
+    setIsPremium(getPremiumFromCookie());
+  }, []);
 
   // -------------------------------------------------------------------------
   // Polling
