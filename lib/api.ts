@@ -1,51 +1,48 @@
-export type CreateCheckoutInput = {
-  plan?: "single" | "pack5" | "unlimited";
+export async function createCheckoutSession(params: {
   jobId: string;
   videoUrl?: string;
-};
-
-export type CreateCheckoutResponse = {
-  url: string;
-  sessionId: string;
-};
-
-export async function createCheckoutSession(
-  input: CreateCheckoutInput
-): Promise<CreateCheckoutResponse> {
-  const res = await fetch("/api/checkout", {
+}) {
+  const response = await fetch("/api/checkout", {
     method: "POST",
     headers: {
       "Content-Type": "application/json",
     },
-    body: JSON.stringify(input),
+    body: JSON.stringify({
+      jobId: params.jobId,
+      videoUrl: params.videoUrl,
+    }),
   });
 
-  const data = await res.json();
-
-  if (!res.ok) {
-    throw new Error(data?.error || "Unable to create checkout session");
+  if (!response.ok) {
+    const errorText = await response.text();
+    throw new Error(errorText || "Impossible de créer la session Stripe.");
   }
 
-  return data;
+  const data = await response.json();
+
+  if (!data?.url) {
+    throw new Error("URL Stripe manquante.");
+  }
+
+  return data as { url: string };
 }
 
-export async function activatePremium(input: {
-  sessionId: string;
-  jobId: string;
-}) {
-  const res = await fetch("/api/set-premium", {
+export async function activatePremium(sessionId: string, jobId: string) {
+  const response = await fetch("/api/set-premium", {
     method: "POST",
     headers: {
       "Content-Type": "application/json",
     },
-    body: JSON.stringify(input),
+    body: JSON.stringify({
+      sessionId,
+      jobId,
+    }),
   });
 
-  const data = await res.json();
-
-  if (!res.ok) {
-    throw new Error(data?.error || "Unable to activate premium");
+  if (!response.ok) {
+    const errorText = await response.text();
+    throw new Error(errorText || "Impossible d’activer le premium.");
   }
 
-  return data;
+  return response.json();
 }
