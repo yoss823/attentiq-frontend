@@ -1,56 +1,102 @@
-import { NextRequest, NextResponse } from 'next/server';
-import Stripe from 'stripe';
+import { NextRequest, NextResponse } from "next/server";
+import Stripe from "stripe";
 
-const stripe = new Stripe(process.env.STRIPE_SECRET_KEY!, {
-  apiVersion: '2024-06-20',
+export const runtime = "nodejs";
+
+const stripe = new Stripe(process.env.STRIPE_SECRET_KEY as string, {
+  apiVersion: "2025-02-24.acacia",
 });
 
-export async function POST(request: NextRequest) {
-  try {
-    const body = await request.json();
-    const { priceId, successUrl, cancelUrl } = body as {
-      priceId: string;
-      successUrl: string;
-      cancelUrl: string;
-    };
+function getBaseUrl(req: NextRequest) {
+  return (
+    process.env.NEXT_PUBLIC_APP_URL ||
+    `${req.nextUrl.protocol}//${req.nextUrl.host}`
+  );
+}
 
-    if (!priceId || !successUrl || !cancelUrl) {
+type CheckoutBody = {
+  plan?: "single" | "pack5" | "unlimited";
+  jobId?: string;
+  videoUrl?: string;
+};
+
+function getPriceId(plan: CheckoutBody["plan"]) {
+  switch (plan) {
+    case "pack5":
+      return process.env.STRIPE_PRICE_PACK_5 || "";
+    case "unlimited":
+      return process.env.STRIPE_PRICE_UNLIMITED || "";
+    case "single":
+    default:
+      return process.env.STRIPE_PRICE_RAPPORT_COMPLET || "";
+  }
+}
+
+export async function POST(req: NextRequest) {
+  try {
+    const body = (await req.json()) as CheckoutBody;
+
+    const plan = body.plan || "single";
+    const jobId = body.jobId?.trim();
+    const videoUrl = body.videoUrl?.trim() || "";
+
+    if (!jobId) {
       return NextResponse.json(
-        { error: 'Missing required fields: priceId, successUrl, cancelUrl' },
+        { error: "Missing required field: jobId" },
         { status: 400 }
       );
     }
 
-    // Retrieve the price to determine whether it is one-time or recurring
-    const price = await stripe.prices.retrieve(priceId);
-    const mode: Stripe.Checkout.SessionCreateParams['mode'] =
-      price.type === 'recurring' ? 'subscription' : 'payment';
+    const priceId = getPriceId(plan);
+
+    if (!priceId) {
+      return NextResponse.json(
+        { error: `No Stripe price configured for plan "${plan}"` },
+        { status: 500 }
+      );
+    }
+
+    const baseUrl = getBaseUrl(req);
+
+    const successUrl = new URL("/merci", baseUrl);
+    successUrl.searchParams.set("session_id", "{CHECKOUT_SESSION_ID}");
+    successUrl.searchParams.set("jobId", jobId);
+    if (videoUrl) {
+      successUrl.searchParams.set("videoUrl", videoUrl);
+    }
+
+    const cancelUrl = new URL("/analyze", baseUrl);
+    cancelUrl.searchParams.set("jobId", jobId);
+    if (videoUrl) {
+      cancelUrl.searchParams.set("videoUrl", videoUrl);
+    }
 
     const session = await stripe.checkout.sessions.create({
-      mode,
+      mode: "payment",
       line_items: [
         {
           price: priceId,
           quantity: 1,
         },
       ],
-      success_url: successUrl,
-      cancel_url: cancelUrl,
+      success_url: successUrl.toString(),
+      cancel_url: cancelUrl.toString(),
+      metadata: {
+        jobId,
+        videoUrl,
+        plan,
+      },
+      allow_promotion_codes: true,
     });
 
-    return NextResponse.json({ sessionId: session.id });
+    return NextResponse.json({
+      url: session.url,
+      sessionId: session.id,
+    });
   } catch (error) {
-    console.error('Stripe checkout session error:', error);
-
-    if (error instanceof Stripe.errors.StripeError) {
-      return NextResponse.json(
-        { error: error.message },
-        { status: error.statusCode ?? 500 }
-      );
-    }
-
+    console.error("Stripe checkout creation error:", error);
     return NextResponse.json(
-      { error: 'Failed to create checkout session' },
+      { error: "Unable to create checkout session" },
       { status: 500 }
     );
   }
