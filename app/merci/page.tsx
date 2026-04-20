@@ -8,91 +8,73 @@ export default function MerciPage() {
   const router = useRouter();
   const searchParams = useSearchParams();
 
-  const [status, setStatus] = useState<"loading" | "success" | "error">("loading");
-  const [message, setMessage] = useState("Vérification du paiement...");
+  const sessionId = searchParams.get("session_id") || "";
+  const jobId = searchParams.get("jobId") || "";
+  const videoUrl = searchParams.get("videoUrl") || "";
 
-  const sessionId = searchParams.get("session_id");
-  const jobId = searchParams.get("jobId");
-  const videoUrl = searchParams.get("videoUrl");
+  const [status, setStatus] = useState<"loading" | "success" | "error">("loading");
+  const [message, setMessage] = useState("Activation de votre accès premium...");
 
   const redirectUrl = useMemo(() => {
     const params = new URLSearchParams();
     if (jobId) params.set("jobId", jobId);
     if (videoUrl) params.set("videoUrl", videoUrl);
-    return `/analyze?${params.toString()}`;
+    return params.toString() ? `/analyze?${params.toString()}` : "/analyze";
   }, [jobId, videoUrl]);
 
   useEffect(() => {
     let cancelled = false;
 
     async function run() {
-      if (!sessionId || !jobId) {
+      if (!sessionId) {
         setStatus("error");
-        setMessage("Paramètres manquants après le paiement.");
+        setMessage("Session de paiement introuvable. Redirection vers l’analyse...");
+        setTimeout(() => router.replace(redirectUrl), 2000);
         return;
       }
 
       try {
-        await activatePremium(sessionId, jobId);
-
+        await activatePremium(sessionId);
         if (cancelled) return;
 
         setStatus("success");
-        setMessage("Paiement confirmé. Redirection en cours...");
-
-        setTimeout(() => {
-          router.replace(redirectUrl);
-        }, 1200);
+        setMessage("Paiement confirmé. Accès premium débloqué. Redirection...");
+        setTimeout(() => router.replace(redirectUrl), 1200);
       } catch (error) {
-        console.error(error);
-
         if (cancelled) return;
-
+        const msg =
+          error instanceof Error
+            ? error.message
+            : "Impossible d’activer votre accès premium.";
         setStatus("error");
-        setMessage("Impossible de confirmer le paiement.");
+        setMessage(`${msg} Redirection vers l’analyse...`);
+        setTimeout(() => router.replace(redirectUrl), 2500);
       }
     }
 
     run();
-
     return () => {
       cancelled = true;
     };
-  }, [sessionId, jobId, redirectUrl, router]);
+  }, [sessionId, redirectUrl, router]);
 
   return (
-    <main className="min-h-screen bg-black text-white flex items-center justify-center px-6">
-      <div className="w-full max-w-lg rounded-2xl border border-white/10 bg-white/5 p-8 text-center">
-        <h1 className="text-2xl font-semibold mb-4">Merci</h1>
-
-        <p className="text-white/80 mb-6">{message}</p>
-
-        {status === "loading" && (
-          <div className="animate-pulse text-sm text-white/60">
-            Validation sécurisée du paiement...
-          </div>
-        )}
-
-        {status === "success" && (
-          <div className="text-green-400 text-sm">
-            Accès premium activé.
-          </div>
-        )}
-
-        {status === "error" && (
-          <div className="space-y-4">
-            <div className="text-red-400 text-sm">
-              Une erreur est survenue.
-            </div>
-
-            <button
-              onClick={() => router.replace("/analyze")}
-              className="inline-flex items-center justify-center rounded-xl bg-white text-black px-4 py-2 font-medium hover:opacity-90"
-            >
-              Retour à l’analyse
-            </button>
-          </div>
-        )}
+    <main className="min-h-screen bg-[#0A0A0B] text-white flex items-center justify-center px-6">
+      <div className="w-full max-w-xl rounded-2xl border border-white/10 bg-white/5 p-8 shadow-2xl backdrop-blur">
+        <div className="flex flex-col items-center text-center">
+          <h1 className="text-2xl font-semibold tracking-tight">
+            {status === "loading" && "Confirmation du paiement"}
+            {status === "success" && "Accès premium activé"}
+            {status === "error" && "Activation incomplète"}
+          </h1>
+          <p className="mt-3 text-sm text-white/70">{message}</p>
+          <button
+            onClick={() => router.replace(redirectUrl)}
+            className="mt-8 inline-flex items-center justify-center rounded-xl bg-white text-black px-5 py-3 text-sm font-medium transition hover:bg-white/90"
+          >
+            Retourner à l’analyse
+          </button>
+        </div>
       </div>
     </main>
   );
