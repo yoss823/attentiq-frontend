@@ -1,3 +1,11 @@
+/**
+ * API client — appelle DIRECTEMENT le backend Railway
+ * (pas de routes Next.js, pas de 405)
+ */
+
+const BACKEND_BASE_URL =
+  "https://attentiqbackend-production.up.railway.app";
+
 export type JobStatus = "queued" | "processing" | "done" | "error";
 
 export interface DropMoment {
@@ -31,10 +39,10 @@ export interface JobStatusResponse {
 }
 
 async function apiFetch<T>(
-  input: RequestInfo | URL,
+  path: string,
   init?: RequestInit
 ): Promise<T> {
-  const res = await fetch(input, {
+  const res = await fetch(`${BACKEND_BASE_URL}${path}`, {
     ...init,
     headers: {
       "Content-Type": "application/json",
@@ -44,35 +52,26 @@ async function apiFetch<T>(
   });
 
   let data: any = null;
-
   try {
     data = await res.json();
-  } catch {
-    data = null;
-  }
+  } catch {}
 
   if (!res.ok) {
-    const message =
-      data?.error ||
-      data?.message ||
-      `Request failed with status ${res.status}`;
-    throw new Error(message);
+    throw new Error(
+      data?.error || `Request failed with status ${res.status}`
+    );
   }
 
   return data as T;
 }
 
 export function isTikTokUrl(value: string): boolean {
-  if (!value) return false;
-
   try {
     const url = new URL(value);
-    const host = url.hostname.toLowerCase();
-
     return (
-      host.includes("tiktok.com") ||
-      host.includes("vt.tiktok.com") ||
-      host.includes("vm.tiktok.com")
+      url.hostname.includes("tiktok.com") ||
+      url.hostname.includes("vt.tiktok.com") ||
+      url.hostname.includes("vm.tiktok.com")
     );
   } catch {
     return false;
@@ -80,12 +79,10 @@ export function isTikTokUrl(value: string): boolean {
 }
 
 /**
- * ✅ CORRECTION ICI : on appelle la vraie route backend
- * POST /analyze (et non /api/analyze)
+ * ✅ LANCER UNE ANALYSE
+ * POST https://attentiqbackend-production.up.railway.app/analyze
  */
-export async function analyzeVideo(
-  videoUrl: string
-): Promise<{ jobId: string }> {
+export async function analyzeVideo(videoUrl: string) {
   return apiFetch<{ jobId: string }>("/analyze", {
     method: "POST",
     body: JSON.stringify({ videoUrl }),
@@ -93,12 +90,10 @@ export async function analyzeVideo(
 }
 
 /**
- * ✅ Polling confirmé par les logs Railway
- * GET /analyze/{jobId}
+ * ✅ POLLING DU JOB
+ * GET https://attentiqbackend-production.up.railway.app/analyze/{jobId}
  */
-export async function getJobStatus(
-  jobId: string
-): Promise<JobStatusResponse> {
+export async function getJobStatus(jobId: string) {
   if (!jobId) {
     throw new Error("jobId manquant");
   }
@@ -109,25 +104,42 @@ export async function getJobStatus(
   );
 }
 
+/**
+ * ✅ STRIPE — reste côté frontend Next
+ */
 export async function createCheckoutSession(params: {
   jobId: string;
   videoUrl: string;
-}): Promise<{ url: string }> {
-  const { jobId, videoUrl } = params;
-
-  if (!jobId) {
-    throw new Error("jobId manquant pour le paiement");
-  }
-
-  if (!videoUrl) {
-    throw new Error("videoUrl manquante pour le paiement");
-  }
-
-  return apiFetch<{ url: string }>("/api/checkout", {
+}) {
+  const res = await fetch("/api/checkout", {
     method: "POST",
-    body: JSON.stringify({ jobId, videoUrl }),
+    headers: {
+      "Content-Type": "application/json",
+    },
+    body: JSON.stringify(params),
   });
+
+  if (!res.ok) {
+    const text = await res.text();
+    throw new Error(`Stripe error ${res.status}: ${text}`);
+  }
+
+  return res.json();
 }
 
-export async function activatePremium(
-  sessionId: string
+export async function activatePremium(sessionId: string) {
+  const res = await fetch("/api/set-premium", {
+    method: "POST",
+    headers: {
+      "Content-Type": "application/json",
+    },
+    body: JSON.stringify({ sessionId }),
+  });
+
+  if (!res.ok) {
+    const text = await res.text();
+    throw new Error(`Premium error ${res.status}: ${text}`);
+  }
+
+  return res.json();
+}
