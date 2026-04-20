@@ -3,20 +3,28 @@
 import { useState } from "react";
 import { createCheckoutSession } from "@/lib/api";
 
-type PremiumPaywallProps = {
-  jobId?: string;
-  videoUrl?: string;
-};
+interface PremiumPaywallProps {
+  jobId: string;
+  videoUrl: string;
+}
 
 export default function PremiumPaywall({
   jobId,
   videoUrl,
 }: PremiumPaywallProps) {
   const [loading, setLoading] = useState(false);
+  const [error, setError] = useState("");
 
-  const handleCheckout = async () => {
+  async function handleCheckout() {
+    setError("");
+
     if (!jobId) {
-      alert("Job introuvable. Relance l'analyse avant de continuer.");
+      setError("Analyse introuvable. Veuillez relancer une analyse.");
+      return;
+    }
+
+    if (!videoUrl) {
+      setError("URL vidéo introuvable. Veuillez relancer une analyse.");
       return;
     }
 
@@ -24,45 +32,70 @@ export default function PremiumPaywall({
       setLoading(true);
 
       const { url } = await createCheckoutSession({
-        plan: "single",
         jobId,
         videoUrl,
       });
 
+      if (!url) {
+        throw new Error("Lien de paiement introuvable.");
+      }
+
       window.location.href = url;
-    } catch (error) {
-      console.error("Checkout error:", error);
-      alert("Impossible de lancer le paiement. Réessaie dans quelques secondes.");
-    } finally {
+    } catch (err) {
+      const message =
+        err instanceof Error
+          ? err.message
+          : "Impossible de lancer le paiement.";
+      setError(message);
       setLoading(false);
     }
-  };
+  }
 
   return (
-    <div className="rounded-2xl border border-neutral-200 bg-white p-6 shadow-sm">
-      <div className="mb-4">
-        <h2 className="text-xl font-semibold text-neutral-900">
-          Débloquer le rapport complet
-        </h2>
-        <p className="mt-2 text-sm text-neutral-600">
-          Accède à l’analyse premium complète pour cette vidéo.
-        </p>
-      </div>
-
-      <div className="mb-6 rounded-xl bg-neutral-50 p-4">
-        <div className="flex items-center justify-between">
-          <span className="text-sm text-neutral-600">Rapport complet</span>
-          <span className="text-lg font-bold text-neutral-900">19€</span>
+    <div className="rounded-2xl border border-white/10 bg-gradient-to-b from-white/10 to-white/5 p-6 md:p-8">
+      <div className="mx-auto max-w-2xl text-center">
+        <div className="inline-flex items-center rounded-full border border-fuchsia-400/30 bg-fuchsia-400/10 px-3 py-1 text-xs font-medium text-fuchsia-200">
+          Premium
         </div>
-      </div>
 
-      <button
-        onClick={handleCheckout}
-        disabled={loading}
-        className="inline-flex w-full items-center justify-center rounded-xl bg-black px-4 py-3 text-sm font-medium text-white transition hover:opacity-90 disabled:cursor-not-allowed disabled:opacity-60"
-      >
-        {loading ? "Redirection vers Stripe..." : "Payer et débloquer"}
-      </button>
+        <h2 className="mt-4 text-2xl md:text-3xl font-semibold tracking-tight text-white">
+          Débloquez l’analyse complète
+        </h2>
+
+        <p className="mt-3 text-sm md:text-base text-white/70">
+          Accédez immédiatement aux recommandations détaillées, aux moments forts,
+          aux points de chute d’attention et à l’interprétation complète de votre vidéo.
+        </p>
+
+        <div className="mt-8 grid gap-3 text-left md:grid-cols-2">
+          <div className="rounded-xl border border-white/10 bg-black/20 p-4 text-sm text-white/80">
+            ✓ Analyse détaillée de la rétention
+          </div>
+          <div className="rounded-xl border border-white/10 bg-black/20 p-4 text-sm text-white/80">
+            ✓ Moments de drop et pics d’attention
+          </div>
+          <div className="rounded-xl border border-white/10 bg-black/20 p-4 text-sm text-white/80">
+            ✓ Recommandations concrètes
+          </div>
+          <div className="rounded-xl border border-white/10 bg-black/20 p-4 text-sm text-white/80">
+            ✓ Déblocage immédiat après paiement
+          </div>
+        </div>
+
+        <div className="mt-8">
+          <button
+            onClick={handleCheckout}
+            disabled={loading}
+            className="inline-flex min-w-[240px] items-center justify-center rounded-xl bg-white px-6 py-3 text-sm font-semibold text-black transition hover:bg-white/90 disabled:cursor-not-allowed disabled:opacity-60"
+          >
+            {loading ? "Redirection vers le paiement..." : "Payer et débloquer"}
+          </button>
+        </div>
+
+        {error ? (
+          <p className="mt-4 text-sm text-red-400">{error}</p>
+        ) : null}
+      </div>
     </div>
   );
 }

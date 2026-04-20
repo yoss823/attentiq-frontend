@@ -1,130 +1,136 @@
-// ============================================
-// PREMIUM & CHECKOUT FUNCTIONS
-// ============================================
-
-export async function createCheckoutSession(params: {
-  jobId: string;
-  videoUrl?: string;
-}) {
-  const response = await fetch("/api/checkout", {
-    method: "POST",
-    headers: {
-      "Content-Type": "application/json",
-    },
-    body: JSON.stringify({
-      jobId: params.jobId,
-      videoUrl: params.videoUrl,
-    }),
-  });
-
-  if (!response.ok) {
-    const errorText = await response.text();
-    throw new Error(errorText || "Impossible de créer la session Stripe.");
-  }
-
-  const data = await response.json();
-
-  if (!data?.url) {
-    throw new Error("URL Stripe manquante.");
-  }
-
-  return data as { url: string };
-}
-
-export async function activatePremium(sessionId: string, jobId: string) {
-  const response = await fetch("/api/set-premium", {
-    method: "POST",
-    headers: {
-      "Content-Type": "application/json",
-    },
-    body: JSON.stringify({
-      sessionId,
-      jobId,
-    }),
-  });
-
-  if (!response.ok) {
-    const errorText = await response.text();
-    throw new Error(errorText || "Impossible d'activer le premium.");
-  }
-
-  return response.json();
-}
-
-// ============================================
-// VIDEO ANALYSIS FUNCTIONS & TYPES
-// ============================================
-
-export type JobStatus = "pending" | "processing" | "completed" | "failed";
+export type JobStatus = "queued" | "processing" | "done" | "error";
 
 export interface DropMoment {
-  timestamp: number;
-  description: string;
-  severity: "low" | "medium" | "high";
+  time: number;
+  reason: string;
+}
+
+export interface PeakMoment {
+  time: number;
+  reason: string;
+}
+
+export interface JobResult {
+  summary: string;
+  hookScore: number;
+  retentionScore: number;
+  ctaScore: number;
+  script: string;
+  strengths: string[];
+  weaknesses: string[];
+  recommendations: string[];
+  dropMoments?: DropMoment[];
+  peakMoments?: PeakMoment[];
 }
 
 export interface JobStatusResponse {
   id: string;
   status: JobStatus;
-  url?: string;
-  summary?: string;
-  recommendations?: string[];
-  dropMoments?: DropMoment[];
-  peakMoments?: {
-    timestamp: number;
-    description: string;
-  }[];
-  isPremium?: boolean;
-  error?: string;
+  error?: string | null;
+  result?: JobResult | null;
 }
 
-export async function analyzeVideo(url: string): Promise<{ jobId: string }> {
-  const response = await fetch("/api/analyze", {
-    method: "POST",
+async function apiFetch<T>(
+  input: RequestInfo | URL,
+  init?: RequestInit
+): Promise<T> {
+  const res = await fetch(input, {
+    ...init,
     headers: {
       "Content-Type": "application/json",
+      ...(init?.headers || {}),
     },
-    body: JSON.stringify({ url }),
+    cache: "no-store",
   });
 
-  if (!response.ok) {
-    const errorText = await response.text();
-    throw new Error(errorText || "Erreur lors de l'analyse vidéo.");
-  }
+  let data: any = null;
 
-  const data = await response.json();
-
-  if (!data?.jobId) {
-    throw new Error("ID de job manquant dans la réponse.");
-  }
-
-  return data as { jobId: string };
-}
-
-export async function getJobStatus(jobId: string): Promise<JobStatusResponse> {
-  const response = await fetch(`/api/job-status?jobId=${jobId}`);
-
-  if (!response.ok) {
-    const errorText = await response.text();
-    throw new Error(errorText || "Erreur lors de la récupération du statut.");
-  }
-
-  return response.json() as Promise<JobStatusResponse>;
-}
-
-export function isTikTokUrl(url: string): boolean {
   try {
-    const urlObj = new URL(url);
-    const hostname = urlObj.hostname.toLowerCase();
+    data = await res.json();
+  } catch {
+    data = null;
+  }
+
+  if (!res.ok) {
+    const message =
+      data?.error ||
+      data?.message ||
+      `Request failed with status ${res.status}`;
+    throw new Error(message);
+  }
+
+  return data as T;
+}
+
+export function isTikTokUrl(value: string): boolean {
+  if (!value) return false;
+
+  try {
+    const url = new URL(value);
+    const host = url.hostname.toLowerCase();
+
     return (
-      hostname === "tiktok.com" ||
-      hostname === "www.tiktok.com" ||
-      hostname === "vm.tiktok.com" ||
-      hostname === "vt.tiktok.com" ||
-      hostname === "www.vm.tiktok.com" ||
-      hostname === "www.vt.tiktok.com"
+      host.includes("tiktok.com") ||
+      host.includes("vt.tiktok.com") ||
+      host.includes("vm.tiktok.com")
     );
   } catch {
     return false;
   }
+}
+
+export async function analyzeVideo(
+  videoUrl: string
+): Promise<{ jobId: string }> {
+  return apiFetch<{ jobId: string }>("/api/analyze", {
+    method: "POST",
+    body: JSON.stringify({ videoUrl }),
+  });
+}
+
+export async function getJobStatus(
+  jobId: string
+): Promise<JobStatusResponse> {
+  if (!jobId) {
+    throw new Error("jobId manquant");
+  }
+
+  return apiFetch<JobStatusResponse>(
+    `/api/analyze/status?jobId=${encodeURIComponent(jobId)}`,
+    { method: "GET" }
+  );
+}
+
+export async function createCheckoutSession(params: {
+  jobId: string;
+  videoUrl: string;
+}): Promise<{ url: string }> {
+  const { jobId, videoUrl } = params;
+
+  if (!jobId) {
+    throw new Error("jobId manquant pour le paiement");
+  }
+
+  if (!videoUrl) {
+    throw new Error("videoUrl manquante pour le paiement");
+  }
+
+  return apiFetch<{ url: string }>("/api/checkout", {
+    method: "POST",
+    body: JSON.stringify({ jobId, videoUrl }),
+  });
+}
+
+export async function activatePremium(sessionId: string): Promise<{
+  ok: boolean;
+  premium: boolean;
+}> {
+  if (!sessionId) {
+    throw new Error("session_id manquant");
+  }
+
+  return apiFetch<{ ok: boolean; premium: boolean }>("/api/set-premium", {
+    method: "POST",
+    body: JSON.stringify({ sessionId }),
+  });
 }
