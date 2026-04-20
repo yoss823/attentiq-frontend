@@ -82,11 +82,13 @@ export function isTikTokUrl(value: string): boolean {
  * ✅ LANCER UNE ANALYSE
  * POST https://attentiqbackend-production.up.railway.app/analyze
  */
-export async function analyzeVideo(videoUrl: string) {
-  return apiFetch<{ jobId: string }>("/analyze", {
+export async function analyzeVideo(videoUrl: string): Promise<{ jobId: string }> {
+  const data = await apiFetch<{ job_id: string }>("/analyze", {
     method: "POST",
-    body: JSON.stringify({ videoUrl }),
+    body: JSON.stringify({ url: videoUrl }),
   });
+
+  return { jobId: data.job_id };
 }
 
 /**

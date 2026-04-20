@@ -2,7 +2,6 @@
 
 import { useEffect, useMemo, useState } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
-import { activatePremium } from "@/lib/api";
 
 export default function MerciPage() {
   const router = useRouter();
@@ -34,7 +33,16 @@ export default function MerciPage() {
       }
 
       try {
-        await activatePremium(sessionId);
+        // ✅ CORRECTION CRITIQUE : on envoie sessionId + jobId
+        await fetch("/api/set-premium", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({
+            sessionId,
+            jobId,
+          }),
+        });
+
         if (cancelled) return;
 
         setStatus("success");
@@ -42,10 +50,12 @@ export default function MerciPage() {
         setTimeout(() => router.replace(redirectUrl), 1200);
       } catch (error) {
         if (cancelled) return;
+
         const msg =
           error instanceof Error
             ? error.message
             : "Impossible d’activer votre accès premium.";
+
         setStatus("error");
         setMessage(`${msg} Redirection vers l’analyse...`);
         setTimeout(() => router.replace(redirectUrl), 2500);
@@ -56,7 +66,7 @@ export default function MerciPage() {
     return () => {
       cancelled = true;
     };
-  }, [sessionId, redirectUrl, router]);
+  }, [sessionId, jobId, redirectUrl, router]);
 
   return (
     <main className="min-h-screen bg-[#0A0A0B] text-white flex items-center justify-center px-6">
@@ -67,7 +77,9 @@ export default function MerciPage() {
             {status === "success" && "Accès premium activé"}
             {status === "error" && "Activation incomplète"}
           </h1>
+
           <p className="mt-3 text-sm text-white/70">{message}</p>
+
           <button
             onClick={() => router.replace(redirectUrl)}
             className="mt-8 inline-flex items-center justify-center rounded-xl bg-white text-black px-5 py-3 text-sm font-medium transition hover:bg-white/90"

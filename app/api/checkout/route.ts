@@ -2,7 +2,6 @@ import { NextRequest, NextResponse } from "next/server";
 import Stripe from "stripe";
 
 const stripe = new Stripe(process.env.STRIPE_SECRET_KEY as string);
-// ✅ Pas de apiVersion hardcodée → Stripe prend celle du compte
 
 function getBaseUrl(req: NextRequest) {
   const forwardedProto = req.headers.get("x-forwarded-proto");
@@ -12,7 +11,7 @@ function getBaseUrl(req: NextRequest) {
     throw new Error("Host header is missing");
   }
 
-  const protocol = forwardedProto ?? "http";
+  const protocol = forwardedProto ?? "https";
   return `${protocol}://${host}`;
 }
 
@@ -21,29 +20,20 @@ export async function POST(req: NextRequest) {
     const { jobId, videoUrl } = await req.json();
 
     if (!jobId) {
-      return NextResponse.json(
-        { error: "jobId manquant" },
-        { status: 400 }
-      );
+      return NextResponse.json({ error: "jobId manquant" }, { status: 400 });
     }
 
     if (!videoUrl) {
-      return NextResponse.json(
-        { error: "videoUrl manquante" },
-        { status: 400 }
-      );
+      return NextResponse.json({ error: "videoUrl manquante" }, { status: 400 });
     }
 
-    const baseUrl = getBaseUrl(req);
-
-    // ✅ Price ID Stripe (à remplacer si besoin)
     const PRICE_ID = process.env.STRIPE_PRICE_SINGLE_REPORT;
-
     if (!PRICE_ID) {
       throw new Error("STRIPE_PRICE_SINGLE_REPORT non défini");
     }
 
-    // ✅ UNE session Stripe par clic utilisateur
+    const baseUrl = getBaseUrl(req);
+
     const session = await stripe.checkout.sessions.create({
       mode: "payment",
       payment_method_types: ["card"],
@@ -53,3 +43,30 @@ export async function POST(req: NextRequest) {
           quantity: 1,
         },
       ],
+      metadata: {
+        jobId,
+        videoUrl,
+      },
+      success_url: `${baseUrl}/merci?session_id={CHECKOUT_SESSION_ID}&jobId=${jobId}`,
+      cancel_url: `${baseUrl}/analyze`,
+    });
+
+    if (!session.url) {
+      throw new Error("Stripe session URL manquante");
+    }
+
+    return NextResponse.json({ url: session.url });
+  } catch (error) {
+    console.error("Stripe checkout error:", error);
+
+    return NextResponse.json(
+      {
+        error:
+          error instanceof Error
+            ? error.message
+            : "Erreur création session Stripe",
+      },
+      { status: 500 }
+    );
+  }
+}

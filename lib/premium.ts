@@ -9,5 +9,11 @@ export function getPremiumFromCookie(): boolean {
   if (!premiumCookie) return false;
 
   const value = premiumCookie.split("=")[1];
-  return value === "true";
+
+  try {
+    const data = JSON.parse(decodeURIComponent(value));
+    return data.active === true;
+  } catch {
+    return false;
+  }
 }
