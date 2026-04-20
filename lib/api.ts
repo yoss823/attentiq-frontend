@@ -30,7 +30,10 @@ export interface JobStatusResponse {
   result?: JobResult | null;
 }
 
-async function apiFetch<T>(input: RequestInfo | URL, init?: RequestInit): Promise<T> {
+async function apiFetch<T>(
+  input: RequestInfo | URL,
+  init?: RequestInit
+): Promise<T> {
   const res = await fetch(input, {
     ...init,
     headers: {
@@ -76,21 +79,26 @@ export function isTikTokUrl(value: string): boolean {
   }
 }
 
-export async function analyzeVideo(videoUrl: string): Promise<{ jobId: string }> {
+export async function analyzeVideo(
+  videoUrl: string
+): Promise<{ jobId: string }> {
   return apiFetch<{ jobId: string }>("/api/analyze", {
     method: "POST",
     body: JSON.stringify({ videoUrl }),
   });
 }
 
-export async function getJobStatus(jobId: string): Promise<JobStatusResponse> {
+export async function getJobStatus(
+  jobId: string
+): Promise<JobStatusResponse> {
   if (!jobId) {
     throw new Error("jobId manquant");
   }
 
-  return apiFetch<JobStatusResponse>(`/api/analyze/status?jobId=${encodeURIComponent(jobId)}`, {
-    method: "GET",
-  });
+  return apiFetch<JobStatusResponse>(
+    `/api/analyze/status?jobId=${encodeURIComponent(jobId)}`,
+    { method: "GET" }
+  );
 }
 
 export async function createCheckoutSession(params: {
@@ -109,10 +117,7 @@ export async function createCheckoutSession(params: {
 
   return apiFetch<{ url: string }>("/api/checkout", {
     method: "POST",
-    body: JSON.stringify({
-      jobId,
-      videoUrl,
-    }),
+    body: JSON.stringify({ jobId, videoUrl }),
   });
 }
 
@@ -126,8 +131,6 @@ export async function activatePremium(sessionId: string): Promise<{
 
   return apiFetch<{ ok: boolean; premium: boolean }>("/api/set-premium", {
     method: "POST",
-    body: JSON.stringify({
-      sessionId,
-    }),
+    body: JSON.stringify({ sessionId }),
   });
 }
