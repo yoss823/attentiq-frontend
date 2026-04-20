@@ -58,15 +58,15 @@ export default function AnalyzePage() {
   const pollingRef = useRef<ReturnType<typeof setInterval> | null>(null);
 
   /* ------------------------------------------------------------------------ */
-  /* Premium                                                                  */
+  /* ✅ PREMIUM — relu à chaque nouveau jobId                                  */
   /* ------------------------------------------------------------------------ */
 
   useEffect(() => {
     setIsPremium(getPremiumFromCookie());
-  }, []);
+  }, [jobId]);
 
   /* ------------------------------------------------------------------------ */
-  /* Reset state when URL changes                                             */
+  /* ✅ RESET COMPLET quand l’URL change                                       */
   /* ------------------------------------------------------------------------ */
 
   useEffect(() => {
@@ -74,6 +74,7 @@ export default function AnalyzePage() {
     setJobId(null);
     setJobData(null);
     setPollAttempts(0);
+    setIsPremium(false);
   }, [videoUrl]);
 
   /* ------------------------------------------------------------------------ */
@@ -113,7 +114,7 @@ export default function AnalyzePage() {
       if (pollAttempts >= POLLING_MAX_ATTEMPTS) {
         stopPolling();
         setSubmitError(
-          "L'analyse prend trop de temps. Veuillez réessayer plus tard."
+          "L'analyse prend trop de temps. Veuillez réessayer."
         );
         return;
       }
@@ -130,12 +131,14 @@ export default function AnalyzePage() {
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
 
+    // ✅ reset AVANT toute nouvelle analyse
     setUrlError(null);
     setSubmitError(null);
     stopPolling();
     setJobId(null);
     setJobData(null);
     setPollAttempts(0);
+    setIsPremium(false);
 
     const trimmed = url.trim();
 
@@ -177,3 +180,52 @@ export default function AnalyzePage() {
   /* ------------------------------------------------------------------------ */
 
   return (
+    <main className="min-h-screen bg-gradient-to-br from-slate-950 via-brand-950 to-slate-900 text-white">
+      <nav className="flex items-center justify-between px-6 py-5 max-w-4xl mx-auto">
+        <Link href="/" className="text-xl font-bold">
+          Attentiq
+        </Link>
+      </nav>
+
+      <div className="max-w-2xl mx-auto px-6 pt-16 pb-24">
+        <h1 className="text-4xl font-extrabold text-center mb-6">
+          Analyser une vidéo TikTok
+        </h1>
+
+        {!jobId && (
+          <form onSubmit={handleSubmit} className="space-y-4">
+            <input
+              type="url"
+              value={url}
+              onChange={(e) => setUrl(e.target.value)}
+              placeholder="https://www.tiktok.com/@username/video/..."
+              className="w-full bg-white/5 border border-white/10 rounded-xl px-4 py-3"
+              disabled={submitting}
+            />
+
+            {urlError && <p className="text-red-400 text-sm">{urlError}</p>}
+            {submitError && (
+              <p className="text-red-400 text-sm">{submitError}</p>
+            )}
+
+            <button
+              type="submit"
+              disabled={submitting}
+              className="w-full bg-brand-600 text-white font-semibold py-4 rounded-xl"
+            >
+              {submitting ? 'Analyse…' : 'Voir le teaser gratuit'}
+            </button>
+          </form>
+        )}
+
+        {jobData && jobData.status === 'done' && jobData.result && (
+          <>
+            {!isPremium && (
+              <PremiumPaywall jobId={jobId!} videoUrl={videoUrl} />
+            )}
+          </>
+        )}
+      </div>
+    </main>
+  );
+}
