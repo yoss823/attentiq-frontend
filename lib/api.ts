@@ -1,5 +1,10 @@
-const API_BASE_URL =
-  process.env.NEXT_PUBLIC_API_BASE_URL || "";
+/**
+ * API client — appelle DIRECTEMENT le backend Railway
+ * (pas de routes Next.js, pas de 405)
+ */
+
+const BACKEND_BASE_URL =
+  "https://attentiqbackend-production.up.railway.app";
 
 export type JobStatus = "queued" | "processing" | "done" | "error";
 
@@ -37,7 +42,7 @@ async function apiFetch<T>(
   path: string,
   init?: RequestInit
 ): Promise<T> {
-  const res = await fetch(`${API_BASE_URL}${path}`, {
+  const res = await fetch(`${BACKEND_BASE_URL}${path}`, {
     ...init,
     headers: {
       "Content-Type": "application/json",
@@ -73,7 +78,10 @@ export function isTikTokUrl(value: string): boolean {
   }
 }
 
-/** ✅ POST backend /analyze */
+/**
+ * ✅ LANCER UNE ANALYSE
+ * POST https://attentiqbackend-production.up.railway.app/analyze
+ */
 export async function analyzeVideo(videoUrl: string) {
   return apiFetch<{ jobId: string }>("/analyze", {
     method: "POST",
@@ -81,31 +89,57 @@ export async function analyzeVideo(videoUrl: string) {
   });
 }
 
-/** ✅ GET backend /analyze/{jobId} */
+/**
+ * ✅ POLLING DU JOB
+ * GET https://attentiqbackend-production.up.railway.app/analyze/{jobId}
+ */
 export async function getJobStatus(jobId: string) {
+  if (!jobId) {
+    throw new Error("jobId manquant");
+  }
+
   return apiFetch<JobStatusResponse>(
     `/analyze/${encodeURIComponent(jobId)}`,
     { method: "GET" }
   );
 }
 
-/** ✅ Stripe */
+/**
+ * ✅ STRIPE — reste côté frontend Next
+ */
 export async function createCheckoutSession(params: {
   jobId: string;
   videoUrl: string;
 }) {
-  return apiFetch<{ url: string }>("/api/checkout", {
+  const res = await fetch("/api/checkout", {
     method: "POST",
+    headers: {
+      "Content-Type": "application/json",
+    },
     body: JSON.stringify(params),
   });
+
+  if (!res.ok) {
+    const text = await res.text();
+    throw new Error(`Stripe error ${res.status}: ${text}`);
+  }
+
+  return res.json();
 }
 
 export async function activatePremium(sessionId: string) {
-  return apiFetch<{ ok: boolean; premium: boolean }>(
-    "/api/set-premium",
-    {
-      method: "POST",
-      body: JSON.stringify({ sessionId }),
-    }
-  );
+  const res = await fetch("/api/set-premium", {
+    method: "POST",
+    headers: {
+      "Content-Type": "application/json",
+    },
+    body: JSON.stringify({ sessionId }),
+  });
+
+  if (!res.ok) {
+    const text = await res.text();
+    throw new Error(`Premium error ${res.status}: ${text}`);
+  }
+
+  return res.json();
 }
