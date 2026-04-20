@@ -88,6 +88,11 @@ export async function analyzeVideo(
   });
 }
 
+/**
+ * ✅ CORRECTION CRITIQUE ICI
+ * Route backend confirmée par les logs Railway :
+ * GET /analyze/{jobId}
+ */
 export async function getJobStatus(
   jobId: string
 ): Promise<JobStatusResponse> {
@@ -96,7 +101,7 @@ export async function getJobStatus(
   }
 
   return apiFetch<JobStatusResponse>(
-    `/api/analyze/status?jobId=${encodeURIComponent(jobId)}`,
+    `/analyze/${encodeURIComponent(jobId)}`,
     { method: "GET" }
   );
 }
