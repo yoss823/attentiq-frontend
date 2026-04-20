@@ -1,3 +1,6 @@
+const API_BASE_URL =
+  process.env.NEXT_PUBLIC_API_BASE_URL || "";
+
 export type JobStatus = "queued" | "processing" | "done" | "error";
 
 export interface DropMoment {
@@ -31,10 +34,10 @@ export interface JobStatusResponse {
 }
 
 async function apiFetch<T>(
-  input: RequestInfo | URL,
+  path: string,
   init?: RequestInit
 ): Promise<T> {
-  const res = await fetch(input, {
+  const res = await fetch(`${API_BASE_URL}${path}`, {
     ...init,
     headers: {
       "Content-Type": "application/json",
@@ -44,90 +47,65 @@ async function apiFetch<T>(
   });
 
   let data: any = null;
-
   try {
     data = await res.json();
-  } catch {
-    data = null;
-  }
+  } catch {}
 
   if (!res.ok) {
-    const message =
-      data?.error ||
-      data?.message ||
-      `Request failed with status ${res.status}`;
-    throw new Error(message);
+    throw new Error(
+      data?.error || `Request failed with status ${res.status}`
+    );
   }
 
   return data as T;
 }
 
 export function isTikTokUrl(value: string): boolean {
-  if (!value) return false;
-
   try {
     const url = new URL(value);
-    const host = url.hostname.toLowerCase();
-
     return (
-      host.includes("tiktok.com") ||
-      host.includes("vt.tiktok.com") ||
-      host.includes("vm.tiktok.com")
+      url.hostname.includes("tiktok.com") ||
+      url.hostname.includes("vt.tiktok.com") ||
+      url.hostname.includes("vm.tiktok.com")
     );
   } catch {
     return false;
   }
 }
 
-/**
- * ✅ CORRECTION ICI : on appelle la vraie route backend
- * POST /analyze (et non /api/analyze)
- */
-export async function analyzeVideo(
-  videoUrl: string
-): Promise<{ jobId: string }> {
+/** ✅ POST backend /analyze */
+export async function analyzeVideo(videoUrl: string) {
   return apiFetch<{ jobId: string }>("/analyze", {
     method: "POST",
     body: JSON.stringify({ videoUrl }),
   });
 }
 
-/**
- * ✅ Polling confirmé par les logs Railway
- * GET /analyze/{jobId}
- */
-export async function getJobStatus(
-  jobId: string
-): Promise<JobStatusResponse> {
-  if (!jobId) {
-    throw new Error("jobId manquant");
-  }
-
+/** ✅ GET backend /analyze/{jobId} */
+export async function getJobStatus(jobId: string) {
   return apiFetch<JobStatusResponse>(
     `/analyze/${encodeURIComponent(jobId)}`,
     { method: "GET" }
   );
 }
 
+/** ✅ Stripe */
 export async function createCheckoutSession(params: {
   jobId: string;
   videoUrl: string;
-}): Promise<{ url: string }> {
-  const { jobId, videoUrl } = params;
-
-  if (!jobId) {
-    throw new Error("jobId manquant pour le paiement");
-  }
-
-  if (!videoUrl) {
-    throw new Error("videoUrl manquante pour le paiement");
-  }
-
+}) {
   return apiFetch<{ url: string }>("/api/checkout", {
     method: "POST",
-    body: JSON.stringify({ jobId, videoUrl }),
+    body: JSON.stringify(params),
   });
 }
 
-export async function activatePremium(
-  sessionId: string
+export async function activatePremium(sessionId: string) {
+  return apiFetch<{ ok: boolean; premium: boolean }>(
+    "/api/set-premium",
+    {
+      method: "POST",
+      body: JSON.stringify({ sessionId }),
+    }
+  );
+}
