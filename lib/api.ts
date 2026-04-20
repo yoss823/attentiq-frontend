@@ -79,18 +79,21 @@ export function isTikTokUrl(value: string): boolean {
   }
 }
 
+/**
+ * ✅ CORRECTION ICI : on appelle la vraie route backend
+ * POST /analyze (et non /api/analyze)
+ */
 export async function analyzeVideo(
   videoUrl: string
 ): Promise<{ jobId: string }> {
-  return apiFetch<{ jobId: string }>("/api/analyze", {
+  return apiFetch<{ jobId: string }>("/analyze", {
     method: "POST",
     body: JSON.stringify({ videoUrl }),
   });
 }
 
 /**
- * ✅ CORRECTION CRITIQUE ICI
- * Route backend confirmée par les logs Railway :
+ * ✅ Polling confirmé par les logs Railway
  * GET /analyze/{jobId}
  */
 export async function getJobStatus(
@@ -126,16 +129,5 @@ export async function createCheckoutSession(params: {
   });
 }
 
-export async function activatePremium(sessionId: string): Promise<{
-  ok: boolean;
-  premium: boolean;
-}> {
-  if (!sessionId) {
-    throw new Error("session_id manquant");
-  }
-
-  return apiFetch<{ ok: boolean; premium: boolean }>("/api/set-premium", {
-    method: "POST",
-    body: JSON.stringify({ sessionId }),
-  });
-}
+export async function activatePremium(
+  sessionId: string
