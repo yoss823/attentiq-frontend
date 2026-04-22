@@ -1,93 +1,74 @@
-"use client";
+import type { Metadata } from "next";
+import MerciRedirectState from "@/components/merci-redirect-state";
 
-import { useEffect, useMemo, useState } from "react";
-import { useRouter, useSearchParams } from "next/navigation";
+export const metadata: Metadata = {
+  title: "Verification du paiement — Attentiq",
+  description:
+    "Attentiq verifie votre session Stripe avant d'activer l'acces premium et de rouvrir la bonne analyse.",
+};
 
-export default function MerciPage() {
-  const router = useRouter();
-  const searchParams = useSearchParams();
+type MerciPageProps = {
+  searchParams: Promise<{
+    session_id?: string | string[] | undefined;
+    sessionId?: string | string[] | undefined;
+  }>;
+};
 
-  const sessionId = searchParams.get("session_id") || "";
-  const jobId = searchParams.get("jobId") || "";
-  const videoUrl = searchParams.get("videoUrl") || "";
+function readFirstParam(value: string | string[] | undefined) {
+  if (Array.isArray(value)) {
+    return value[0]?.trim() || null;
+  }
 
-  const [status, setStatus] = useState<"loading" | "success" | "error">("loading");
-  const [message, setMessage] = useState("Activation de votre accès premium...");
+  return value?.trim() || null;
+}
 
-  const redirectUrl = useMemo(() => {
-    const params = new URLSearchParams();
-    if (jobId) params.set("jobId", jobId);
-    if (videoUrl) params.set("videoUrl", videoUrl);
-    return params.toString() ? `/analyze?${params.toString()}` : "/analyze";
-  }, [jobId, videoUrl]);
-
-  useEffect(() => {
-    let cancelled = false;
-
-    async function run() {
-      if (!sessionId) {
-        setStatus("error");
-        setMessage("Session de paiement introuvable. Redirection vers l’analyse...");
-        setTimeout(() => router.replace(redirectUrl), 2000);
-        return;
-      }
-
-      try {
-        // ✅ CORRECTION CRITIQUE : on envoie sessionId + jobId
-        await fetch("/api/set-premium", {
-          method: "POST",
-          headers: { "Content-Type": "application/json" },
-          body: JSON.stringify({
-            sessionId,
-            jobId,
-          }),
-        });
-
-        if (cancelled) return;
-
-        setStatus("success");
-        setMessage("Paiement confirmé. Accès premium débloqué. Redirection...");
-        setTimeout(() => router.replace(redirectUrl), 1200);
-      } catch (error) {
-        if (cancelled) return;
-
-        const msg =
-          error instanceof Error
-            ? error.message
-            : "Impossible d’activer votre accès premium.";
-
-        setStatus("error");
-        setMessage(`${msg} Redirection vers l’analyse...`);
-        setTimeout(() => router.replace(redirectUrl), 2500);
-      }
-    }
-
-    run();
-    return () => {
-      cancelled = true;
-    };
-  }, [sessionId, jobId, redirectUrl, router]);
+export default async function MerciPage({ searchParams }: MerciPageProps) {
+  const params = await searchParams;
+  const initialSessionId =
+    readFirstParam(params.session_id) ?? readFirstParam(params.sessionId);
 
   return (
-    <main className="min-h-screen bg-[#0A0A0B] text-white flex items-center justify-center px-6">
-      <div className="w-full max-w-xl rounded-2xl border border-white/10 bg-white/5 p-8 shadow-2xl backdrop-blur">
-        <div className="flex flex-col items-center text-center">
-          <h1 className="text-2xl font-semibold tracking-tight">
-            {status === "loading" && "Confirmation du paiement"}
-            {status === "success" && "Accès premium activé"}
-            {status === "error" && "Activation incomplète"}
-          </h1>
+    <main
+      style={{
+        minHeight: "100vh",
+        display: "flex",
+        alignItems: "center",
+        justifyContent: "center",
+        padding: "24px 16px",
+        background:
+          "radial-gradient(circle at top, rgba(0, 212, 255, 0.1), transparent 30%), var(--bg-base)",
+      }}
+    >
+      <section
+        style={{
+          width: "100%",
+          maxWidth: "560px",
+          padding: "40px 32px",
+          borderRadius: "28px",
+          border: "1px solid rgba(0, 212, 255, 0.18)",
+          background:
+            "linear-gradient(160deg, rgba(0, 212, 255, 0.07) 0%, rgba(12, 17, 23, 0.98) 60%)",
+          boxShadow:
+            "0 0 0 1px rgba(0,212,255,0.06) inset, 0 32px 80px rgba(0,0,0,0.32)",
+          position: "relative",
+          overflow: "hidden",
+        }}
+      >
+        <div
+          aria-hidden="true"
+          style={{
+            position: "absolute",
+            top: 0,
+            left: "15%",
+            right: "15%",
+            height: "1px",
+            background:
+              "linear-gradient(90deg, transparent, rgba(0,212,255,0.4), transparent)",
+          }}
+        />
 
-          <p className="mt-3 text-sm text-white/70">{message}</p>
-
-          <button
-            onClick={() => router.replace(redirectUrl)}
-            className="mt-8 inline-flex items-center justify-center rounded-xl bg-white text-black px-5 py-3 text-sm font-medium transition hover:bg-white/90"
-          >
-            Retourner à l’analyse
-          </button>
-        </div>
-      </div>
+        <MerciRedirectState initialSessionId={initialSessionId} />
+      </section>
     </main>
   );
 }

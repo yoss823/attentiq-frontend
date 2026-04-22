@@ -1,44 +1,37 @@
-import type { Metadata } from 'next';
-import './globals.css';
+import type { Metadata } from "next";
+import { DM_Sans } from "next/font/google";
+import "./globals.css";
+
+const dmSans = DM_Sans({
+  subsets: ["latin"],
+  variable: "--font-dm-sans",
+  weight: ["300", "400", "500", "600", "700"],
+});
 
 export const metadata: Metadata = {
-  title: {
-    default: 'Attentiq — Analyse TikTok par IA',
-    template: '%s | Attentiq',
-  },
+  title: "Attentiq",
   description:
-    'Attentiq analyse vos vidéos TikTok avec l\'IA pour identifier ce qui capte l\'attention et maximiser votre engagement.',
-  keywords: ['TikTok', 'analyse vidéo', 'IA', 'engagement', 'créateur de contenu'],
-  authors: [{ name: 'Attentiq' }],
+    "Diagnostic structurel de la rétention sur les formats courts.",
   openGraph: {
-    type: 'website',
-    locale: 'fr_FR',
-    url: 'https://attentiq.com',
-    siteName: 'Attentiq',
-    title: 'Attentiq — Analyse TikTok par IA',
+    title: "Attentiq",
     description:
-      'Analysez vos vidéos TikTok avec l\'IA pour maximiser votre engagement.',
-  },
-  twitter: {
-    card: 'summary_large_image',
-    title: 'Attentiq — Analyse TikTok par IA',
-    description:
-      'Analysez vos vidéos TikTok avec l\'IA pour maximiser votre engagement.',
-  },
-  robots: {
-    index: true,
-    follow: true,
+      "Diagnostic structurel de la rétention sur les formats courts.",
+    siteName: "Attentiq",
   },
 };
 
 export default function RootLayout({
   children,
-}: {
-  children: React.ReactNode;
-}) {
+}: Readonly<{ children: React.ReactNode }>) {
   return (
-    <html lang="fr" suppressHydrationWarning>
-      <body className="antialiased">{children}</body>
+    <html lang="fr" className={`${dmSans.variable}`}>
+      <head>
+        <script
+          src="https://phospho-nanocorp-prod--nanocorp-api-fastapi-app.modal.run/beacon/snippet.js?s=attentiq"
+          defer
+        />
+      </head>
+      <body className="min-h-screen">{children}</body>
     </html>
   );
 }
