@@ -1,7 +1,7 @@
 'use client';
 
 import { useState } from 'react';
-import { stripePromise, STRIPE_PRICES } from '@/lib/stripe';
+import { STRIPE_LINKS } from '@/lib/stripe';
 
 export default function CheckoutButton({
   planName,
@@ -13,48 +13,14 @@ export default function CheckoutButton({
   currency: string;
 }) {
   const [loading, setLoading] = useState(false);
-  const [error, setError] = useState<string | null>(null);
 
   const handleClick = async () => {
     setLoading(true);
-    setError(null);
-
-    try {
-      const baseUrl = window.location.origin;
-
-      const res = await fetch('/api/checkout', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-          priceId: STRIPE_PRICES.cinq_rapports,
-          successUrl: `${baseUrl}/merci`,
-          cancelUrl: `${baseUrl}/checkout/5-rapports`,
-        }),
-      });
-
-      if (!res.ok) {
-        const data = await res.json();
-        throw new Error(data.error ?? 'Erreur lors de la création du paiement');
-      }
-
-      const { sessionId } = await res.json();
-      const stripe = await stripePromise;
-
-      if (!stripe) {
-        throw new Error('Stripe non disponible');
-      }
-
-      const { error: stripeError } = await stripe.redirectToCheckout({
-        sessionId,
-      });
-
-      if (stripeError) {
-        throw new Error(stripeError.message);
-      }
-    } catch (err) {
-      setError(
-        err instanceof Error ? err.message : 'Une erreur est survenue'
-      );
+    const link = STRIPE_LINKS.cinq_rapports;
+    if (link) {
+      window.location.href = link;
+    } else {
+      alert('Lien de paiement non disponible');
       setLoading(false);
     }
   };
@@ -95,9 +61,6 @@ export default function CheckoutButton({
           <>Payer {price}{currency} — {planName}</>
         )}
       </button>
-      {error && (
-        <p className="text-center text-sm text-red-400">{error}</p>
-      )}
       <p className="text-center text-xs text-slate-500">
         Paiement sécurisé · Satisfait ou remboursé 7 jours
       </p>

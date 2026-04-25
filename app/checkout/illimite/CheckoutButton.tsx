@@ -1,62 +1,26 @@
 'use client';
 
 import { useState } from 'react';
-import { stripePromise, STRIPE_PRICES } from '@/lib/stripe';
+import { STRIPE_LINKS } from '@/lib/stripe';
 
 export default function CheckoutButton({
   planName,
   price,
   currency,
-  period,
 }: {
   planName: string;
   price: number;
   currency: string;
-  period: string | null;
 }) {
   const [loading, setLoading] = useState(false);
-  const [error, setError] = useState<string | null>(null);
 
   const handleClick = async () => {
     setLoading(true);
-    setError(null);
-
-    try {
-      const baseUrl = window.location.origin;
-
-      const res = await fetch('/api/checkout', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-          priceId: STRIPE_PRICES.illimite,
-          successUrl: `${baseUrl}/merci`,
-          cancelUrl: `${baseUrl}/checkout/illimite`,
-        }),
-      });
-
-      if (!res.ok) {
-        const data = await res.json();
-        throw new Error(data.error ?? 'Erreur lors de la création du paiement');
-      }
-
-      const { sessionId } = await res.json();
-      const stripe = await stripePromise;
-
-      if (!stripe) {
-        throw new Error('Stripe non disponible');
-      }
-
-      const { error: stripeError } = await stripe.redirectToCheckout({
-        sessionId,
-      });
-
-      if (stripeError) {
-        throw new Error(stripeError.message);
-      }
-    } catch (err) {
-      setError(
-        err instanceof Error ? err.message : 'Une erreur est survenue'
-      );
+    const link = STRIPE_LINKS.illimite;
+    if (link) {
+      window.location.href = link;
+    } else {
+      alert('Lien de paiement non disponible');
       setLoading(false);
     }
   };
@@ -66,7 +30,7 @@ export default function CheckoutButton({
       <button
         type="button"
         disabled={loading}
-        className="w-full bg-purple-600 hover:bg-purple-500 disabled:opacity-60 disabled:cursor-not-allowed text-white font-bold py-4 rounded-xl text-lg transition-all duration-200 shadow-lg shadow-purple-900/50 hover:shadow-purple-700/50 hover:-translate-y-0.5"
+        className="w-full bg-brand-600 hover:bg-brand-500 disabled:opacity-60 disabled:cursor-not-allowed text-white font-bold py-4 rounded-xl text-lg transition-all duration-200 shadow-lg shadow-brand-900/50 hover:shadow-brand-700/50 hover:-translate-y-0.5"
         onClick={handleClick}
       >
         {loading ? (
@@ -94,14 +58,11 @@ export default function CheckoutButton({
             Redirection vers le paiement…
           </span>
         ) : (
-          <>Démarrer pour {price}{currency}{period ? `/${period}` : ''}</>
+          <>Payer {price}{currency} — {planName}</>
         )}
       </button>
-      {error && (
-        <p className="text-center text-sm text-red-400">{error}</p>
-      )}
       <p className="text-center text-xs text-slate-500">
-        Paiement sécurisé · Annulation à tout moment
+        Paiement sécurisé · Satisfait ou remboursé 7 jours
       </p>
     </div>
   );
