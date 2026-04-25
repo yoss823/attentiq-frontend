@@ -60,11 +60,14 @@ export default function AnalyzePage() {
   const [url, setUrl] = useState('');
   const [text, setText] = useState('');
   const [file, setFile] = useState<File | null>(null);
+  const [videoMode, setVideoMode] = useState<'url' | 'upload'>('url');
+  const [videoFile, setVideoFile] = useState<File | null>(null);
   const [error, setError] = useState('');
   const [loading, setLoading] = useState(false);
   const [stepIndex, setStepIndex] = useState(0);
   const [elapsedSeconds, setElapsedSeconds] = useState(0);
   const fileInputRef = useRef<HTMLInputElement>(null);
+  const videoFileInputRef = useRef<HTMLInputElement>(null);
   const pollingRef = useRef<NodeJS.Timeout | null>(null);
   const stepTimerRef = useRef<NodeJS.Timeout | null>(null);
   const elapsedRef = useRef<NodeJS.Timeout | null>(null);
@@ -114,6 +117,14 @@ export default function AnalyzePage() {
   const handleSubmitUrl = async (e: React.FormEvent) => {
     e.preventDefault();
     setError('');
+    if (videoMode === 'upload') {
+      if (!videoFile) {
+        setError('Veuillez sélectionner une vidéo à uploader.');
+        return;
+      }
+      startAnalysisVideoUpload(videoFile);
+      return;
+    }
     if (!url.trim()) {
       setError(`Veuillez entrer une URL ${PLATFORMS.find((p) => p.id === selectedPlatform)?.label}.`);
       return;
@@ -251,6 +262,37 @@ export default function AnalyzePage() {
     }
   };
 
+  const startAnalysisVideoUpload = async (videoFile: File) => {
+    setLoading(true);
+    setStepIndex(0);
+    setElapsedSeconds(0);
+    elapsedRef.current = setInterval(() => {
+      setElapsedSeconds(s => s + 1);
+    }, 1000);
+    advanceStep(0);
+    try {
+      const formData = new FormData();
+      formData.append('file', videoFile);
+      const res = await fetch(`${BACKEND_URL}/analyze/upload`, {
+        method: 'POST',
+        body: formData,
+      });
+      if (!res.ok) {
+        throw new Error(`Erreur ${res.status}`);
+      }
+      const data = await res.json();
+      if (!data.job_id) {
+        throw new Error('Réponse invalide du serveur.');
+      }
+      pollJob(data.job_id);
+    } catch (err: unknown) {
+      if (elapsedRef.current) clearInterval(elapsedRef.current);
+      if (stepTimerRef.current) clearTimeout(stepTimerRef.current);
+      setError(err instanceof Error ? err.message : 'Une erreur est survenue. Réessayez.');
+      setLoading(false);
+    }
+  };
+
   return (
     <main className="min-h-screen bg-black text-white flex flex-col items-center justify-center px-4 py-8">
       <div className="w-full max-w-md">
@@ -312,19 +354,84 @@ export default function AnalyzePage() {
                     </button>
                   ))}
                 </div>
-                <div>
-                  <input
-                    type="url"
-                    value={url}
-                    onChange={(e) => {
-                      setUrl(e.target.value);
+
+                {/* URL vs Upload toggle */}
+                <div className="flex gap-2 mb-4">
+                  <button
+                    type="button"
+                    onClick={() => {
+                      setVideoMode('url');
+                      setUrl('');
+                      setVideoFile(null);
                       setError('');
                     }}
-                    placeholder={PLATFORMS.find((p) => p.id === selectedPlatform)?.placeholder}
-                    className="w-full bg-gray-900 border border-gray-700 text-white placeholder-gray-600 rounded-xl px-4 py-4 text-sm focus:outline-none focus:border-gray-400 transition-colors"
-                  />
-                  {error && <p className="mt-2 text-red-400 text-xs leading-relaxed">{error}</p>}
+                    className={`flex-1 py-2 rounded-xl text-xs font-medium transition-colors ${
+                      videoMode === 'url'
+                        ? 'bg-white text-black'
+                        : 'bg-gray-900 text-gray-400 border border-gray-700 hover:border-gray-500'
+                    }`}
+                  >
+                    🔗 URL
+                  </button>
+                  <button
+                    type="button"
+                    onClick={() => {
+                      setVideoMode('upload');
+                      setUrl('');
+                      setVideoFile(null);
+                      setError('');
+                    }}
+                    className={`flex-1 py-2 rounded-xl text-xs font-medium transition-colors ${
+                      videoMode === 'upload'
+                        ? 'bg-white text-black'
+                        : 'bg-gray-900 text-gray-400 border border-gray-700 hover:border-gray-500'
+                    }`}
+                  >
+                    📤 Upload
+                  </button>
                 </div>
+
+                {videoMode === 'url' ? (
+                  <div>
+                    <input
+                      type="url"
+                      value={url}
+                      onChange={(e) => {
+                        setUrl(e.target.value);
+                        setError('');
+                      }}
+                      placeholder={PLATFORMS.find((p) => p.id === selectedPlatform)?.placeholder}
+                      className="w-full bg-gray-900 border border-gray-700 text-white placeholder-gray-600 rounded-xl px-4 py-4 text-sm focus:outline-none focus:border-gray-400 transition-colors"
+                    />
+                    {error && <p className="mt-2 text-red-400 text-xs leading-relaxed">{error}</p>}
+                  </div>
+                ) : (
+                  <div>
+                    <div
+                      onClick={() => videoFileInputRef.current?.click()}
+                      className="border-2 border-dashed border-gray-700 rounded-xl p-8 text-center cursor-pointer hover:border-gray-500 transition-colors"
+                    >
+                      <p className="text-gray-400 text-sm mb-2">
+                        {videoFile ? `✓ ${videoFile.name}` : '🎬 Cliquez pour sélectionner une vidéo'}
+                      </p>
+                      <p className="text-gray-600 text-xs">MP4, MOV ou WebM (max 500 MB)</p>
+                    </div>
+                    <input
+                      ref={videoFileInputRef}
+                      type="file"
+                      accept="video/mp4,video/quicktime,video/webm"
+                      onChange={(e) => {
+                        if (e.target.files?.[0]) {
+                          setVideoFile(e.target.files[0]);
+                          setError('');
+                        }
+                      }}
+                      className="hidden"
+                    />
+                    {error && <p className="mt-2 text-red-400 text-xs leading-relaxed">{error}</p>}
+                  </div>
+                )}
+
                 <button
                   type="submit"
                   className="w-full bg-white text-black font-semibold py-4 rounded-xl hover:bg-gray-100 transition-colors text-sm"
