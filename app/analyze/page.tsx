@@ -12,10 +12,35 @@ const LOADING_STEPS = [
   { message: '🧠 Génération du diagnostic...', duration: 25000 },
 ];
 
-function isValidTikTokUrl(url: string): boolean {
+type Platform = 'tiktok' | 'instagram' | 'youtube';
+
+const PLATFORMS: { id: Platform; label: string; domains: string[]; placeholder: string }[] = [
+  {
+    id: 'tiktok',
+    label: 'TikTok',
+    domains: ['tiktok.com', 'vm.tiktok.com'],
+    placeholder: 'https://www.tiktok.com/@username/video/...',
+  },
+  {
+    id: 'instagram',
+    label: 'Instagram',
+    domains: ['instagram.com', 'instagr.am'],
+    placeholder: 'https://www.instagram.com/reel/...',
+  },
+  {
+    id: 'youtube',
+    label: 'YouTube',
+    domains: ['youtube.com', 'youtu.be'],
+    placeholder: 'https://www.youtube.com/watch?v=...',
+  },
+];
+
+function isValidUrl(url: string, platform: Platform): boolean {
   try {
     const parsed = new URL(url);
-    return parsed.hostname.includes('tiktok.com') || parsed.hostname.includes('vm.tiktok.com');
+    const config = PLATFORMS.find((p) => p.id === platform);
+    if (!config) return false;
+    return config.domains.some((domain) => parsed.hostname.includes(domain));
   } catch {
     return false;
   }
@@ -24,6 +49,7 @@ function isValidTikTokUrl(url: string): boolean {
 export default function AnalyzePage() {
   const router = useRouter();
   const [url, setUrl] = useState('');
+  const [selectedPlatform, setSelectedPlatform] = useState<Platform>('tiktok');
   const [error, setError] = useState('');
   const [loading, setLoading] = useState(false);
   const [stepIndex, setStepIndex] = useState(0);
@@ -77,12 +103,13 @@ export default function AnalyzePage() {
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setError('');
+    const platformConfig = PLATFORMS.find((p) => p.id === selectedPlatform)!;
     if (!url.trim()) {
-      setError('Veuillez entrer une URL TikTok.');
+      setError(`Veuillez entrer une URL ${platformConfig.label}.`);
       return;
     }
-    if (!isValidTikTokUrl(url.trim())) {
-      setError('Seules les URLs TikTok sont supportées pour l\'instant. Exemple : https://www.tiktok.com/@username/video/...');
+    if (!isValidUrl(url.trim(), selectedPlatform)) {
+      setError(`URL ${platformConfig.label} invalide. Exemple : ${platformConfig.placeholder}`);
       return;
     }
     setLoading(true);
@@ -99,7 +126,7 @@ export default function AnalyzePage() {
         body: JSON.stringify({
           request_id: crypto.randomUUID(),
           url: url.trim(),
-          platform: 'tiktok',
+          platform: selectedPlatform,
           max_duration_seconds: 60,
           requested_at: new Date().toISOString(),
         }),
@@ -124,19 +151,35 @@ export default function AnalyzePage() {
     <main className="min-h-screen bg-black text-white flex flex-col items-center justify-center px-4">
       <div className="w-full max-w-md">
         <div className="mb-8 text-center">
-          <h1 className="text-2xl font-bold mb-2">Analysez votre vidéo TikTok</h1>
+          <h1 className="text-2xl font-bold mb-2">Analysez votre vidéo</h1>
           <p className="text-gray-400 text-sm">
             Collez l'URL. Le diagnostic arrive en 60 à 90 secondes.
           </p>
         </div>
         {!loading ? (
           <form onSubmit={handleSubmit} className="space-y-4">
+            <div className="flex gap-2">
+              {PLATFORMS.map((platform) => (
+                <button
+                  key={platform.id}
+                  type="button"
+                  onClick={() => { setSelectedPlatform(platform.id); setUrl(''); setError(''); }}
+                  className={`flex-1 py-2 rounded-xl text-sm font-medium transition-colors ${
+                    selectedPlatform === platform.id
+                      ? 'bg-white text-black'
+                      : 'bg-gray-900 text-gray-400 border border-gray-700 hover:border-gray-500'
+                  }`}
+                >
+                  {platform.label}
+                </button>
+              ))}
+            </div>
             <div>
               <input
                 type="url"
                 value={url}
                 onChange={(e) => { setUrl(e.target.value); setError(''); }}
-                placeholder="https://www.tiktok.com/@username/video/..."
+                placeholder={PLATFORMS.find((p) => p.id === selectedPlatform)?.placeholder}
                 className="w-full bg-gray-900 border border-gray-700 text-white placeholder-gray-600 rounded-xl px-4 py-4 text-sm focus:outline-none focus:border-gray-400 transition-colors"
                 disabled={loading}
               />
