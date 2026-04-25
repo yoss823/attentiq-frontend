@@ -16,7 +16,7 @@ export interface DiagnosticAction {
 
 export interface DiagnosticResult {
   format: 'video' | 'image' | 'text';
-  score: number; // 0-100
+  score: number;
   headline: string;
   summary: string;
   metrics: DiagnosticMetric[];
