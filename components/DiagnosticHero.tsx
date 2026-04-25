@@ -1,25 +1,38 @@
 'use client';
 
-interface DiagnosticHeroProps {
-  score: number;
-  headline: string;
-  summary: string;
+const LABEL_MAP: Record<string, { emoji: string; color: string }> = {
+  retention_high:  { emoji: '🟢', color: 'text-green-400' },
+  retention_low:   { emoji: '🔴', color: 'text-red-400' },
+  pacing_off:      { emoji: '🟡', color: 'text-yellow-400' },
+  hook_weak:       { emoji: '🟠', color: 'text-orange-400' },
+  hook_strong:     { emoji: '🟢', color: 'text-green-400' },
+  cta_missing:     { emoji: '🟠', color: 'text-orange-400' },
+  audio_mismatch:  { emoji: '🟡', color: 'text-yellow-400' },
+};
+
+function labelToDisplay(label: string): string {
+  return label
+    .split('_')
+    .map((w) => w.charAt(0).toUpperCase() + w.slice(1))
+    .join(' ');
 }
 
-export default function DiagnosticHero({ score, headline, summary }: DiagnosticHeroProps) {
-  const scoreColor = score >= 70 ? 'text-green-400' : score >= 40 ? 'text-orange-400' : 'text-red-400';
-  const barColor = score >= 70 ? 'bg-green-400' : score >= 40 ? 'bg-orange-400' : 'bg-red-400';
+interface DiagnosticHeroProps {
+  label: string;
+  explanation: string;
+}
+
+export default function DiagnosticHero({ label, explanation }: DiagnosticHeroProps) {
+  const style = LABEL_MAP[label] ?? { emoji: '⚪', color: 'text-gray-300' };
   return (
     <div className="px-6 py-10 text-center">
-      <div className={`text-8xl font-black mb-2 ${scoreColor}`}>
-        {score}
-        <span className="text-3xl font-normal text-gray-500">/100</span>
-      </div>
-      <div className="w-full max-w-xs mx-auto h-2 bg-gray-800 rounded-full mb-8">
-        <div className={`h-2 rounded-full transition-all ${barColor}`} style={{ width: `${Math.min(score, 100)}%` }} />
-      </div>
-      <h1 className="text-2xl font-bold text-white mb-3 leading-tight">{headline}</h1>
-      <p className="text-gray-400 text-sm leading-relaxed max-w-md mx-auto">{summary}</p>
+      <div className="text-5xl mb-4">{style.emoji}</div>
+      <h1 className={`text-2xl font-black mb-4 leading-tight ${style.color}`}>
+        {labelToDisplay(label)}
+      </h1>
+      <p className="text-gray-300 text-base leading-relaxed max-w-md mx-auto">
+        {explanation}
+      </p>
     </div>
   );
 }

@@ -3,7 +3,7 @@
 import { useState, useEffect, useRef } from 'react';
 import { useRouter } from 'next/navigation';
 
-const BACKEND_URL = process.env.NEXT_PUBLIC_BACKEND_URL || 'https://attentiqbackend-production.up.railway.app';
+const BACKEND_URL = process.env.NEXT_PUBLIC_BACKEND_URL || 'https://attentiq-backend-prod-production.up.railway.app';
 
 const LOADING_STEPS = [
   { message: '📥 Téléchargement de la vidéo...', duration: 15000 },

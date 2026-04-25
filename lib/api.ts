@@ -4,7 +4,7 @@
  */
 
 const BACKEND_BASE_URL =
-  "https://attentiqbackend-production.up.railway.app";
+  process.env.NEXT_PUBLIC_BACKEND_URL || "https://attentiq-backend-prod-production.up.railway.app";
 
 export type JobStatus = "queued" | "processing" | "done" | "error";
 
