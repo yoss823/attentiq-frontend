@@ -19,7 +19,18 @@ export type AttentiqOffer = {
   featured?: boolean;
 };
 
-const SHARED_STRIPE_URL = "https://buy.stripe.com/00w28s5PmeXl22m3WreP11u";
+// Stripe payment links — update these when new links are generated in the Stripe dashboard.
+// These are used as fallbacks when the /api/checkout/prepare session creation fails.
+// Primary checkout flow uses /api/checkout/prepare to create dynamic Stripe sessions.
+const STRIPE_SINGLE_URL =
+  process.env.NEXT_PUBLIC_STRIPE_LINK_SINGLE ||
+  "https://buy.stripe.com/00w28s5PmeXl22m3WreP11u";
+const STRIPE_MONTHLY5_URL =
+  process.env.NEXT_PUBLIC_STRIPE_LINK_MONTHLY5 ||
+  "https://buy.stripe.com/00w28s5PmeXl22m3WreP11u";
+const STRIPE_UNLIMITED_URL =
+  process.env.NEXT_PUBLIC_STRIPE_LINK_UNLIMITED ||
+  "https://buy.stripe.com/00w28s5PmeXl22m3WreP11u";
 
 export const FREE_TEASER_LIMITS = {
   drops: 3,
@@ -44,7 +55,7 @@ export const ATTENTIQ_OFFERS: AttentiqOffer[] = [
       "Plan d'actions détaillé",
     ],
     stripePriceId: "price_1TNxfxKXvWnroW3IZzYmMgtN",
-    stripeUrl: SHARED_STRIPE_URL,
+    stripeUrl: STRIPE_SINGLE_URL,
     checkoutPath: "/checkout/single",
     monthlyQuota: 1,
   },
@@ -66,7 +77,7 @@ export const ATTENTIQ_OFFERS: AttentiqOffer[] = [
       "Le meilleur point de départ pour une routine",
     ],
     stripePriceId: "price_1TNxfxKXvWnroW3IUCapqAK5",
-    stripeUrl: SHARED_STRIPE_URL,
+    stripeUrl: STRIPE_MONTHLY5_URL,
     checkoutPath: "/checkout/monthly-5",
     createsAccount: true,
     monthlyQuota: 5,
@@ -90,12 +101,13 @@ export const ATTENTIQ_OFFERS: AttentiqOffer[] = [
       "Pensé pour une cadence de publication soutenue",
     ],
     stripePriceId: "price_1TNxfxKXvWnroW3IG6G9qmDF",
-    stripeUrl: SHARED_STRIPE_URL,
+    stripeUrl: STRIPE_UNLIMITED_URL,
     checkoutPath: "/checkout/unlimited",
     createsAccount: true,
     monthlyQuota: null,
   },
 ];
+
 
 export function normalizeOfferSlug(slug: string | null | undefined) {
   const trimmed = slug?.trim();
