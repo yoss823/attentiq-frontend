@@ -1,5 +1,7 @@
 import { NextRequest, NextResponse } from "next/server";
 import Stripe from "stripe";
+import { getPlanFromOfferSlug } from "@/lib/premium";
+import { normalizeOfferSlug, getOfferByPriceCents } from "@/lib/offer-config";
 
 export const runtime = "nodejs";
 
@@ -7,93 +9,82 @@ const stripe = new Stripe(process.env.STRIPE_SECRET_KEY as string, {
   apiVersion: "2025-02-24.acacia",
 });
 
-const PREMIUM_COOKIE_NAME = "premium_access";
-
 type SetPremiumBody = {
-  sessionId?: string;
-  jobId?: string;
+  sessionId?: unknown;
+  jobId?: unknown;
+  videoUrl?: unknown;
 };
+
+function normalizeString(value: unknown) {
+  return typeof value === "string" && value.trim() ? value.trim() : null;
+}
 
 export async function POST(req: NextRequest) {
   try {
     const body = (await req.json()) as SetPremiumBody;
-    const sessionId = body.sessionId?.trim();
-    const requestedJobId = body.jobId?.trim();
+    const sessionId = normalizeString(body.sessionId);
+    const jobId = normalizeString(body.jobId);
+    const videoUrl = normalizeString(body.videoUrl);
 
-    if (!sessionId || !requestedJobId) {
+    if (!sessionId) {
       return NextResponse.json(
-        { error: "Missing sessionId or jobId" },
+        { ok: false, error: "MISSING_SESSION_ID" },
         { status: 400 }
       );
     }
 
-    const session = await stripe.checkout.sessions.retrieve(sessionId);
-
-    if (!session) {
+    let session: Stripe.Checkout.Session;
+    try {
+      session = await stripe.checkout.sessions.retrieve(sessionId);
+    } catch {
       return NextResponse.json(
-        { error: "Stripe session not found" },
+        { ok: false, error: "SESSION_NOT_FOUND" },
         { status: 404 }
       );
     }
 
     const paymentOk =
-      session.payment_status === "paid" ||
-      session.status === "complete";
+      session.payment_status === "paid" || session.status === "complete";
 
     if (!paymentOk) {
       return NextResponse.json(
-        {
-          error: "Stripe session is not paid",
-          payment_status: session.payment_status,
-          status: session.status,
-        },
+        { ok: false, error: "SESSION_NOT_PAID" },
         { status: 403 }
       );
     }
 
-    const paidJobId = session.metadata?.jobId?.trim() || "";
-    const paidPlan = session.metadata?.plan?.trim() || "single";
+    // Resolve offer slug from session metadata or amount
+    const rawOfferSlug =
+      session.metadata?.offerSlug?.trim() ||
+      session.metadata?.plan?.trim() ||
+      null;
+    const amountTotal = session.amount_total ?? 0;
+    const offerFromAmount = getOfferByPriceCents(amountTotal);
+    const resolvedOfferSlug =
+      normalizeOfferSlug(rawOfferSlug) ??
+      offerFromAmount?.slug ??
+      "single";
 
-    if (!paidJobId) {
-      return NextResponse.json(
-        { error: "No jobId found in Stripe session metadata" },
-        { status: 409 }
-      );
-    }
+    const plan = getPlanFromOfferSlug(resolvedOfferSlug);
 
-    if (paidJobId !== requestedJobId) {
-      return NextResponse.json(
-        { error: "jobId mismatch" },
-        { status: 403 }
-      );
-    }
+    // Resolve jobId from body or session metadata
+    const resolvedJobId =
+      jobId ?? normalizeString(session.metadata?.jobId) ?? null;
+    const resolvedVideoUrl =
+      videoUrl ?? normalizeString(session.metadata?.videoUrl) ?? null;
 
-    const payload = {
-      active: true,
-      jobId: paidJobId,
-      plan: paidPlan,
-      sessionId,
-      grantedAt: Date.now(),
-    };
-
-    const response = NextResponse.json({
+    return NextResponse.json({
       ok: true,
-      premium: payload,
+      paid: true,
+      offerSlug: resolvedOfferSlug,
+      plan,
+      jobId: resolvedJobId,
+      videoUrl: resolvedVideoUrl,
     });
-
-    response.cookies.set(PREMIUM_COOKIE_NAME, JSON.stringify(payload), {
-      httpOnly: false,
-      secure: process.env.NODE_ENV === "production",
-      sameSite: "lax",
-      path: "/",
-      maxAge: 60 * 60 * 24 * 30,
-    });
-
-    return response;
   } catch (error) {
-    console.error("set-premium error:", error);
+    console.error("[set-premium] error:", error);
     return NextResponse.json(
-      { error: "Unable to validate premium access" },
+      { ok: false, error: "PREMIUM_SET_FAILED" },
       { status: 500 }
     );
   }

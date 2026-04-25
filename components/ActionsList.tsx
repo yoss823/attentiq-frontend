@@ -1,42 +1,49 @@
-// components/ActionsList.tsx
 'use client';
 
-import { Action } from '@/types/v2';
+import { DiagnosticAction } from '@/types/v2';
 
 interface Props {
-  actions: [Action, Action, Action];
+  actions: [DiagnosticAction, DiagnosticAction, DiagnosticAction];
 }
 
-const severityStyles: Record<string, string> = {
-  critical: 'border-red-500 bg-red-950/30',
-  high:     'border-orange-500 bg-orange-950/30',
-  medium:   'border-yellow-500 bg-yellow-950/30',
-  low:      'border-gray-600 bg-gray-900',
-};
-
-const effortLabel: Record<string, string> = {
-  low: 'Effort faible',
-  medium: 'Effort moyen',
-  high: 'Effort élevé',
+const severityColors: Record<string, string> = {
+  high: 'bg-red-500 text-white',
+  medium: 'bg-orange-500 text-white',
+  low: 'bg-yellow-500 text-black',
 };
 
 export default function ActionsList({ actions }: Props) {
   return (
-    <div className="flex flex-col gap-3 px-4 max-w-2xl mx-auto w-full">
-      <h2 className="text-sm uppercase tracking-widest text-gray-500 mb-1">3 actions prioritaires</h2>
-      {actions.map((action) => (
-        <div
-          key={action.id}
-          className={`border rounded-xl p-4 flex flex-col gap-2 ${severityStyles[action.severity]}`}
-        >
-          <div className="flex items-center justify-between">
-            <span className="text-xs font-bold text-gray-400">#{action.rank}</span>
-            <span className="text-xs text-gray-500">{effortLabel[action.effort]}</span>
+    <section className="w-full px-4 py-6">
+      <h2 className="text-sm font-semibold text-gray-400 uppercase tracking-widest mb-4">
+        Actions prioritaires
+      </h2>
+      <div className="flex flex-col gap-4">
+        {actions.map((action) => (
+          <div
+            key={action.id}
+            className="bg-gray-900 border border-gray-800 rounded-xl p-4 flex gap-4"
+          >
+            <div
+              className={`flex-shrink-0 w-8 h-8 rounded-full flex items-center justify-center font-bold text-sm ${
+                severityColors[action.severity]
+              }`}
+            >
+              {action.rank}
+            </div>
+            <div>
+              <p className="text-white font-semibold text-sm mb-1">
+                {action.title}
+              </p>
+              {action.description && action.description !== action.title && (
+                <p className="text-gray-400 text-sm leading-relaxed">
+                  {action.description}
+                </p>
+              )}
+            </div>
           </div>
-          <p className="text-white font-semibold text-sm">{action.title}</p>
-          <p className="text-gray-400 text-xs leading-relaxed">{action.description}</p>
-        </div>
-      ))}
-    </div>
+        ))}
+      </div>
+    </section>
   );
 }
