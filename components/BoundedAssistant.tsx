@@ -1,8 +1,7 @@
 'use client';
-
 import { useState } from 'react';
 
-interface Props {
+interface BoundedAssistantProps {
   context: string;
   jobId?: string;
 }
@@ -14,121 +13,74 @@ const INTENTS = [
   { id: 'prioritize', label: 'Prioriser' },
 ];
 
-export default function BoundedAssistant({ context }: Props) {
+export default function BoundedAssistant({ context }: BoundedAssistantProps) {
   const [selectedIntent, setSelectedIntent] = useState<string | null>(null);
   const [userInput, setUserInput] = useState('');
   const [response, setResponse] = useState('');
   const [loading, setLoading] = useState(false);
-  const [error, setError] = useState('');
 
-  async function handleSend() {
+  const handleSend = async () => {
     if (!selectedIntent) return;
     setLoading(true);
-    setError('');
     setResponse('');
-
     try {
       const res = await fetch('/api/assistant', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-          intent: selectedIntent,
-          context,
-          user_input: userInput || '',
-        }),
+        body: JSON.stringify({ intent: selectedIntent, context, user_input: userInput }),
       });
-
-      if (!res.ok) throw new Error('Erreur de l\'assistant');
       const data = await res.json();
-      setResponse(data.response || 'Pas de réponse.');
-    } catch (err) {
-      setError('Erreur lors de la génération de la réponse. Réessaie.');
+      setResponse(data.response || 'Aucune réponse disponible.');
+    } catch {
+      setResponse('Erreur lors de la connexion à l\'assistant.');
     } finally {
       setLoading(false);
     }
-  }
+  };
 
-  function reset() {
+  const handleReset = () => {
     setSelectedIntent(null);
     setUserInput('');
     setResponse('');
-    setError('');
-  }
+  };
 
   return (
-    <section className="w-full px-4 py-6 border-t border-gray-800 mt-4">
-      <h2 className="text-sm font-semibold text-gray-400 uppercase tracking-widest mb-4">
-        Posez une question sur ce diagnostic
-      </h2>
-
-      {!selectedIntent && (
-        <div className="flex flex-wrap gap-2">
-          {INTENTS.map((intent) => (
-            <button
-              key={intent.id}
-              onClick={() => setSelectedIntent(intent.id)}
-              className="px-4 py-2 rounded-full bg-gray-800 text-white text-sm hover:bg-gray-700 transition border border-gray-700"
-            >
-              {intent.label}
-            </button>
-          ))}
-        </div>
-      )}
-
-      {selectedIntent && !response && (
-        <div className="flex flex-col gap-3">
-          <p className="text-gray-300 text-sm">
-            Intent sélectionné :{' '}
-            <span className="font-semibold text-white">
-              {INTENTS.find((i) => i.id === selectedIntent)?.label}
-            </span>
-          </p>
-          <textarea
-            value={userInput}
-            onChange={(e) => setUserInput(e.target.value)}
-            placeholder="Précise ta question (optionnel)…"
-            className="w-full px-3 py-2 bg-gray-900 border border-gray-700 rounded-lg text-white text-sm placeholder-gray-500 focus:outline-none focus:border-white resize-none"
-            rows={2}
-          />
-          <div className="flex gap-2">
-            <button
-              onClick={handleSend}
-              disabled={loading}
-              className="flex-1 py-2 bg-white text-black rounded-lg font-semibold text-sm hover:bg-gray-100 transition disabled:opacity-50"
-            >
-              {loading ? 'En cours…' : 'Envoyer →'}
-            </button>
-            <button
-              onClick={reset}
-              className="px-4 py-2 bg-gray-800 text-gray-400 rounded-lg text-sm hover:bg-gray-700 transition"
-            >
-              Annuler
-            </button>
+    <div className="mx-4 mb-8 border border-gray-800 rounded-xl overflow-hidden">
+      <div className="bg-gray-900 px-4 py-3 border-b border-gray-800">
+        <p className="text-sm font-semibold text-white">Posez une question sur ce diagnostic</p>
+      </div>
+      <div className="p-4">
+        {!selectedIntent ? (
+          <div className="grid grid-cols-2 gap-2">
+            {INTENTS.map((intent) => (
+              <button key={intent.id} onClick={() => setSelectedIntent(intent.id)} className="py-2 px-3 bg-gray-800 hover:bg-gray-700 text-white text-sm rounded-lg transition-colors text-left">
+                {intent.label}
+              </button>
+            ))}
           </div>
-          {error && <p className="text-red-400 text-sm">{error}</p>}
-        </div>
-      )}
-
-      {response && (
-        <div className="flex flex-col gap-3">
-          <div className="bg-gray-900 border border-gray-800 rounded-xl p-4">
-            <p className="text-gray-200 text-sm leading-relaxed whitespace-pre-wrap">
-              {response}
-            </p>
+        ) : (
+          <div className="space-y-3">
+            <div className="flex items-center gap-2">
+              <span className="text-xs text-gray-400">Intent :</span>
+              <span className="bg-gray-700 text-white text-xs px-2 py-1 rounded">{INTENTS.find(i => i.id === selectedIntent)?.label}</span>
+              <button onClick={handleReset} className="text-gray-500 text-xs hover:text-white ml-auto">← Changer</button>
+            </div>
+            <textarea value={userInput} onChange={(e) => setUserInput(e.target.value)} placeholder="Précisez votre question (optionnel)..." className="w-full bg-gray-800 text-white text-sm rounded-lg p-3 border border-gray-700 focus:border-gray-500 focus:outline-none resize-none" rows={2} />
+            <button onClick={handleSend} disabled={loading} className="w-full bg-white text-black font-semibold text-sm py-2 rounded-lg hover:bg-gray-100 transition-colors disabled:opacity-50">
+              {loading ? 'En cours...' : 'Envoyer →'}
+            </button>
+            {response && (
+              <div className="bg-gray-800 border border-gray-700 rounded-lg p-4">
+                <p className="text-gray-300 text-sm leading-relaxed whitespace-pre-wrap">{response}</p>
+                <button onClick={handleReset} className="mt-3 text-xs text-gray-500 hover:text-white">Poser une autre question</button>
+              </div>
+            )}
           </div>
-          <button
-            onClick={reset}
-            className="self-start px-4 py-2 bg-gray-800 text-gray-400 rounded-lg text-sm hover:bg-gray-700 transition"
-          >
-            Nouvelle question
-          </button>
-        </div>
-      )}
-
-      <p className="text-gray-600 text-xs mt-6">
-        Cet assistant répond uniquement à partir de votre diagnostic actuel.{' '}
-        <a href="/analyze" className="underline">Analyser une autre vidéo</a>
-      </p>
-    </section>
+        )}
+      </div>
+      <div className="px-4 py-2 border-t border-gray-800">
+        <p className="text-xs text-gray-600">Cet assistant répond uniquement à partir de votre diagnostic.</p>
+      </div>
+    </div>
   );
 }

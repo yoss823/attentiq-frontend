@@ -1,54 +1,32 @@
 'use client';
-
 import { DiagnosticMetric } from '@/types/v2';
 
-interface Props {
+interface MetricsDashboardProps {
   metrics: DiagnosticMetric[];
 }
 
-const trendIcon: Record<string, string> = {
-  up: '↑',
-  down: '↓',
-  neutral: '→',
-};
-
-const trendColor: Record<string, string> = {
-  up: 'text-green-400',
-  down: 'text-red-400',
-  neutral: 'text-gray-400',
-};
-
-export default function MetricsDashboard({ metrics }: Props) {
-  if (!metrics || metrics.length === 0) {
-    return null;
-  }
-
+export default function MetricsDashboard({ metrics }: MetricsDashboardProps) {
+  const displayed = metrics.slice(0, 5);
+  const trendIcon = (trend?: string) => {
+    if (trend === 'up') return <span className="text-green-400 text-xs ml-1">↑</span>;
+    if (trend === 'down') return <span className="text-red-400 text-xs ml-1">↓</span>;
+    return <span className="text-gray-500 text-xs ml-1">→</span>;
+  };
   return (
-    <section className="w-full px-4 py-4">
-      <h2 className="text-sm font-semibold text-gray-400 uppercase tracking-widest mb-3">
-        Métriques clés
-      </h2>
-      <div className="grid grid-cols-2 gap-3">
-        {metrics.map((metric, index) => (
-          <div
-            key={index}
-            className="bg-gray-900 border border-gray-800 rounded-xl p-3 flex flex-col gap-1"
-          >
-            <p className="text-gray-500 text-xs">{metric.label}</p>
-            <div className="flex items-center gap-1">
-              <span className="text-white font-bold text-sm">
-                {metric.value}
-                {metric.unit ? ` ${metric.unit}` : ''}
-              </span>
-              {metric.trend && (
-                <span className={`text-xs font-bold ${trendColor[metric.trend]}`}>
-                  {trendIcon[metric.trend]}
-                </span>
-              )}
-            </div>
+    <div className="px-4 pb-6">
+      <h2 className="text-xs font-semibold text-gray-500 uppercase tracking-wider mb-3 px-2">Métriques clés</h2>
+      <div className="grid grid-cols-2 sm:grid-cols-3 gap-3">
+        {displayed.map((metric, i) => (
+          <div key={i} className="bg-gray-900 border border-gray-800 rounded-xl p-4">
+            <p className="text-xs text-gray-500 mb-1">{metric.label}</p>
+            <p className="text-white font-bold text-lg">
+              {metric.value}
+              {metric.unit && <span className="text-gray-500 text-sm font-normal ml-1">{metric.unit}</span>}
+              {trendIcon(metric.trend)}
+            </p>
           </div>
         ))}
       </div>
-    </section>
+    </div>
   );
 }
