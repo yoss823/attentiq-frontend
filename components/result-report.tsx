@@ -79,6 +79,15 @@ const CATEGORY_CONFIG = {
 
 type DiagnosticCategory = keyof typeof CATEGORY_CONFIG;
 
+type ContentKind = "video" | "text" | "image";
+
+function inferContentKindFromPlatform(platform: string | undefined | null): ContentKind {
+  const key = (platform ?? "").toLowerCase().trim();
+  if (key === "text") return "text";
+  if (key === "image") return "image";
+  return "video";
+}
+
 function scoreAppearance(score: number | null | undefined) {
   if (score == null) {
     return {
@@ -652,6 +661,13 @@ export default function ResultReport({
 
   const metadata = report.data.metadata;
   const diagnostic = report.data.diagnostic;
+  const contentKind = inferContentKindFromPlatform(metadata?.platform);
+  const isVideoContent = contentKind === "video";
+  const analyzeHref =
+    contentKind === "text" ? "/text" : contentKind === "image" ? "/images" : "/analyze";
+  const guideHref = `/guide?format=${contentKind}`;
+  const contentLabel =
+    contentKind === "text" ? "texte" : contentKind === "image" ? "visuel" : "video";
   const allDrops = Array.isArray(diagnostic?.attention_drops)
     ? diagnostic.attention_drops
     : [];
@@ -693,10 +709,16 @@ export default function ResultReport({
       : "—";
   const teaserDropStatHelper =
     isPremiumUnlocked
-      ? "timeline complete visible, avec toute la chronologie detectee"
+      ? isVideoContent
+        ? "timeline complete visible, avec toute la chronologie detectee"
+        : "timeline detaillee visible, avec toute la progression detectee"
       : previewDrops.length === 0
-        ? `Aucune chute listée dans cet aperçu ; le score et le résumé restent utiles. Jusqu'à ${FREE_TEASER_LIMITS.drops} chutes chronologiques après déblocage.`
-        : `jusqu'a ${FREE_TEASER_LIMITS.drops} chutes visibles avant le deblocage`;
+        ? isVideoContent
+          ? `Aucune chute listée dans cet aperçu ; le score et le résumé restent utiles. Jusqu'à ${FREE_TEASER_LIMITS.drops} chutes chronologiques après déblocage.`
+          : `Aucun point de friction listé dans cet aperçu ; le score et le résumé restent utiles. Jusqu'à ${FREE_TEASER_LIMITS.drops} points détaillés après déblocage.`
+        : isVideoContent
+          ? `jusqu'a ${FREE_TEASER_LIMITS.drops} chutes visibles avant le deblocage`
+          : `jusqu'a ${FREE_TEASER_LIMITS.drops} points de friction visibles avant le deblocage`;
   const hiddenPreviewTotal = hiddenDropsCount + hiddenActionsCount;
   const teaserHiddenStatValue: ReactNode =
     isPremiumUnlocked
@@ -755,7 +777,7 @@ export default function ResultReport({
           }}
         >
           <Link
-            href="/analyze"
+            href={analyzeHref}
             style={{
               display: "inline-flex",
               alignItems: "center",
@@ -828,7 +850,7 @@ export default function ResultReport({
           />
         )}
 
-        {isAudioOnly && (
+        {isVideoContent && isAudioOnly && (
           <div
             style={{
               marginBottom: "14px",
@@ -888,7 +910,7 @@ export default function ResultReport({
               >
                 {isPremiumUnlocked
                   ? "Votre rapport complet d'attention."
-                  : "Ce que votre video laisse deja voir."}
+                  : `Ce que votre ${contentLabel} laisse deja voir.`}
               </h1>
               <p
                 style={{
@@ -972,7 +994,13 @@ export default function ResultReport({
           }}
         >
           <StatCard
-            label={isPremiumUnlocked ? "Chutes detectees" : "Teaser gratuit"}
+            label={
+              isPremiumUnlocked
+                ? isVideoContent
+                  ? "Chutes detectees"
+                  : "Points detectes"
+                : "Teaser gratuit"
+            }
             value={teaserDropStatValue}
             helper={teaserDropStatHelper}
           />
@@ -1047,8 +1075,12 @@ export default function ResultReport({
           <>
             <Panel style={{ marginBottom: "14px" }}>
               <SectionHeader
-                eyebrow="Timeline complete"
-                title="Toutes les chutes et leur nature"
+                eyebrow={isVideoContent ? "Timeline complete" : "Timeline detaillee"}
+                title={
+                  isVideoContent
+                    ? "Toutes les chutes et leur nature"
+                    : "Tous les points de friction et leur nature"
+                }
               />
 
               {allDrops.length > 0 ? (
@@ -1357,7 +1389,7 @@ export default function ResultReport({
           <>
             <Panel style={{ marginBottom: "14px" }}>
               <SectionHeader
-                eyebrow="Preview chutes"
+                eyebrow={isVideoContent ? "Preview chutes" : "Preview frictions"}
                 title="Ce que le gratuit montre deja"
               />
 
@@ -1467,10 +1499,9 @@ export default function ResultReport({
                     color: "var(--text-secondary)",
                   }}
                 >
-                  Dans cet aperçu gratuit, aucune chute n&apos;est affichée avec une
-                  chronologie (souvent le cas en mode audio ou si le modèle ne
-                  segmente pas encore finement). Le résumé ci-dessus et les
-                  actions listées restent le cœur du diagnostic.
+                  {isVideoContent
+                    ? "Dans cet aperçu gratuit, aucune chute n'est affichée avec une chronologie (souvent le cas en mode audio ou si le modèle ne segmente pas encore finement). Le résumé ci-dessus et les actions listées restent le cœur du diagnostic."
+                    : "Dans cet aperçu gratuit, aucun point de friction détaillé n'est affiché sur une progression complète. Le résumé ci-dessus et les actions listées restent le cœur du diagnostic."}
                 </p>
               )}
 
@@ -1487,7 +1518,9 @@ export default function ResultReport({
                 }}
               >
                 {hiddenDropsCount > 0
-                  ? `${hiddenDropsCount} chute(s) supplementaire(s) restent masquees dans le rapport gratuit.`
+                  ? isVideoContent
+                    ? `${hiddenDropsCount} chute(s) supplementaire(s) restent masquees dans le rapport gratuit.`
+                    : `${hiddenDropsCount} point(s) supplementaire(s) restent masques dans le rapport gratuit.`
                   : "Le rapport complet ajoute surtout plus de contexte et une priorisation plus fine."}
               </div>
             </Panel>
@@ -1599,8 +1632,12 @@ export default function ResultReport({
                 }}
               >
                 <LockedPreviewCard
-                  title="Timeline complete"
-                  helper="Toutes les chutes sont visibles avec leur severite et leur categorie verbale, rythme ou visuelle."
+                  title={isVideoContent ? "Timeline complete" : "Timeline detaillee"}
+                  helper={
+                    isVideoContent
+                      ? "Toutes les chutes sont visibles avec leur severite et leur categorie verbale, rythme ou visuelle."
+                      : "Tous les points de friction sont visibles avec leur severite et leur categorie principale."
+                  }
                 />
                 <LockedPreviewCard
                   title="Diagnostic structurel detaille"
@@ -1637,8 +1674,8 @@ export default function ResultReport({
             }}
           >
             {isPremiumUnlocked
-              ? "Le rapport complet sert maintenant a executer. Corrigez d'abord la priorite numero un, puis relancez une autre video pour comparer un hook, une structure ou une nouvelle version."
-              : "Le gratuit sert a qualifier rapidement la valeur du diagnostic. Soit vous debloquez le rapport complet, soit vous relancez une autre video pour comparer un hook ou une structure differente."}
+              ? `Le rapport complet sert maintenant a executer. Corrigez d'abord la priorite numero un, puis relancez un autre ${contentLabel} pour comparer une nouvelle version.`
+              : `Le gratuit sert a qualifier rapidement la valeur du diagnostic. Soit vous debloquez le rapport complet, soit vous relancez un autre ${contentLabel} pour comparer.`}
           </p>
 
           <div
@@ -1650,7 +1687,7 @@ export default function ResultReport({
             }}
           >
             <Link
-              href="/analyze"
+              href={analyzeHref}
               style={{
                 display: "inline-flex",
                 alignItems: "center",
@@ -1665,10 +1702,10 @@ export default function ResultReport({
                 fontWeight: 900,
               }}
             >
-              Analyser une autre video
+              Analyser un autre contenu
             </Link>
             <Link
-              href="/guide?format=video"
+              href={guideHref}
               style={{
                 display: "inline-flex",
                 alignItems: "center",

@@ -140,6 +140,18 @@ function buildAudienceLossEstimate(score10: number): string {
   )}/10 résume la cohérence perçue (accroche, promesse, clarté, CTA), pas une prédiction d'audience réelle.`;
 }
 
+function inferContentKind(result: V2AnalysisResult): "video" | "text" | "image" {
+  const key = (result.inputFormat || "video").toLowerCase();
+  if (key === "text" || key === "image") return key;
+  return "video";
+}
+
+function titleForContentKind(kind: "video" | "text" | "image"): string {
+  if (kind === "text") return "Diagnostic d'attention (texte)";
+  if (kind === "image") return "Diagnostic d'attention (image)";
+  return "Diagnostic d'attention (video)";
+}
+
 /**
  * Adapte le résultat JSON V2 du backend au modèle « Railway legacy » consommé par l'UI rapport.
  */
@@ -163,13 +175,14 @@ export function buildLegacyReportFromV2(result: V2AnalysisResult): AttentiqRepor
     .map((action) => action.label?.trim())
     .filter((l): l is string => Boolean(l));
 
+  const contentKind = inferContentKind(result);
   const attentionDrops = mapV2AttentionDropsToLegacy(result);
 
   const metadata: RailwayResponse["metadata"] = {
     url: result.sourceUrl ?? "",
-    platform: result.sourcePlatform ?? "unknown",
+    platform: result.sourcePlatform ?? contentKind,
     author: "@attentiq",
-    title: "Diagnostic d'attention",
+    title: titleForContentKind(contentKind),
     duration_seconds: result.durationSeconds ?? 0,
     hashtags: [],
   };
@@ -183,7 +196,16 @@ export function buildLegacyReportFromV2(result: V2AnalysisResult): AttentiqRepor
       global_summary: buildGlobalSummary(explanation, result.actions),
       drop_off_rule: dropOffLine(label),
       creator_perception: buildCreatorPerception(result.dashboard),
-      audience_loss_estimate: buildAudienceLossEstimate(retentionScore),
+      audience_loss_estimate:
+        contentKind === "video"
+          ? buildAudienceLossEstimate(retentionScore)
+          : contentKind === "text"
+            ? `Sans analytics natives : le score ${retentionScore.toFixed(
+                1
+              )}/10 mesure surtout clarté, densité et intention d'action (clic/like/commentaire), pas la performance réelle.`
+            : `Sans analytics natives : le score ${retentionScore.toFixed(
+                1
+              )}/10 mesure surtout lisibilité visuelle, hiérarchie et clarté du message, pas la performance réelle.`,
       corrective_actions: actions.slice(0, 3),
       attention_drops: attentionDrops,
     },

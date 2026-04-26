@@ -9,14 +9,16 @@ const PLATFORM_LABELS: Record<string, string> = {
   snapchat: "Snapchat",
   twitter: "X / Twitter",
   upload: "Fichier importé",
-  unknown: "Vidéo courte",
+  text: "Texte",
+  image: "Image",
+  unknown: "Contenu",
 };
 
 export function formatSourcePlatformLabel(
   platform: string | undefined | null
 ): string {
   const key = (platform ?? "unknown").toLowerCase().trim();
-  return PLATFORM_LABELS[key] ?? "Vidéo courte";
+  return PLATFORM_LABELS[key] ?? "Contenu";
 }
 
 export function formatAttentionDiagnosticEyebrow(
