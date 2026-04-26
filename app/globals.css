@@ -51,6 +51,22 @@ body {
   50%       { opacity: 1; }
 }
 
+@keyframes attentiq-chat-fab {
+  0%,
+  100% {
+    transform: translateY(0);
+    box-shadow:
+      0 14px 44px rgba(0, 212, 255, 0.42),
+      0 0 0 1px rgba(255, 255, 255, 0.14);
+  }
+  50% {
+    transform: translateY(-3px);
+    box-shadow:
+      0 18px 52px rgba(0, 212, 255, 0.55),
+      0 0 0 1px rgba(255, 255, 255, 0.2);
+  }
+}
+
 @keyframes scan {
   0%   { transform: translateY(0); opacity: 0; }
   5%   { opacity: 1; }

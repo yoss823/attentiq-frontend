@@ -14,7 +14,7 @@ const FREE_ITEMS = [
 
 const COMPLETE_ITEMS = [
   "Timeline complete des chutes",
-  "Severite + categories verbal / rythme / visuel",
+  "Pour chaque chute : importance, cause, et type (verbal, rythme ou visuel)",
   "Diagnostic structurel + plan d'actions priorise",
 ];
 

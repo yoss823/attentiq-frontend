@@ -734,7 +734,7 @@ export default function ResultReport({
     isPremiumUnlocked
       ? "resume structurel, perception et impact relus ensemble"
       : hiddenPreviewTotal === 0
-        ? "Même sans détail masqué ici, le rapport complet ajoute timeline, sévérités et plan priorisé."
+        ? "Même sans détail masqué ici, le rapport complet ajoute timeline, niveaux d'impact par chute et plan priorisé."
         : "les parties detaillees restent reservees au rapport complet";
 
   return (
@@ -844,7 +844,7 @@ export default function ResultReport({
             subtitle={
               isSubscriptionEntitlement
                 ? "La timeline complete, le diagnostic structurel detaille, le plan d'action priorise et l'assistant coach sont maintenant visibles sur ce rapport."
-                : "Le teaser a bascule vers la version complete. Vous voyez maintenant toutes les chutes, leurs niveaux de severite, leurs categories et le plan d'action priorise."
+                : "Le teaser a bascule vers la version complete. Vous voyez maintenant toutes les chutes, leur importance (Critique, Fort…), leur type (verbal, rythme, visuel) et le plan d'action priorise."
             }
             border="rgba(52, 211, 153, 0.24)"
             glow="rgba(52, 211, 153, 0.12)"
@@ -1162,7 +1162,7 @@ export default function ResultReport({
                                 letterSpacing: "0.14em",
                               }}
                             >
-                              Severite {severity.label}
+                              Impact {severity.label}
                             </span>
 
                             {categories.map((category) => {
@@ -1272,9 +1272,10 @@ export default function ResultReport({
 
             <InlineChatbot
               diagnosticContext={buildChatDiagnosticContext(report)}
-              defaultOpen={false}
+              variant="floating"
+              defaultOpen
               title="Coach Attentiq"
-              subtitle="Ouvert par defaut pour traduire le diagnostic en decisions concretes"
+              subtitle="Posez vos questions sur ce rapport"
               suggestedPrompts={assistantPrompts}
               footerNote="Coach centre sur ce rapport complet et son plan d'action."
               maxAssistantReplies={3}
@@ -1412,7 +1413,7 @@ export default function ResultReport({
                 >
                   Aperçu gratuit : vous voyez les{" "}
                   <strong>{FREE_TEASER_LIMITS.drops}</strong> premières chutes avec
-                  cause et sévérité. Le rapport complet ajoute les{" "}
+                  cause et niveau d&apos;impact. Le rapport complet ajoute les{" "}
                   <strong>{allDrops.length - FREE_TEASER_LIMITS.drops}+</strong>{" "}
                   suivantes, la timeline entière, les liens entre chutes, le détail
                   par axe (verbal / rythme / visuel quand le signal existe) et un plan
@@ -1610,9 +1611,10 @@ export default function ResultReport({
 
             <InlineChatbot
               diagnosticContext={buildChatDiagnosticContext(report)}
-              defaultOpen={false}
+              variant="floating"
+              defaultOpen
               title="Assistant Attentiq"
-              subtitle="Visible par defaut sous le teaser pour clarifier ce que vous voyez deja"
+              subtitle="Une question sur ce diagnostic ?"
               suggestedPrompts={assistantPrompts}
               footerNote="Assistant limite a ce teaser et a votre diagnostic actuel."
               maxAssistantReplies={1}
@@ -1647,8 +1649,8 @@ export default function ResultReport({
                   title={isVideoContent ? "Timeline complete" : "Timeline detaillee"}
                   helper={
                     isVideoContent
-                      ? "Toutes les chutes sont visibles avec leur severite et leur categorie verbale, rythme ou visuelle."
-                      : "Tous les points de friction sont visibles avec leur severite et leur categorie principale."
+                      ? "Toutes les chutes sont visibles avec leur niveau d'impact et leur categorie verbale, rythme ou visuelle."
+                      : "Tous les points de friction sont visibles avec leur niveau d'impact et leur categorie principale."
                   }
                 />
                 <LockedPreviewCard

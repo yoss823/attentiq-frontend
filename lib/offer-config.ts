@@ -86,7 +86,7 @@ export const ATTENTIQ_OFFERS: AttentiqOffer[] = [
     featureList: [
       "5 rapports complets / mois",
       "Même profondeur d'analyse",
-      "Idéal pour une routine de publication",
+      "Assistant : jusqu'à 3 réponses personnalisées / mois",
     ],
     stripePriceId:
       process.env.STRIPE_PRICE_MONTHLY_29 || "price_1TNxfxKXvWnroW3IUCapqAK5",
@@ -111,7 +111,7 @@ export const ATTENTIQ_OFFERS: AttentiqOffer[] = [
     ctaLabel: "Choisir 89€/mois",
     featureList: [
       "15 rapports complets / mois",
-      "Renouvelé chaque mois",
+      "Assistant : jusqu'à 5 réponses personnalisées / mois",
       "Chaque rapport : même contenu qu'une analyse à 9 €",
     ],
     stripePriceId:

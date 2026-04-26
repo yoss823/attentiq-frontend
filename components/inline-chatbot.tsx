@@ -27,6 +27,8 @@ function createMessage(role: ChatMessage["role"], content: string): ChatMessage 
 
 type InlineChatbotProps = {
   diagnosticContext: ChatDiagnosticContext;
+  /** Bloc dans le flux de page (défaut). */
+  variant?: "embedded" | "floating";
   defaultOpen?: boolean;
   title?: string;
   subtitle?: string;
@@ -39,6 +41,7 @@ type InlineChatbotProps = {
 
 export default function InlineChatbot({
   diagnosticContext,
+  variant = "embedded",
   defaultOpen = false,
   title = "Assistant post-diagnostic",
   subtitle = "Posez vos questions sur ce diagnostic précis",
@@ -48,7 +51,10 @@ export default function InlineChatbot({
   paywallHref = "/videos#tarifs",
   showAttentionNudge = true,
 }: InlineChatbotProps) {
-  const [isOpen, setIsOpen] = useState(defaultOpen);
+  const isFloating = variant === "floating";
+  const [isOpen, setIsOpen] = useState(() =>
+    isFloating ? true : defaultOpen
+  );
   const [messages, setMessages] = useState<ChatMessage[]>([]);
   const [input, setInput] = useState("");
   const [isSending, setIsSending] = useState(false);
@@ -118,158 +124,293 @@ export default function InlineChatbot({
     }
   }
 
+  const showSection = !isFloating || isOpen;
+
   return (
-    <section
-      style={{
-        marginBottom: "14px",
-        borderRadius: "22px",
-        border: "1px solid var(--border)",
-        background:
-          "linear-gradient(180deg, rgba(12,17,23,0.98) 0%, rgba(7,11,16,0.97) 100%)",
-        overflow: "hidden",
-      }}
-    >
-      {!isOpen && showAttentionNudge && !nudgeDismissed && (
-        <div
+    <>
+      {isFloating && !isOpen && (
+        <button
+          type="button"
+          aria-label="Ouvrir l'assistant Attentiq"
+          onClick={() => setIsOpen(true)}
           style={{
-            padding: "12px 16px",
-            borderBottom: "1px solid var(--border)",
-            background: "rgba(0, 212, 255, 0.08)",
+            position: "fixed",
+            bottom: "22px",
+            right: "22px",
+            zIndex: 70,
             display: "flex",
             alignItems: "center",
-            justifyContent: "space-between",
             gap: "10px",
-            flexWrap: "wrap",
+            padding: "14px 22px 14px 18px",
+            borderRadius: "999px",
+            border: "none",
+            cursor: "pointer",
+            fontWeight: 900,
+            fontSize: "14px",
+            letterSpacing: "-0.02em",
+            color: "#041017",
+            background: "linear-gradient(135deg, var(--accent), #79e7ff)",
+            boxShadow:
+              "0 14px 44px rgba(0, 212, 255, 0.42), 0 0 0 1px rgba(255,255,255,0.14)",
+            fontFamily: "inherit",
+            animation: "attentiq-chat-fab 2.4s ease-in-out infinite",
           }}
         >
-          <button
-            type="button"
-            onClick={() => setIsOpen(true)}
-            style={{
-              border: "none",
-              background: "none",
-              color: "var(--text-primary)",
-              fontSize: "13px",
-              fontWeight: 800,
-              cursor: "pointer",
-            }}
-          >
-            Tu as des questions sur l&apos;analyse ? Clique ici.
-          </button>
-          <button
-            type="button"
-            onClick={() => setNudgeDismissed(true)}
-            style={{
-              border: "1px solid var(--border)",
-              borderRadius: "999px",
-              background: "rgba(255,255,255,0.04)",
-              color: "var(--text-secondary)",
-              fontSize: "11px",
-              padding: "4px 8px",
-              cursor: "pointer",
-            }}
-          >
-            Masquer
-          </button>
-        </div>
+          <span style={{ fontSize: "22px", lineHeight: 1 }} aria-hidden>
+            💬
+          </span>
+          Assistant
+        </button>
       )}
 
-      {/* accordion header / toggle */}
-      <button
-        type="button"
-        onClick={() => setIsOpen((v) => !v)}
-        style={{
-          width: "100%",
-          display: "flex",
-          alignItems: "center",
-          justifyContent: "space-between",
-          gap: "12px",
-          padding: "20px 24px",
-          background: "none",
-          border: "none",
-          cursor: "pointer",
-          textAlign: "left",
-        }}
-      >
-        <div style={{ display: "flex", alignItems: "center", gap: "12px" }}>
-          <div
-            style={{
-              width: "36px",
-              height: "36px",
-              borderRadius: "12px",
-              background: "rgba(0,212,255,0.1)",
-              border: "1px solid rgba(0,212,255,0.2)",
-              display: "flex",
-              alignItems: "center",
-              justifyContent: "center",
-              fontSize: "17px",
-              flexShrink: 0,
-            }}
-          >
-            💬
-          </div>
-          <div>
+      {showSection && (
+        <section
+          style={{
+            marginBottom: isFloating ? 0 : "14px",
+            borderRadius: "22px",
+            border: "1px solid var(--border)",
+            background:
+              "linear-gradient(180deg, rgba(12,17,23,0.98) 0%, rgba(7,11,16,0.97) 100%)",
+            overflow: "hidden",
+            ...(isFloating && isOpen
+              ? {
+                  position: "fixed",
+                  bottom: "22px",
+                  right: "22px",
+                  width: "min(400px, calc(100vw - 28px))",
+                  maxHeight: "min(560px, 82vh)",
+                  zIndex: 65,
+                  display: "flex",
+                  flexDirection: "column",
+                  boxShadow:
+                    "0 24px 70px rgba(0, 0, 0, 0.55), 0 0 0 1px rgba(0, 212, 255, 0.14)",
+                }
+              : {}),
+          }}
+        >
+          {isFloating && isOpen && (
             <div
               style={{
-                fontSize: "15px",
-                  fontWeight: 800,
-                  color: "var(--text-primary)",
-                  letterSpacing: "-0.02em",
-                }}
-              >
-              {title}
-            </div>
-            <div
-              style={{
-                fontSize: "13px",
-                color: "var(--text-secondary)",
-                marginTop: "1px",
+                padding: "14px 16px",
+                borderBottom: "1px solid var(--border)",
+                display: "flex",
+                alignItems: "center",
+                justifyContent: "space-between",
+                gap: "12px",
+                background: "rgba(0, 212, 255, 0.08)",
+                flexShrink: 0,
               }}
             >
-              {subtitle}
+              <div
+                style={{
+                  display: "flex",
+                  alignItems: "center",
+                  gap: "10px",
+                  minWidth: 0,
+                }}
+              >
+                <span style={{ fontSize: "20px", lineHeight: 1 }} aria-hidden>
+                  💬
+                </span>
+                <div style={{ minWidth: 0 }}>
+                  <div
+                    style={{
+                      fontWeight: 800,
+                      fontSize: "14px",
+                      color: "var(--text-primary)",
+                      letterSpacing: "-0.02em",
+                    }}
+                  >
+                    {title}
+                  </div>
+                  <div
+                    style={{
+                      fontSize: "12px",
+                      color: "var(--text-secondary)",
+                      marginTop: "2px",
+                      lineHeight: 1.35,
+                    }}
+                  >
+                    {subtitle}
+                  </div>
+                </div>
+              </div>
+              <button
+                type="button"
+                aria-label="Réduire le chat"
+                onClick={() => setIsOpen(false)}
+                style={{
+                  flexShrink: 0,
+                  width: "36px",
+                  height: "36px",
+                  borderRadius: "12px",
+                  border: "1px solid var(--border)",
+                  background: "rgba(255,255,255,0.06)",
+                  color: "var(--text-primary)",
+                  fontSize: "18px",
+                  lineHeight: 1,
+                  cursor: "pointer",
+                  display: "flex",
+                  alignItems: "center",
+                  justifyContent: "center",
+                }}
+              >
+                ×
+              </button>
             </div>
-          </div>
-        </div>
-        <div
-          style={{
-            width: "28px",
-            height: "28px",
-            borderRadius: "8px",
-            border: "1px solid var(--border)",
-            background: "rgba(255,255,255,0.04)",
-            display: "flex",
-            alignItems: "center",
-            justifyContent: "center",
-            color: "var(--text-secondary)",
-            fontSize: "14px",
-            flexShrink: 0,
-            transition: "transform 0.22s",
-            transform: isOpen ? "rotate(180deg)" : "rotate(0deg)",
-          }}
-        >
-          ↓
-        </div>
-      </button>
+          )}
 
-      {/* accordion body */}
-      {isOpen && (
-        <div
-          style={{
-            borderTop: "1px solid var(--border)",
-          }}
-        >
-          {/* messages area */}
-          <div
-            style={{
-              padding: "16px",
-              display: "flex",
-              flexDirection: "column",
-              gap: "12px",
-              minHeight: "120px",
-              maxHeight: "420px",
-              overflowY: "auto",
-            }}
-          >
+          {!isFloating && !isOpen && showAttentionNudge && !nudgeDismissed && (
+            <div
+              style={{
+                padding: "12px 16px",
+                borderBottom: "1px solid var(--border)",
+                background: "rgba(0, 212, 255, 0.08)",
+                display: "flex",
+                alignItems: "center",
+                justifyContent: "space-between",
+                gap: "10px",
+                flexWrap: "wrap",
+              }}
+            >
+              <button
+                type="button"
+                onClick={() => setIsOpen(true)}
+                style={{
+                  border: "none",
+                  background: "none",
+                  color: "var(--text-primary)",
+                  fontSize: "13px",
+                  fontWeight: 800,
+                  cursor: "pointer",
+                }}
+              >
+                Tu as des questions sur l&apos;analyse ? Clique ici.
+              </button>
+              <button
+                type="button"
+                onClick={() => setNudgeDismissed(true)}
+                style={{
+                  border: "1px solid var(--border)",
+                  borderRadius: "999px",
+                  background: "rgba(255,255,255,0.04)",
+                  color: "var(--text-secondary)",
+                  fontSize: "11px",
+                  padding: "4px 8px",
+                  cursor: "pointer",
+                }}
+              >
+                Masquer
+              </button>
+            </div>
+          )}
+
+          {!isFloating && (
+            <button
+              type="button"
+              onClick={() => setIsOpen((v) => !v)}
+              style={{
+                width: "100%",
+                display: "flex",
+                alignItems: "center",
+                justifyContent: "space-between",
+                gap: "12px",
+                padding: "20px 24px",
+                background: "none",
+                border: "none",
+                cursor: "pointer",
+                textAlign: "left",
+              }}
+            >
+              <div style={{ display: "flex", alignItems: "center", gap: "12px" }}>
+                <div
+                  style={{
+                    width: "36px",
+                    height: "36px",
+                    borderRadius: "12px",
+                    background: "rgba(0,212,255,0.1)",
+                    border: "1px solid rgba(0,212,255,0.2)",
+                    display: "flex",
+                    alignItems: "center",
+                    justifyContent: "center",
+                    fontSize: "17px",
+                    flexShrink: 0,
+                  }}
+                >
+                  💬
+                </div>
+                <div>
+                  <div
+                    style={{
+                      fontSize: "15px",
+                      fontWeight: 800,
+                      color: "var(--text-primary)",
+                      letterSpacing: "-0.02em",
+                    }}
+                  >
+                    {title}
+                  </div>
+                  <div
+                    style={{
+                      fontSize: "13px",
+                      color: "var(--text-secondary)",
+                      marginTop: "1px",
+                    }}
+                  >
+                    {subtitle}
+                  </div>
+                </div>
+              </div>
+              <div
+                style={{
+                  width: "28px",
+                  height: "28px",
+                  borderRadius: "8px",
+                  border: "1px solid var(--border)",
+                  background: "rgba(255,255,255,0.04)",
+                  display: "flex",
+                  alignItems: "center",
+                  justifyContent: "center",
+                  color: "var(--text-secondary)",
+                  fontSize: "14px",
+                  flexShrink: 0,
+                  transition: "transform 0.22s",
+                  transform: isOpen ? "rotate(180deg)" : "rotate(0deg)",
+                }}
+              >
+                ↓
+              </div>
+            </button>
+          )}
+
+          {isOpen && (
+            <div
+              style={{
+                borderTop: isFloating ? "none" : "1px solid var(--border)",
+                ...(isFloating
+                  ? {
+                      flex: 1,
+                      minHeight: 0,
+                      display: "flex",
+                      flexDirection: "column",
+                      overflow: "hidden",
+                    }
+                  : {}),
+              }}
+            >
+              {/* messages area */}
+              <div
+                style={{
+                  padding: "16px",
+                  display: "flex",
+                  flexDirection: "column",
+                  gap: "12px",
+                  minHeight: isFloating ? 0 : "120px",
+                  maxHeight: isFloating ? "none" : "420px",
+                  flex: isFloating ? 1 : undefined,
+                  overflowY: "auto",
+                }}
+              >
             {/* welcome */}
             {messages.length === 0 && (
               <div
@@ -532,7 +673,9 @@ export default function InlineChatbot({
             </Link>
           </div>
         </div>
+          )}
+        </section>
       )}
-    </section>
+    </>
   );
 }

@@ -38,7 +38,7 @@ export const PRICING_PLANS: PricingPlan[] = [
     features: [
       "5 rapports complets / mois",
       "Même profondeur qu'à l'unité",
-      "Renouvelé chaque mois",
+      "Assistant : jusqu'à 3 réponses personnalisées / mois",
     ],
     cta: "S'abonner",
     highlighted: true,
@@ -54,7 +54,7 @@ export const PRICING_PLANS: PricingPlan[] = [
       "15 diagnostics complets par mois — abonnement mensuel, idéal si vous produisez souvent.",
     features: [
       "15 rapports complets / mois",
-      "Renouvelé chaque mois",
+      "Assistant : jusqu'à 5 réponses personnalisées / mois",
       "Chaque rapport : même contenu qu'une analyse à 9 €",
     ],
     cta: "S'abonner",
