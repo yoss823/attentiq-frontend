@@ -6,8 +6,7 @@ import AnalysisLoadingState from "@/components/analysis-loading-state";
 import ResultReport from "@/components/result-report";
 import { persistAnalyzeResult, readAnalyzeResult } from "@/lib/analyze-session";
 import type { PremiumEntitlement } from "@/lib/premium";
-import type { AttentiqReport } from "@/lib/railway-client";
-import ResultV2 from "@/components/ResultV2";
+import type { AttentiqReport, RailwayResponse } from "@/lib/railway-client";
 import type { V2AnalysisResult } from "@/lib/v2-types";
 
 type ResultPageShellProps = {
@@ -38,6 +37,49 @@ function isV2AnalysisResult(value: unknown): value is V2AnalysisResult {
     Array.isArray(candidate.dashboard) &&
     Array.isArray(candidate.actions)
   );
+}
+
+function buildLegacyReportFromV2(result: V2AnalysisResult): AttentiqReport {
+  const retentionScore = Math.max(
+    0,
+    Math.min(10, Number((result.diagnostic.score * 10).toFixed(1)))
+  );
+  const actions = result.actions
+    .map((action) => action.label?.trim())
+    .filter((label): label is string => Boolean(label));
+  const metadata: RailwayResponse["metadata"] = {
+    url: result.sourceUrl ?? "",
+    platform: result.sourcePlatform ?? "unknown",
+    author: "attentiq",
+    title: "Diagnostic d'attention",
+    duration_seconds: result.durationSeconds ?? 0,
+    hashtags: [],
+  };
+
+  const response: RailwayResponse = {
+    request_id: result.id,
+    status: "success",
+    metadata,
+    diagnostic: {
+      retention_score: retentionScore,
+      global_summary: result.diagnostic.explanation,
+      drop_off_rule: `Diagnostic dominant: ${result.diagnostic.label.replace(
+        /_/g,
+        " "
+      )}`,
+      creator_perception:
+        "Ce diagnostic est genere automatiquement a partir du format envoye.",
+      audience_loss_estimate: "Estimation fournie par le moteur V2.",
+      corrective_actions: actions.slice(0, 3),
+      attention_drops: [],
+    },
+  };
+
+  return {
+    text: result.diagnostic.explanation,
+    data: response,
+    partial: false,
+  };
 }
 
 function matchesExpectedStoredResult({
@@ -229,9 +271,6 @@ export default function ResultPageShell({
   const [storedReport, setStoredReport] = useState<AttentiqReport | null>(
     initialReport
   );
-  const [storedV2Report, setStoredV2Report] = useState<V2AnalysisResult | null>(
-    null
-  );
   const [storedReportJobId, setStoredReportJobId] = useState<string | null>(
     initialReportJobId
   );
@@ -258,11 +297,6 @@ export default function ResultPageShell({
       });
 
       setStoredReport(matchesStoredResult ? stored?.report ?? null : null);
-      setStoredV2Report(
-        matchesStoredResult && isV2AnalysisResult(stored?.report)
-          ? stored.report
-          : null
-      );
       setStoredReportJobId(matchesStoredResult ? stored?.jobId ?? null : null);
       setHasResolvedStoredResult(true);
     }, 0);
@@ -322,18 +356,18 @@ export default function ResultPageShell({
           if (data?.status === "success" && data.result) {
             if (!cancelled) {
               if (isV2AnalysisResult(data.result)) {
-                setStoredV2Report(data.result);
+                setStoredReport(buildLegacyReportFromV2(data.result));
               } else {
                 setStoredReport(data.result as AttentiqReport);
               }
               setStoredReportJobId(expectedReportJobId);
-              if (!isV2AnalysisResult(data.result)) {
-                persistAnalyzeResult({
-                  report: data.result as AttentiqReport,
-                  url: expectedVideoUrl ?? "",
-                  jobId: expectedReportJobId,
-                });
-              }
+              persistAnalyzeResult({
+                report: isV2AnalysisResult(data.result)
+                  ? buildLegacyReportFromV2(data.result)
+                  : (data.result as AttentiqReport),
+                url: expectedVideoUrl ?? "",
+                jobId: expectedReportJobId,
+              });
             }
             return;
           }
@@ -385,12 +419,7 @@ export default function ResultPageShell({
     hasResolvedStoredResult &&
     Boolean(expectedReportJobId) &&
     !storedReport &&
-    !storedV2Report &&
     !runtimeMessage;
-
-  if (storedV2Report) {
-    return <ResultV2 result={storedV2Report} />;
-  }
 
   if (storedReport) {
     return (

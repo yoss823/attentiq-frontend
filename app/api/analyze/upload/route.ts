@@ -1,10 +1,35 @@
 import { NextRequest, NextResponse } from "next/server";
 import { URL_PIPELINE_VERSION, buildPipelineHeaders } from "@/lib/railway-server";
+import {
+  parsePremiumEntitlement,
+  PREMIUM_ENTITLEMENT_COOKIE_NAME,
+} from "@/lib/premium";
 
 const ACCEPTED_MIME_TYPES = ["video/mp4", "video/quicktime", "video/webm"];
 const MAX_FILE_SIZE_BYTES = 500 * 1024 * 1024; // 500 MB
+const FREE_TRIAL_COOKIE_NAME = "attentiq_free_trial_used";
+const FREE_TRIAL_COOKIE_MAX_AGE_SECONDS = 60 * 60 * 24 * 365;
 
 export async function POST(req: NextRequest) {
+  const entitlement = parsePremiumEntitlement(
+    req.cookies.get(PREMIUM_ENTITLEMENT_COOKIE_NAME)?.value ?? null
+  );
+  const hasUsedFreeTrial = req.cookies.get(FREE_TRIAL_COOKIE_NAME)?.value === "1";
+  const hasPremium = Boolean(entitlement?.isPremium);
+
+  if (hasUsedFreeTrial && !hasPremium) {
+    return NextResponse.json(
+      {
+        error: "FREE_TRIAL_EXHAUSTED",
+        userMessage:
+          "Votre analyse gratuite est deja utilisee. Debloquez une offre pour continuer.",
+        paywallPath: "/videos#tarifs",
+        pipelineVersion: URL_PIPELINE_VERSION,
+      },
+      { status: 402, headers: buildPipelineHeaders() }
+    );
+  }
+
   if (!process.env.RAILWAY_BASE_URL) {
     return NextResponse.json(
       {
@@ -78,9 +103,9 @@ export async function POST(req: NextRequest) {
     const controller = new AbortController();
     const timeoutId = setTimeout(() => controller.abort(), 120_000);
 
-    let response: Response;
+    let upstreamResponse: Response;
     try {
-      response = await fetch(`${railwayBaseUrl}/analyze/upload`, {
+      upstreamResponse = await fetch(`${railwayBaseUrl}/analyze/upload`, {
         method: "POST",
         body: upstream,
         signal: controller.signal,
@@ -89,12 +114,12 @@ export async function POST(req: NextRequest) {
       clearTimeout(timeoutId);
     }
 
-    const payload = (await response.json().catch(() => null)) as Record<
+    const payload = (await upstreamResponse.json().catch(() => null)) as Record<
       string,
       unknown
     > | null;
 
-    if (!response.ok || !payload) {
+    if (!upstreamResponse.ok || !payload) {
       return NextResponse.json(
         {
           error: "UPLOAD_FAILED",
@@ -106,10 +131,24 @@ export async function POST(req: NextRequest) {
       );
     }
 
-    return NextResponse.json(
+    const response = NextResponse.json(
       { ...payload, pipelineVersion: URL_PIPELINE_VERSION },
       { headers: buildPipelineHeaders() }
     );
+
+    if (!hasPremium) {
+      response.cookies.set({
+        name: FREE_TRIAL_COOKIE_NAME,
+        value: "1",
+        maxAge: FREE_TRIAL_COOKIE_MAX_AGE_SECONDS,
+        httpOnly: true,
+        sameSite: "lax",
+        secure: true,
+        path: "/",
+      });
+    }
+
+    return response;
   } catch (error) {
     if (error instanceof Error && error.name === "AbortError") {
       return NextResponse.json(
