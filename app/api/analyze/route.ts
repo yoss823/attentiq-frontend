@@ -1,6 +1,6 @@
 import { NextRequest, NextResponse } from "next/server";
 import { formatAttentiqReport, mockSalesWithEvaResponse } from "@/lib/railway-client";
-import { URL_PIPELINE_VERSION, buildPipelineHeaders, preflightRailwayUrl, resolveTikTokUrl, startRailwayAnalyze, UrlIntakeError } from "@/lib/railway-server";
+import { URL_PIPELINE_VERSION, buildPipelineHeaders, preflightRailwayUrl, resolveVideoUrl, startRailwayAnalyze, UrlIntakeError } from "@/lib/railway-server";
 import {
   parsePremiumEntitlement,
   PREMIUM_ENTITLEMENT_COOKIE_NAME,
@@ -23,7 +23,7 @@ export async function POST(req: NextRequest) {
   const rawUrl = typeof body.url === "string" ? body.url : "";
   if (!rawUrl.trim()) {
     return NextResponse.json(
-      { error: "MISSING_URL", userMessage: "Collez une URL TikTok publique ou passez par l'upload video.", needsUpload: true, pipelineVersion: URL_PIPELINE_VERSION },
+      { error: "MISSING_URL", userMessage: "Collez une URL de vidéo courte (TikTok, YouTube Shorts, Instagram…) ou passez par l'upload.", needsUpload: true, pipelineVersion: URL_PIPELINE_VERSION },
       { status: 400, headers: buildPipelineHeaders() }
     );
   }
@@ -53,7 +53,7 @@ export async function POST(req: NextRequest) {
   }
 
   try {
-    const resolvedUrl = await resolveTikTokUrl(rawUrl);
+    const resolvedUrl = await resolveVideoUrl(rawUrl);
     await preflightRailwayUrl(resolvedUrl);
     const payload = await startRailwayAnalyze(resolvedUrl);
     const response = NextResponse.json(

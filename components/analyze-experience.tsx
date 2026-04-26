@@ -234,7 +234,7 @@ export default function AnalyzeExperience({
           <AnalysisLoadingState
             elapsedMs={elapsedMs}
             headline="Analyse en cours."
-            detail="Attentiq telecharge la video, transcrit l'audio et genere votre diagnostic de retention. Cela prend generalement 60 a 90 secondes."
+            detail="Attentiq telecharge la video (yt-dlp), transcrit l'audio et genere votre diagnostic. Cela prend generalement 60 a 90 secondes."
           />
         </section>
       </main>
@@ -405,7 +405,7 @@ export default function AnalyzeExperience({
               color: "var(--text-primary)",
             }}
           >
-            Analysez votre video TikTok.
+            Analysez une video courte.
           </h1>
           <p
             style={{
@@ -417,8 +417,8 @@ export default function AnalyzeExperience({
             }}
           >
             {inputMode === "url"
-              ? "Collez une URL TikTok publique. Le diagnostic de retention arrive en 60 a 90 secondes — gratuitement."
-              : "Importez votre video directement (MP4, MOV, WebM). Le diagnostic arrive en 60 a 90 secondes — gratuitement."}
+              ? "Collez une URL publique : TikTok, YouTube Shorts, Reel Instagram ou Snapchat Spotlight. La video doit durer moins de 60 secondes. En 60 a 90 secondes : aperçu gratuit limite (2 a 3 points max.) ; rapport complet avec une offre payante."
+              : "Importez votre fichier (MP4, MOV, WebM), moins de 60 secondes. En 60 a 90 secondes : aperçu gratuit limite (2 a 3 points max.) ; rapport complet avec une offre payante."}
           </p>
 
           {/* Mode toggle */}
@@ -470,62 +470,75 @@ export default function AnalyzeExperience({
           </div>
 
           {inputMode === "url" ? (
-            <form onSubmit={handleSubmit}>
-              <div
-                style={{
-                  display: "grid",
-                  gap: "12px",
-                  gridTemplateColumns: "minmax(0, 1fr) auto",
-                }}
-              >
-                <input
-                  type="url"
-                  value={videoUrl}
-                  onChange={(e) => setVideoUrl(e.target.value)}
-                  placeholder="https://www.tiktok.com/@..."
-                  required
+            <>
+              <form onSubmit={handleSubmit}>
+                <div
                   style={{
-                    minHeight: "54px",
-                    borderRadius: "18px",
-                    border: "1px solid var(--border)",
-                    background: "rgba(5, 9, 14, 0.78)",
-                    color: "var(--text-primary)",
-                    fontSize: "15px",
-                    padding: "0 16px",
-                    outline: "none",
-                  }}
-                />
-                <button
-                  type="submit"
-                  disabled={isAnalyzing || !videoUrl.trim()}
-                  style={{
-                    minHeight: "54px",
-                    borderRadius: "999px",
-                    border: "none",
-                    padding: "0 22px",
-                    background:
-                      isAnalyzing || !videoUrl.trim()
-                        ? "rgba(255,255,255,0.08)"
-                        : "linear-gradient(135deg, var(--accent), #79e7ff)",
-                    color:
-                      isAnalyzing || !videoUrl.trim()
-                        ? "var(--text-secondary)"
-                        : "#041017",
-                    fontSize: "15px",
-                    fontWeight: 900,
-                    cursor:
-                      isAnalyzing || !videoUrl.trim() ? "not-allowed" : "pointer",
-                    whiteSpace: "nowrap",
-                    boxShadow:
-                      isAnalyzing || !videoUrl.trim()
-                        ? "none"
-                        : "0 18px 52px rgba(0, 212, 255, 0.18)",
+                    display: "grid",
+                    gap: "12px",
+                    gridTemplateColumns: "minmax(0, 1fr) auto",
                   }}
                 >
-                  Analyser →
-                </button>
-              </div>
-            </form>
+                  <input
+                    type="url"
+                    value={videoUrl}
+                    onChange={(e) => setVideoUrl(e.target.value)}
+                    placeholder="https://www.tiktok.com/... ou youtube.com/shorts/..."
+                    required
+                    style={{
+                      minHeight: "54px",
+                      borderRadius: "18px",
+                      border: "1px solid var(--border)",
+                      background: "rgba(5, 9, 14, 0.78)",
+                      color: "var(--text-primary)",
+                      fontSize: "15px",
+                      padding: "0 16px",
+                      outline: "none",
+                    }}
+                  />
+                  <button
+                    type="submit"
+                    disabled={isAnalyzing || !videoUrl.trim()}
+                    style={{
+                      minHeight: "54px",
+                      borderRadius: "999px",
+                      border: "none",
+                      padding: "0 22px",
+                      background:
+                        isAnalyzing || !videoUrl.trim()
+                          ? "rgba(255,255,255,0.08)"
+                          : "linear-gradient(135deg, var(--accent), #79e7ff)",
+                      color:
+                        isAnalyzing || !videoUrl.trim()
+                          ? "var(--text-secondary)"
+                          : "#041017",
+                      fontSize: "15px",
+                      fontWeight: 900,
+                      cursor:
+                        isAnalyzing || !videoUrl.trim() ? "not-allowed" : "pointer",
+                      whiteSpace: "nowrap",
+                      boxShadow:
+                        isAnalyzing || !videoUrl.trim()
+                          ? "none"
+                          : "0 18px 52px rgba(0, 212, 255, 0.18)",
+                    }}
+                  >
+                    Analyser →
+                  </button>
+                </div>
+              </form>
+              <p
+                style={{
+                  margin: "10px 0 0",
+                  fontSize: "12px",
+                  lineHeight: 1.5,
+                  color: "var(--text-muted)",
+                }}
+              >
+                La video source doit faire moins de 60 secondes (Short, Reel,
+                extrait).
+              </p>
+            </>
           ) : (
             <form onSubmit={handleUpload}>
               <div style={{ display: "grid", gap: "12px" }}>

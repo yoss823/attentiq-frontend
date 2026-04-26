@@ -3,6 +3,7 @@ import "server-only";
 import {
   URL_PIPELINE_VERSION,
   buildCanonicalTikTokUrl,
+  parseGenericVideoUrlInput,
   parseTikTokUrlInput,
   type ParsedTikTokUrl,
 } from "@/lib/url-intake";
@@ -158,6 +159,19 @@ export async function resolveTikTokUrl(rawUrl: string) {
   return resolvedResult.value.normalizedUrl;
 }
 
+/** TikTok (sonde d'accessibilité) ou autres plateformes courtes (validation côté serveur). */
+export async function resolveVideoUrl(rawUrl: string): Promise<string> {
+  const tik = parseTikTokUrlInput(rawUrl);
+  if (tik.ok) {
+    return resolveTikTokUrl(rawUrl);
+  }
+  const gen = parseGenericVideoUrlInput(rawUrl);
+  if (!gen.ok) {
+    throw new UrlIntakeError(gen.code, 400, gen.message, true);
+  }
+  return gen.normalizedUrl;
+}
+
 export async function preflightRailwayUrl(videoUrl: string) {
   const railwayBaseUrl = getRailwayBaseUrl();
   const response = await fetchWithTimeout(
@@ -261,11 +275,12 @@ function mapRailwayJobFailure(
     );
   }
 
-  if (errorCode === "DURATION_EXCEEDED") {
+  if (errorCode === "DURATION_EXCEEDED" || errorCode === "VIDEO_TOO_LONG") {
     return new UrlIntakeError(
-      "DURATION_EXCEEDED",
+      errorCode === "VIDEO_TOO_LONG" ? "VIDEO_TOO_LONG" : "DURATION_EXCEEDED",
       422,
-      "Cette video depasse la limite actuelle de 60 secondes. Importez un extrait video plus court."
+      errorMessage ||
+        "Cette video depasse 60 secondes. Utilisez un Short, Reel ou extrait, ou importez un fichier decoupe."
     );
   }
 

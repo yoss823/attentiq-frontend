@@ -367,10 +367,13 @@ export default function HomePage() {
                 maxWidth: "48rem",
               }}
             >
-              Lancez une analyse gratuite. Vous voyez immediatement les 3
-              premieres chutes d&apos;attention et 2 actions prioritaires — sans
-              carte bancaire. Le rapport complet se debloque en un clic si vous
-              voulez aller plus loin.
+              Lancez une analyse gratuite : aperçu limité — en général{" "}
+              <strong style={{ color: "rgba(237, 242, 247, 0.95)" }}>
+                2 à 3 points
+              </strong>{" "}
+              maximum (chutes visibles, actions prioritaires, etc.) — sans carte
+              bancaire. Le rapport complet se débloque en un clic si vous voulez
+              aller plus loin.
             </p>
           </div>
         </section>

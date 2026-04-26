@@ -274,8 +274,9 @@ export default function AnalyzeTextImageExperience({
           color: "var(--text-secondary)",
         }}
       >
-        Meme moteur que la video : diagnostic dominant, mini-dashboard et 3
-        actions. Un essai gratuit par format.
+        Meme moteur que la video : en essai gratuit, aperçu limité (2 a 3
+        points max.). Un essai par format ; le rapport complet se debloque avec
+        une offre payante.
       </p>
 
       {mode === "text" ? (

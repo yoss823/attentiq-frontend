@@ -2,12 +2,12 @@ import type { Metadata } from "next";
 import Link from "next/link";
 import { Suspense } from "react";
 import AnalyzeTextImageExperience from "@/components/analyze-text-image-experience";
-import { landingPlansWithFreeTrial } from "@/lib/landing-pricing-plans";
+import { LANDING_PAID_PLANS } from "@/lib/landing-pricing-plans";
 
 export const metadata: Metadata = {
   title: "Analysez vos photos — Attentiq",
   description:
-    "Diagnostic IA de rétention pour vos visuels. Essai gratuit, puis 9€, 29€/mois (5 rapports), 89€/mois (15 rapports).",
+    "Analyse de rétention pour vos visuels. Aperçu gratuit limité, puis 9 €, 29 €/mois ou 89 €/mois (même grille que la vidéo).",
 };
 
 const features = [
@@ -19,7 +19,7 @@ const features = [
   "Plan d'actions concret et actionnable",
 ];
 
-const plans = landingPlansWithFreeTrial("/images");
+const plans = LANDING_PAID_PLANS;
 
 export default function ImagesPage() {
   return (
@@ -185,7 +185,7 @@ export default function ImagesPage() {
                 color: "var(--accent)",
               }}
             >
-              Analyse visuelle IA
+              Analyse visuelle
             </span>
           </div>
 
@@ -204,7 +204,7 @@ export default function ImagesPage() {
 
           <p
             style={{
-              margin: "0 0 28px",
+              margin: "0 0 12px",
               fontSize: "17px",
               lineHeight: 1.8,
               color: "rgba(237, 242, 247, 0.8)",
@@ -214,6 +214,28 @@ export default function ImagesPage() {
             Attentiq identifie les zones de votre visuel qui captent ou perdent
             l&apos;attention — avec les causes et un plan d&apos;actions concret
             pour composer plus efficacement.
+          </p>
+          <p
+            style={{
+              margin: "0 0 28px",
+              fontSize: "16px",
+              lineHeight: 1.75,
+              color: "rgba(237, 242, 247, 0.72)",
+              maxWidth: "44rem",
+            }}
+          >
+            <strong style={{ color: "rgba(237, 242, 247, 0.95)" }}>
+              Essai gratuit :
+            </strong>{" "}
+            aperçu limité — en général{" "}
+            <strong style={{ color: "rgba(237, 242, 247, 0.95)" }}>
+              2 à 3 points
+            </strong>{" "}
+            maximum (score, zones sensibles, pistes).{" "}
+            <strong style={{ color: "rgba(237, 242, 247, 0.95)" }}>
+              Payant :
+            </strong>{" "}
+            le rapport complet — à l&apos;unité (9 €) ou en abonnement.
           </p>
 
           <div style={{ display: "flex", gap: "12px", flexWrap: "wrap" }}>
@@ -293,6 +315,18 @@ export default function ImagesPage() {
             >
               Un diagnostic complet de votre visuel
             </h2>
+            <p
+              style={{
+                margin: "0 0 16px",
+                fontSize: "14px",
+                lineHeight: 1.65,
+                color: "rgba(237, 242, 247, 0.65)",
+                maxWidth: "44rem",
+              }}
+            >
+              L&apos;essai gratuit ne montre qu&apos;un aperçu (2 à 3 points).
+              Ci-dessous : ce que débloque le rapport payant.
+            </p>
             <div
               style={{
                 display: "grid",
@@ -352,7 +386,7 @@ export default function ImagesPage() {
           </p>
           <h2
             style={{
-              margin: "0 0 24px",
+              margin: "0 0 10px",
               fontSize: "clamp(1.4rem, 4vw, 2rem)",
               lineHeight: 1,
               letterSpacing: "-0.05em",
@@ -361,6 +395,18 @@ export default function ImagesPage() {
           >
             Choisissez votre formule
           </h2>
+          <p
+            style={{
+              margin: "0 0 24px",
+              fontSize: "14px",
+              lineHeight: 1.65,
+              color: "rgba(237, 242, 247, 0.65)",
+              maxWidth: "40rem",
+            }}
+          >
+            Essai gratuit : aperçu limité (2 à 3 points max.) via le formulaire
+            ci-dessus — sans carte bancaire.
+          </p>
 
           <div
             style={{

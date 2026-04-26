@@ -55,7 +55,7 @@ export const PRICING_PLANS: PricingPlan[] = [
     features: [
       "15 rapports complets / mois",
       "Renouvelé chaque mois",
-      "Même qualité d'analyse qu'à l'unité",
+      "Chaque rapport : même contenu qu'une analyse à 9 €",
     ],
     cta: "S'abonner",
     highlighted: false,

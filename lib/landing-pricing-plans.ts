@@ -1,6 +1,7 @@
 /**
  * Cartes tarifaires landing (vidéo / texte / image) : même grille que Stripe,
- * pour éviter des prix différents par page.
+ * pour éviter des prix différents par page. L'essai gratuit n'est pas une carte
+ * tarifaire : aperçu limité (voir textes sur chaque page).
  */
 export type LandingPlanCard = {
   kicker: string;
@@ -11,20 +12,6 @@ export type LandingPlanCard = {
   ctaLabel: string;
   ctaHref: string;
   featured: boolean;
-};
-
-export const LANDING_FREE_TRIAL_PLAN: LandingPlanCard = {
-  kicker: "Essai gratuit",
-  priceLabel: "0€",
-  summary: "1 analyse complète offerte pour découvrir Attentiq.",
-  featureList: [
-    "1 rapport complet",
-    "Toutes les chutes d'attention",
-    "Plan d'actions détaillé",
-  ],
-  ctaLabel: "Analyser gratuitement",
-  ctaHref: "/analyze",
-  featured: false,
 };
 
 export const LANDING_PAID_PLANS: LandingPlanCard[] = [
@@ -47,7 +34,7 @@ export const LANDING_PAID_PLANS: LandingPlanCard[] = [
     priceLabel: "29€",
     cadenceLabel: "/mois",
     summary:
-      "5 rapports complets par mois — comme presque 2 analyses offertes vs l'unité.",
+      "5 rapports complets / mois — près de 2 analyses offertes vs 5 × 9 € à l'unité.",
     featureList: [
       "5 rapports complets / mois",
       "Même profondeur d'analyse",
@@ -65,17 +52,10 @@ export const LANDING_PAID_PLANS: LandingPlanCard[] = [
     featureList: [
       "15 rapports complets / mois",
       "Renouvelé chaque mois",
-      "Même qualité qu'à l'unité",
+      "Chaque rapport : même contenu qu'une analyse à 9 €",
     ],
     ctaLabel: "Choisir 89€/mois",
     ctaHref: "/checkout/pack-15",
     featured: false,
   },
 ];
-
-export function landingPlansWithFreeTrial(analyzeHref: string): LandingPlanCard[] {
-  return [
-    { ...LANDING_FREE_TRIAL_PLAN, ctaHref: analyzeHref },
-    ...LANDING_PAID_PLANS,
-  ];
-}

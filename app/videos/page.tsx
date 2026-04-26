@@ -1,11 +1,11 @@
 import type { Metadata } from "next";
 import Link from "next/link";
-import { landingPlansWithFreeTrial } from "@/lib/landing-pricing-plans";
+import { LANDING_PAID_PLANS } from "@/lib/landing-pricing-plans";
 
 export const metadata: Metadata = {
   title: "Analysez vos vidéos — Attentiq",
   description:
-    "Diagnostic IA de rétention pour YouTube Shorts, Instagram Reels et TikTok. Essai gratuit, puis 9€, 29€/mois (5 rapports) ou 89€/mois (15 rapports).",
+    "Analyse vidéo pour Shorts, Reels et TikTok : aperçu gratuit limité, puis 9 €, 29 €/mois (5 rapports) ou 89 €/mois (15 rapports).",
 };
 
 const platforms = [
@@ -23,7 +23,7 @@ const features = [
   "Rapport téléchargeable",
 ];
 
-const plans = landingPlansWithFreeTrial("/analyze");
+const plans = LANDING_PAID_PLANS;
 
 export default function VideosPage() {
   return (
@@ -189,7 +189,7 @@ export default function VideosPage() {
                 color: "var(--accent)",
               }}
             >
-              Analyse vidéo IA
+              Analyse vidéo
             </span>
           </div>
 
@@ -208,16 +208,38 @@ export default function VideosPage() {
 
           <p
             style={{
-              margin: "0 0 20px",
+              margin: "0 0 12px",
               fontSize: "17px",
               lineHeight: 1.8,
               color: "rgba(237, 242, 247, 0.8)",
               maxWidth: "44rem",
             }}
           >
-            Attentiq identifie les secondes exactes où votre audience décroche
-            — avec les causes et un plan d&apos;actions concret. 1 analyse
-            gratuite, puis abonnement.
+            Attentiq identifie les secondes où votre audience décroche — causes
+            précises et plan d&apos;actions pour vos prochaines vidéos.
+          </p>
+          <p
+            style={{
+              margin: "0 0 20px",
+              fontSize: "16px",
+              lineHeight: 1.75,
+              color: "rgba(237, 242, 247, 0.72)",
+              maxWidth: "44rem",
+            }}
+          >
+            <strong style={{ color: "rgba(237, 242, 247, 0.95)" }}>
+              Essai gratuit :
+            </strong>{" "}
+            aperçu limité — en général{" "}
+            <strong style={{ color: "rgba(237, 242, 247, 0.95)" }}>
+              2 à 3 points
+            </strong>{" "}
+            maximum (score, chutes, pistes).{" "}
+            <strong style={{ color: "rgba(237, 242, 247, 0.95)" }}>
+              Payant :
+            </strong>{" "}
+            le rapport complet — à l&apos;unité (9 €) ou en abonnement dès que
+            vous enchaînez les sorties.
           </p>
 
           {/* Platform badges */}
@@ -326,6 +348,18 @@ export default function VideosPage() {
             >
               Un diagnostic complet en 90 secondes
             </h2>
+            <p
+              style={{
+                margin: "0 0 16px",
+                fontSize: "14px",
+                lineHeight: 1.65,
+                color: "rgba(237, 242, 247, 0.65)",
+                maxWidth: "44rem",
+              }}
+            >
+              L&apos;essai gratuit ne montre qu&apos;un aperçu (2 à 3 points).
+              Ci-dessous : ce que débloque le rapport payant.
+            </p>
             <div
               style={{
                 display: "grid",
@@ -385,7 +419,7 @@ export default function VideosPage() {
           </p>
           <h2
             style={{
-              margin: "0 0 24px",
+              margin: "0 0 10px",
               fontSize: "clamp(1.4rem, 4vw, 2rem)",
               lineHeight: 1,
               letterSpacing: "-0.05em",
@@ -394,6 +428,18 @@ export default function VideosPage() {
           >
             Choisissez votre formule
           </h2>
+          <p
+            style={{
+              margin: "0 0 24px",
+              fontSize: "14px",
+              lineHeight: 1.65,
+              color: "rgba(237, 242, 247, 0.65)",
+              maxWidth: "40rem",
+            }}
+          >
+            Essai gratuit : aperçu limité (2 à 3 points max.) via le bouton «
+            Analyser gratuitement » dans la bannière — sans carte bancaire.
+          </p>
 
           <div
             style={{
@@ -646,7 +692,7 @@ export default function VideosPage() {
               color: "var(--text-secondary)",
             }}
           >
-            Attentiq — Diagnostic IA de retention video
+            Attentiq — Analyse vidéo et rétention
           </p>
           <nav style={{ display: "flex", gap: "16px", flexWrap: "wrap" }}>
             {[

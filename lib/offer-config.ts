@@ -77,7 +77,8 @@ export const ATTENTIQ_OFFERS: AttentiqOffer[] = [
     priceCents: 2900,
     priceLabel: "29€",
     cadenceLabel: "/mois",
-    summary: "5 rapports complets par mois — comme presque 2 analyses offertes vs l'unité.",
+    summary:
+      "5 rapports complets / mois — près de 2 analyses offertes vs 5 × 9 € à l'unité.",
     audience: "Pour les créateurs qui testent plusieurs hooks par mois.",
     ctaLabel: "Choisir 29€/mois",
     featureList: [
@@ -109,7 +110,7 @@ export const ATTENTIQ_OFFERS: AttentiqOffer[] = [
     featureList: [
       "15 rapports complets / mois",
       "Renouvelé chaque mois",
-      "Même qualité d'analyse qu'à l'unité",
+      "Chaque rapport : même contenu qu'une analyse à 9 €",
     ],
     stripePriceId:
       STRIPE_PRICE_PACK_15_RESOLVED || "price_1TNxfxKXvWnroW3IG6G9qmDF",

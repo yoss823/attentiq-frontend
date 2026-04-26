@@ -4,6 +4,21 @@ export const SUPPORTED_TIKTOK_HOSTS = [
   "www.tiktok.com", "m.tiktok.com", "tiktok.com", "vm.tiktok.com", "vt.tiktok.com",
 ] as const;
 
+const SUPPORTED_YOUTUBE_CORE = new Set([
+  "youtube.com",
+  "m.youtube.com",
+  "music.youtube.com",
+  "youtu.be",
+  "youtube-nocookie.com",
+]);
+
+const SUPPORTED_INSTAGRAM_CORE = new Set(["instagram.com"]);
+
+function hostCore(hostname: string) {
+  const h = hostname.toLowerCase();
+  return h.startsWith("www.") ? h.slice(4) : h;
+}
+
 export type ParsedTikTokUrl = {
   raw: string; trimmed: string; parsed: URL;
   normalizedUrl: string; host: string; path: string; isShortUrl: boolean;
@@ -61,4 +76,100 @@ export function parseTikTokUrlInput(rawValue: string): UrlValidationResult {
 export function validateTikTokUrl(value: string) {
   const result = parseTikTokUrlInput(value);
   return result.ok ? null : result.message;
+}
+
+export type GenericVideoUrlResult =
+  | { ok: true; normalizedUrl: string }
+  | { ok: false; code: string; message: string };
+
+/**
+ * URL courte non-TikTok (aligné sur le backend) : YouTube, Instagram Reel, Snapchat.
+ */
+export function parseGenericVideoUrlInput(rawValue: string): GenericVideoUrlResult {
+  const trimmed = rawValue.trim();
+  if (!trimmed) {
+    return {
+      ok: false,
+      code: "MISSING_URL",
+      message:
+        "Collez une URL publique (YouTube Shorts, Instagram Reel, Snapchat…) ou importez la vidéo.",
+    };
+  }
+
+  let parsed: URL;
+  try {
+    parsed = new URL(trimmed);
+  } catch {
+    return {
+      ok: false,
+      code: "INVALID_URL",
+      message:
+        "URL invalide. Copiez une adresse complète en https://, ou importez le fichier vidéo.",
+    };
+  }
+
+  const protocol = parsed.protocol.toLowerCase();
+  if (protocol !== "http:" && protocol !== "https:") {
+    return {
+      ok: false,
+      code: "UNSUPPORTED_SCHEME",
+      message: "Utilisez une URL https publique, ou passez par l'upload vidéo.",
+    };
+  }
+
+  const host = parsed.hostname.toLowerCase();
+  const core = hostCore(host);
+  const path = parsed.pathname || "";
+  const pathLower = path.toLowerCase();
+
+  if (SUPPORTED_YOUTUBE_CORE.has(core)) {
+    if (!path || path === "/") {
+      return {
+        ok: false,
+        code: "UNSUPPORTED_YOUTUBE_PATH",
+        message:
+          "URL YouTube incomplète. Utilisez un lien Short (/shorts/…), une page watch ou youtu.be.",
+      };
+    }
+    const u = new URL(parsed.toString());
+    u.protocol = "https:";
+    u.hostname = host;
+    u.hash = "";
+    return { ok: true, normalizedUrl: u.toString() };
+  }
+
+  if (SUPPORTED_INSTAGRAM_CORE.has(core)) {
+    if (
+      !pathLower.includes("/reel") &&
+      !pathLower.includes("/tv/") &&
+      !pathLower.includes("/p/")
+    ) {
+      return {
+        ok: false,
+        code: "UNSUPPORTED_INSTAGRAM_PATH",
+        message:
+          "Utilisez une URL de Reel ou de publication vidéo Instagram (/reel/, /tv/…).",
+      };
+    }
+    const u = new URL(parsed.toString());
+    u.protocol = "https:";
+    u.hostname = host;
+    u.hash = "";
+    return { ok: true, normalizedUrl: u.toString() };
+  }
+
+  if (host.includes("snapchat.com")) {
+    const u = new URL(parsed.toString());
+    u.protocol = "https:";
+    u.hostname = host;
+    u.hash = "";
+    return { ok: true, normalizedUrl: u.toString() };
+  }
+
+  return {
+    ok: false,
+    code: "UNSUPPORTED_URL",
+    message:
+      "URL non reconnue. Utilisez TikTok, YouTube, Instagram (Reel) ou Snapchat, ou importez la vidéo.",
+  };
 }
