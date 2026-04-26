@@ -11,6 +11,7 @@ import {
   getTeaserDrops,
 } from "@/lib/offer-config";
 import {
+  resolveMaxAssistantRepliesForReport,
   resolvePremiumAccessState,
   type PremiumEntitlement,
 } from "@/lib/premium";
@@ -685,12 +686,16 @@ export default function ResultReport({
     report.partial ||
     diagnostic?.mode === "audio_only" ||
     !(diagnostic?.attention_drops?.length);
-  const { isPremiumUnlocked, isSubscriptionEntitlement } =
+  const { entitlement, isPremiumUnlocked, isSubscriptionEntitlement } =
     resolvePremiumAccessState({
       reportRequestId: report.data.request_id,
       reportJobId,
       initialEntitlement: initialPremiumEntitlement,
     });
+  const maxAssistantRepliesForReport = resolveMaxAssistantRepliesForReport(
+    entitlement,
+    isPremiumUnlocked
+  );
   const wasRecentlyUnlocked = isPremiumUnlocked;
   const structuralCards = buildStructuralCards(report, isAudioOnly);
   const assistantPrompts = buildAssistantPrompts(
@@ -1278,7 +1283,7 @@ export default function ResultReport({
               subtitle="Posez vos questions sur ce rapport"
               suggestedPrompts={assistantPrompts}
               footerNote="Coach centre sur ce rapport complet et son plan d'action."
-              maxAssistantReplies={3}
+              maxAssistantReplies={maxAssistantRepliesForReport}
               paywallHref={analyzeHref}
             />
 

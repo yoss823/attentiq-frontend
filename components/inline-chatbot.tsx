@@ -81,7 +81,7 @@ export default function InlineChatbot({
           "assistant",
           maxAssistantReplies <= 1
             ? "Vous avez déjà votre réponse clé sur le teaser gratuit. Pour aller plus loin (timeline complète, détail des causes, plan étendu), débloquez la formule payante."
-            : "Vous avez atteint la limite de 3 réponses pour cette session. Ouvrez une nouvelle analyse ou le rapport suivant pour continuer."
+            : `Vous avez atteint la limite de ${maxAssistantReplies} réponses pour ce rapport. Ouvrez une nouvelle analyse ou le rapport suivant pour continuer.`
         ),
       ]);
       return;

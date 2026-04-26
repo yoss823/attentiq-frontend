@@ -57,7 +57,7 @@ export const LANDING_PAID_PLANS: LandingPlanCard[] = [
     featureList: [
       "5 rapports complets / mois",
       "Même profondeur d'analyse",
-      "Assistant : jusqu'à 3 réponses personnalisées / mois",
+      "Assistant : jusqu'à 3 réponses personnalisées par rapport",
     ],
     ctaLabel: "Choisir 35€/mois",
     ctaHref: "/checkout/monthly-5",
@@ -71,7 +71,7 @@ export const LANDING_PAID_PLANS: LandingPlanCard[] = [
     summary: "15 diagnostics complets par mois — abonnement mensuel.",
     featureList: [
       "15 rapports complets / mois",
-      "Assistant : jusqu'à 5 réponses personnalisées / mois",
+      "Assistant : jusqu'à 5 réponses personnalisées par rapport",
       "Chaque rapport : même contenu qu'une analyse à 9 €",
     ],
     ctaLabel: "Choisir 89€/mois",

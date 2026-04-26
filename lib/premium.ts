@@ -412,6 +412,22 @@ export function hasSubscriptionAccess(
   return entitlement?.plan === "5" || entitlement?.plan === "pack15";
 }
 
+/** Réponses assistant autorisées par rapport complet (pas un quota mensuel). */
+export function getMaxAssistantRepliesForPremiumPlan(
+  plan: PremiumPlan | null
+): number {
+  if (plan === "pack15") return 5;
+  return 3;
+}
+
+export function resolveMaxAssistantRepliesForReport(
+  entitlement: PremiumEntitlement | null,
+  isPremiumUnlocked: boolean
+) {
+  if (!isPremiumUnlocked) return 1;
+  return getMaxAssistantRepliesForPremiumPlan(entitlement?.plan ?? null);
+}
+
 export function resolvePremiumAccessState({
   reportRequestId,
   reportJobId = null,

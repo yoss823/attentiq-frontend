@@ -19,9 +19,9 @@ export type GuideCopy = {
 };
 
 const SHARED_LIMITATIONS = [
-  "Ce n'est pas une prediction de vues",
-  "Ce n'est pas une promesse de viralite",
-  "Ce n'est pas un outil algorithmique",
+  "Ce n'est pas une prédiction de vues",
+  "Ce n'est pas une promesse de viralité",
+  "Ce n'est pas une lecture des algorithmes internes des plateformes — c'est une lecture de votre contenu",
 ];
 
 const VIDEO: GuideCopy = {

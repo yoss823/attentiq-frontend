@@ -4,44 +4,61 @@ import Link from "next/link";
 export const metadata: Metadata = {
   title: "Ce qu'Attentiq fait — et ce qu'il ne fait pas | Attentiq",
   description:
-    "Transparence sur les capacités et limites d'Attentiq. Ce que l'outil fait bien, ce qu'il ne peut pas garantir, et comment vos données sont traitées.",
+    "Transparence sur les capacités et limites d'Attentiq pour la vidéo courte, le texte et l'image : ce que l'outil fait, ce qu'il ne garantit pas, et vos données.",
 };
 
+const FORMAT_LINKS = [
+  { href: "/videos", label: "Vidéo" },
+  { href: "/text", label: "Texte" },
+  { href: "/images", label: "Image" },
+] as const;
+
 const strengths = [
-  "Identifier des signaux structurels dans la video (rythme, accroche, ruptures narratives)",
-  "Donner des timestamps precis sur les zones a risque de decrochage",
-  "Traduire ces signaux en langage actionnable pour vos prochaines videos",
-  "Fonctionner sans acces a votre compte (pas besoin de connexion)",
+  "Structurer ce qui aide ou freine l'attention : vidéo (rythme, accroche, ruptures), texte (promesse, clarté, preuve), image (hiérarchie, lisibilité, intention).",
+  "Donner des repères précis quand le signal le permet — timestamps sur une vidéo, passages ou zones à risque sur un texte, points de friction sur un visuel.",
+  "Traduire le diagnostic en actions concrètes pour votre prochaine publication, quel que soit le format.",
+  "Proposer un aperçu gratuit sans compte sur les parcours publics (selon la page d'analyse).",
 ];
 
 const limits = [
-  "Il n'analyse pas l'algorithme des plateformes ni les tendances du moment",
-  "Il ne peut pas predire les vues, la viralite ou la croissance",
-  "Il n'a pas acces aux donnees reelles de retention de votre compte",
-  "Les recommandations sont des pistes diagnostiques — pas des certitudes",
+  "Ne prédit ni les vues, ni la viralité, ni la croissance de votre compte.",
+  "Ne s'appuie pas sur les statistiques privées de vos réseaux (analytics, rétention réelle du trafic).",
+  "Ne remplace pas votre jugement créatif ni la diversité du public réel.",
+  "Ne décrypte pas les règles internes des algorithmes des feeds — il lit votre contenu, pas le moteur de recommandation.",
+  "Les sorties sont des lectures automatisées du signal disponible : une aide à décider, pas une certitude.",
 ];
 
 const edgeCases = [
   {
-    title: "Videos tres courtes (< 10 s)",
-    detail: "Peu de signal a analyser. Le diagnostic devient moins stable.",
+    title: "Vidéo très courte (< 10 s)",
+    detail: "Peu de signal à analyser. Le diagnostic devient moins stable.",
   },
   {
-    title: "Audio indisponible",
+    title: "Audio manquant (vidéo)",
     detail:
-      "L'analyse reste possible, mais elle est partielle — la transcription manque.",
+      "L'analyse reste possible, mais partielle — la dimension verbale et le rythme pèsent plus que le visuel.",
   },
   {
-    title: "Comptes prives ou videos supprimees",
+    title: "Contenu privé ou indisponible",
     detail:
-      "Inaccessibles. L'outil ne peut pas analyser ce qu'il ne peut pas telecharger.",
+      "URL ou fichier inaccessible : l'outil ne peut pas analyser ce qu'il ne peut pas récupérer.",
+  },
+  {
+    title: "Texte au-delà de la limite",
+    detail:
+      "L'analyse porte sur un extrait ou un périmètre réduit ; la finesse peut diminuer.",
+  },
+  {
+    title: "Image basse résolution ou surchargée",
+    detail:
+      "Peu de signal exploitable : repères moins stables sur le message et la hiérarchie.",
   },
 ];
 
 const privacyPoints = [
-  "La video est telechargee temporairement pour l'analyse puis supprimee",
-  "Aucun stockage des URLs ou rapports apres traitement",
-  "Aucune donnee vendue ou partagee avec des tiers",
+  "Vos vidéos, images et textes d'analyse sont traités pour produire le diagnostic — pas revendus à des tiers.",
+  "Pas d'utilisation de vos contenus pour de la publicité ciblée ou du profilage marketing.",
+  "Des cookies techniques peuvent limiter l'abus d'essai gratuit ; pas de revente de données personnelles.",
 ];
 
 export default function TransparencePage() {
@@ -71,7 +88,7 @@ export default function TransparencePage() {
         style={{
           position: "relative",
           zIndex: 1,
-          maxWidth: "760px",
+          maxWidth: "900px",
           margin: "0 auto",
           padding: "28px 16px 72px",
         }}
@@ -196,9 +213,51 @@ export default function TransparencePage() {
               maxWidth: "44rem",
             }}
           >
-            Nous preferons etre clairs sur les limites de cet outil plutot que
-            de vous promettre des resultats que nous ne pouvons pas garantir.
+            Nous préférons être clairs sur les limites de cet outil plutôt que
+            de vous promettre des résultats que nous ne pouvons pas garantir —
+            sur la vidéo courte, le texte ou l&apos;image.
           </p>
+          <div
+            style={{
+              marginTop: "22px",
+              display: "flex",
+              flexWrap: "wrap",
+              gap: "10px",
+              alignItems: "center",
+            }}
+          >
+            <span
+              style={{
+                fontSize: "11px",
+                fontWeight: 800,
+                letterSpacing: "0.14em",
+                textTransform: "uppercase",
+                color: "var(--text-secondary)",
+              }}
+            >
+              Formats
+            </span>
+            {FORMAT_LINKS.map((f) => (
+              <Link
+                key={f.href}
+                href={f.href}
+                style={{
+                  display: "inline-flex",
+                  alignItems: "center",
+                  padding: "8px 14px",
+                  borderRadius: "999px",
+                  border: "1px solid rgba(0, 212, 255, 0.22)",
+                  background: "rgba(0, 212, 255, 0.06)",
+                  color: "var(--accent)",
+                  fontSize: "13px",
+                  fontWeight: 800,
+                  textDecoration: "none",
+                }}
+              >
+                {f.label}
+              </Link>
+            ))}
+          </div>
         </section>
 
         {/* Content blocks */}
@@ -259,10 +318,7 @@ export default function TransparencePage() {
                 color: "var(--text-secondary)",
               }}
             >
-              Attentiq est utile quand vous cherchez a comprendre comment une
-              video perd l&apos;attention sur le plan structurel. Il lit la
-              video comme un assemblage de signaux — pas comme une promesse de
-              resultats.
+              Attentiq aide à voir <strong style={{ color: "rgba(237,242,247,0.95)" }}>où</strong> votre contenu court perd l&apos;attention — vidéo, texte ou image — à partir de signaux observables (rythme, promesse, hiérarchie…), pas à partir de promesses de performance.
             </p>
             <div style={{ display: "grid", gap: "10px" }}>
               {strengths.map((item) => (
@@ -358,8 +414,7 @@ export default function TransparencePage() {
                 color: "var(--text-secondary)",
               }}
             >
-              Cet outil n&apos;est pas branche sur une verite cachee des
-              plateformes. Il donne une lecture serieuse, mais bornee.
+              Pas de baguette magique : une lecture sérieuse du signal que vous lui donnez, avec des bornes claires (pas vos stats privées, pas la viralité).
             </p>
             <div style={{ display: "grid", gap: "10px" }}>
               {limits.map((item) => (
@@ -455,14 +510,14 @@ export default function TransparencePage() {
                 color: "var(--text-secondary)",
               }}
             >
-              Il existe des contextes ou la lecture reste possible mais perd en
-              finesse. Mieux vaut le savoir a l&apos;avance.
+              Selon le format, certains contextes gardent une lecture utile mais
+              moins fine. Mieux vaut le savoir à l&apos;avance.
             </p>
             <div
               style={{
                 display: "grid",
                 gap: "10px",
-                gridTemplateColumns: "repeat(auto-fit, minmax(200px, 1fr))",
+                gridTemplateColumns: "repeat(auto-fit, minmax(240px, 1fr))",
               }}
             >
               {edgeCases.map((ec) => (
@@ -557,7 +612,8 @@ export default function TransparencePage() {
               }}
             >
               La confiance ne repose pas seulement sur le ton. Elle repose sur
-              ce que nous faisons — et ne faisons pas — avec vos donnees.
+              ce que nous faisons — et ne faisons pas — avec vos données, pour
+              tous les formats.
             </p>
             <div style={{ display: "grid", gap: "10px" }}>
               {privacyPoints.map((item) => (
@@ -619,7 +675,7 @@ export default function TransparencePage() {
                 color: "var(--accent)",
               }}
             >
-              Pret ?
+              Tester
             </p>
             <h2
               style={{
@@ -630,8 +686,7 @@ export default function TransparencePage() {
                 color: "var(--text-primary)",
               }}
             >
-              Si le diagnostic vous aide, il doit aussi pouvoir dire ce
-              qu&apos;il ne sait pas faire.
+              Un même cadre d&apos;honnêteté pour la vidéo, le texte et l&apos;image.
             </h2>
             <p
               style={{
@@ -641,27 +696,57 @@ export default function TransparencePage() {
                 color: "rgba(237, 242, 247, 0.8)",
               }}
             >
-              Vous savez maintenant exactement ce que vous obtenez — et ce que
-              vous n&apos;obtenez pas.
+              Choisissez un format, lancez un aperçu gratuit en quelques secondes — sans carte bancaire sur les parcours publics.
             </p>
-            <Link
-              href="/analyze"
+            <div
               style={{
-                display: "inline-flex",
-                alignItems: "center",
+                display: "flex",
+                flexWrap: "wrap",
+                gap: "10px",
                 justifyContent: "center",
-                padding: "13px 24px",
-                borderRadius: "999px",
-                textDecoration: "none",
-                background: "linear-gradient(135deg, var(--accent), #79e7ff)",
-                color: "#041017",
-                fontSize: "14px",
-                fontWeight: 900,
-                boxShadow: "0 18px 52px rgba(0, 212, 255, 0.18)",
+                alignItems: "center",
               }}
             >
-              Analyser une video
-            </Link>
+              <Link
+                href="/analyze"
+                style={{
+                  display: "inline-flex",
+                  alignItems: "center",
+                  justifyContent: "center",
+                  padding: "13px 24px",
+                  borderRadius: "999px",
+                  textDecoration: "none",
+                  background: "linear-gradient(135deg, var(--accent), #79e7ff)",
+                  color: "#041017",
+                  fontSize: "14px",
+                  fontWeight: 900,
+                  boxShadow: "0 18px 52px rgba(0, 212, 255, 0.18)",
+                }}
+              >
+                Analyser une vidéo
+              </Link>
+              {FORMAT_LINKS.filter((f) => f.href !== "/videos").map((f) => (
+                <Link
+                  key={f.href}
+                  href={f.href}
+                  style={{
+                    display: "inline-flex",
+                    alignItems: "center",
+                    justifyContent: "center",
+                    padding: "12px 20px",
+                    borderRadius: "999px",
+                    textDecoration: "none",
+                    border: "1px solid var(--border)",
+                    color: "var(--text-primary)",
+                    fontSize: "13px",
+                    fontWeight: 800,
+                    background: "rgba(255,255,255,0.04)",
+                  }}
+                >
+                  {f.label}
+                </Link>
+              ))}
+            </div>
           </div>
         </div>
 
@@ -689,9 +774,11 @@ export default function TransparencePage() {
           </p>
           <nav style={{ display: "flex", gap: "16px", flexWrap: "wrap" }}>
             {[
-              { href: "/guide", label: "Comment ca marche" },
+              { href: "/guide", label: "Comment ça marche" },
               { href: "/transparence", label: "Transparence" },
-              { href: "/analyze", label: "Analyser" },
+              { href: "/analyze", label: "Vidéo" },
+              { href: "/text", label: "Texte" },
+              { href: "/images", label: "Image" },
             ].map((link) => (
               <Link
                 key={link.href}
