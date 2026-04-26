@@ -11,7 +11,7 @@ const steps = [
   {
     number: "01",
     icon: "🔗",
-    title: "Vous collez une URL TikTok",
+    title: "Vous collez une URL ou uploadez un fichier",
     description:
       "N'importe quelle vidéo publique, la vôtre ou celle d'un concurrent.",
   },
@@ -107,17 +107,14 @@ function SeverityBadge({ level }: { level: string }) {
 
 export default function GuidePage() {
   return (
-    <main
-      className="min-h-screen"
-      style={{ background: "var(--bg-base)", color: "var(--text-primary)" }}
-    >
+    <main className="min-h-screen bg-slate-950 text-white">
       {/* Subtle grid texture */}
       <div
         aria-hidden="true"
         className="pointer-events-none fixed inset-0"
         style={{
           backgroundImage:
-            "linear-gradient(rgba(0,212,255,0.025) 1px, transparent 1px), linear-gradient(90deg, rgba(0,212,255,0.025) 1px, transparent 1px)",
+            "linear-gradient(rgba(51,64,245,0.025) 1px, transparent 1px), linear-gradient(90deg, rgba(51,64,245,0.025) 1px, transparent 1px)",
           backgroundSize: "60px 60px",
           maskImage:
             "linear-gradient(180deg, rgba(0,0,0,0.6) 0%, rgba(0,0,0,0.1) 60%, rgba(0,0,0,0) 100%)",
@@ -128,20 +125,10 @@ export default function GuidePage() {
         {/* Nav */}
         <nav className="rise flex items-center justify-between py-2">
           <Link href="/" className="flex items-center gap-3">
-            <div
-              className="flex h-10 w-10 items-center justify-center rounded-xl text-sm font-bold tracking-widest"
-              style={{
-                background: "var(--accent-dim)",
-                border: "1px solid var(--border-accent)",
-                color: "var(--accent)",
-              }}
-            >
+            <div className="flex h-10 w-10 items-center justify-center rounded-xl text-sm font-bold tracking-widest bg-brand-600/10 border border-brand-600/30 text-brand-300">
               AT
             </div>
-            <span
-              className="text-base font-semibold tracking-[-0.02em]"
-              style={{ color: "var(--text-primary)" }}
-            >
+            <span className="text-base font-semibold tracking-[-0.02em] text-white">
               Attentiq
             </span>
           </Link>
@@ -149,32 +136,19 @@ export default function GuidePage() {
           <div className="flex items-center gap-1 sm:gap-2">
             <Link
               href="/guide"
-              className="hidden rounded-full px-4 py-2 text-sm font-medium sm:block"
-              style={{
-                background: "var(--accent-dim)",
-                color: "var(--accent)",
-                border: "1px solid var(--border-accent)",
-              }}
+              className="hidden rounded-full px-4 py-2 text-sm font-medium sm:block bg-brand-600/10 text-brand-300 border border-brand-600/30"
             >
               Comment ça marche
             </Link>
             <Link
               href="/transparence"
-              className="hidden rounded-full px-4 py-2 text-sm font-medium transition sm:block"
-              style={{
-                color: "var(--text-secondary)",
-                border: "1px solid var(--border)",
-              }}
+              className="hidden rounded-full px-4 py-2 text-sm font-medium transition sm:block text-slate-400 border border-white/[0.08]"
             >
               Transparence
             </Link>
             <Link
               href="/analyze"
-              className="rounded-full px-4 py-2 text-sm font-semibold transition"
-              style={{
-                background: "var(--accent)",
-                color: "#060a0f",
-              }}
+              className="rounded-full px-4 py-2 text-sm font-semibold transition bg-brand-600 text-white hover:opacity-90"
             >
               Analyser
             </Link>
@@ -184,26 +158,13 @@ export default function GuidePage() {
         {/* Hero */}
         <section className="pb-16 pt-16 sm:pt-24">
           <div className="rise" style={{ animationDelay: "0.05s" }}>
-            <p
-              className="mb-5 inline-flex items-center gap-2 rounded-full px-4 py-1.5 text-[11px] font-semibold uppercase tracking-[0.22em]"
-              style={{
-                background: "var(--accent-dim)",
-                color: "var(--accent)",
-                border: "1px solid var(--border-accent)",
-              }}
-            >
+            <p className="mb-5 inline-flex items-center gap-2 rounded-full px-4 py-1.5 text-[11px] font-semibold uppercase tracking-[0.22em] bg-brand-600/10 text-brand-300 border border-brand-600/30">
               Guide
             </p>
-            <h1
-              className="max-w-3xl text-4xl font-semibold tracking-[-0.05em] sm:text-5xl lg:text-6xl"
-              style={{ color: "var(--text-primary)", lineHeight: 1.05 }}
-            >
+            <h1 className="max-w-3xl text-4xl font-semibold tracking-[-0.05em] sm:text-5xl lg:text-6xl text-white" style={{ lineHeight: 1.05 }}>
               Comment fonctionne Attentiq ?
             </h1>
-            <p
-              className="mt-6 max-w-2xl text-lg leading-8"
-              style={{ color: "var(--text-secondary)" }}
-            >
+            <p className="mt-6 max-w-2xl text-lg leading-8 text-slate-400">
               3 étapes. 90 secondes. Un diagnostic que vous ne trouverez nulle
               part ailleurs.
             </p>
@@ -216,32 +177,19 @@ export default function GuidePage() {
             {steps.map((step, i) => (
               <article
                 key={step.number}
-                className="rise relative rounded-2xl p-6"
-                style={{
-                  background: "var(--bg-surface)",
-                  border: "1px solid var(--border)",
-                  animationDelay: `${0.1 + i * 0.1}s`,
-                }}
+                className="rise relative rounded-2xl p-6 bg-white/[0.03] border border-white/[0.06]"
+                style={{ animationDelay: `${0.1 + i * 0.1}s` }}
               >
                 <div className="mb-5 flex items-start justify-between">
-                  <span
-                    className="font-mono text-xs font-semibold tracking-[0.2em]"
-                    style={{ color: "var(--accent)" }}
-                  >
+                  <span className="font-mono text-xs font-semibold tracking-[0.2em] text-brand-300">
                     {step.number}
                   </span>
                   <span className="text-2xl">{step.icon}</span>
                 </div>
-                <h3
-                  className="mb-3 text-base font-semibold leading-snug tracking-[-0.02em]"
-                  style={{ color: "var(--text-primary)" }}
-                >
+                <h3 className="mb-3 text-base font-semibold leading-snug tracking-[-0.02em] text-white">
                   {step.title}
                 </h3>
-                <p
-                  className="text-sm leading-7"
-                  style={{ color: "var(--text-secondary)" }}
-                >
+                <p className="text-sm leading-7 text-slate-400">
                   {step.description}
                 </p>
               </article>
@@ -254,35 +202,19 @@ export default function GuidePage() {
           <div className="grid gap-5 md:grid-cols-2">
             {/* Contains */}
             <div
-              className="rise rounded-2xl p-6 sm:p-8"
-              style={{
-                background: "var(--bg-surface)",
-                border: "1px solid var(--border)",
-                animationDelay: "0.15s",
-              }}
+              className="rise rounded-2xl p-6 sm:p-8 bg-white/[0.03] border border-white/[0.06]"
+              style={{ animationDelay: "0.15s" }}
             >
-              <h2
-                className="mb-6 text-xl font-semibold tracking-[-0.03em]"
-                style={{ color: "var(--text-primary)" }}
-              >
+              <h2 className="mb-6 text-xl font-semibold tracking-[-0.03em] text-white">
                 Ce que le rapport contient
               </h2>
               <ul className="space-y-3">
                 {reportContains.map((item) => (
                   <li key={item} className="flex items-start gap-3">
-                    <span
-                      className="mt-0.5 flex h-5 w-5 shrink-0 items-center justify-center rounded-full text-xs"
-                      style={{
-                        background: "var(--accent-dim)",
-                        color: "var(--accent)",
-                      }}
-                    >
+                    <span className="mt-0.5 flex h-5 w-5 shrink-0 items-center justify-center rounded-full text-xs bg-brand-600/10 text-brand-300">
                       ✓
                     </span>
-                    <span
-                      className="text-sm leading-6"
-                      style={{ color: "var(--text-secondary)" }}
-                    >
+                    <span className="text-sm leading-6 text-slate-400">
                       {item}
                     </span>
                   </li>
@@ -292,24 +224,14 @@ export default function GuidePage() {
 
             {/* Does not contain */}
             <div
-              className="rise rounded-2xl p-6 sm:p-8"
-              style={{
-                background: "var(--bg-elevated)",
-                border: "1px solid var(--border)",
-                animationDelay: "0.2s",
-              }}
+              className="rise rounded-2xl p-6 sm:p-8 bg-white/[0.04] border border-white/[0.06]"
+              style={{ animationDelay: "0.2s" }}
             >
-              <h2
-                className="mb-6 text-xl font-semibold tracking-[-0.03em]"
-                style={{ color: "var(--text-primary)" }}
-              >
+              <h2 className="mb-6 text-xl font-semibold tracking-[-0.03em] text-white">
                 Ce que le rapport ne contient{" "}
-                <span style={{ color: "#f87171" }}>pas</span>
+                <span className="text-red-400">pas</span>
               </h2>
-              <p
-                className="mb-5 text-sm leading-7"
-                style={{ color: "var(--text-secondary)" }}
-              >
+              <p className="mb-5 text-sm leading-7 text-slate-400">
                 La transparence, c&apos;est aussi savoir ce qu&apos;on ne promet
                 pas.
               </p>
@@ -326,10 +248,7 @@ export default function GuidePage() {
                     >
                       ×
                     </span>
-                    <span
-                      className="text-sm leading-6"
-                      style={{ color: "var(--text-secondary)" }}
-                    >
+                    <span className="text-sm leading-6 text-slate-400">
                       {item}
                     </span>
                   </li>
@@ -342,71 +261,40 @@ export default function GuidePage() {
         {/* Example report mockup */}
         <section className="pb-20">
           <div className="rise mb-6" style={{ animationDelay: "0.1s" }}>
-            <p
-              className="mb-3 text-[11px] font-semibold uppercase tracking-[0.22em]"
-              style={{ color: "var(--accent)" }}
-            >
+            <p className="mb-3 text-[11px] font-semibold uppercase tracking-[0.22em] text-brand-300">
               Exemple de rapport
             </p>
-            <h2
-              className="text-2xl font-semibold tracking-[-0.04em] sm:text-3xl"
-              style={{ color: "var(--text-primary)" }}
-            >
+            <h2 className="text-2xl font-semibold tracking-[-0.04em] sm:text-3xl text-white">
               À quoi ressemble un diagnostic réel ?
             </h2>
-            <p
-              className="mt-3 max-w-2xl text-base leading-7"
-              style={{ color: "var(--text-secondary)" }}
-            >
+            <p className="mt-3 max-w-2xl text-base leading-7 text-slate-400">
               Ci-dessous, un exemple fictif mais représentatif. Chiffres
               concrets, timestamps réels, causes précises.
             </p>
           </div>
 
           <div
-            className="rise rounded-2xl overflow-hidden"
-            style={{
-              background: "var(--bg-surface)",
-              border: "1px solid var(--border)",
-              animationDelay: "0.2s",
-            }}
+            className="rise rounded-2xl overflow-hidden bg-white/[0.03] border border-white/[0.06]"
+            style={{ animationDelay: "0.2s" }}
           >
             {/* Report header */}
-            <div
-              className="flex flex-wrap items-start justify-between gap-4 border-b p-5 sm:p-6"
-              style={{ borderColor: "var(--border)" }}
-            >
+            <div className="flex flex-wrap items-start justify-between gap-4 border-b border-white/[0.06] p-5 sm:p-6">
               <div>
-                <p
-                  className="font-mono text-[11px] font-medium uppercase tracking-[0.18em]"
-                  style={{ color: "var(--text-secondary)" }}
-                >
+                <p className="font-mono text-[11px] font-medium uppercase tracking-[0.18em] text-slate-500">
                   Diagnostic Attentiq — exemple fictif
                 </p>
-                <p
-                  className="mt-2 text-base font-semibold tracking-[-0.02em]"
-                  style={{ color: "var(--text-primary)" }}
-                >
+                <p className="mt-2 text-base font-semibold tracking-[-0.02em] text-white">
                   Pasta carbonara en 3 étapes —{" "}
-                  <span style={{ color: "var(--accent)" }}>@chefmaxime</span>
+                  <span className="text-brand-300">@chefmaxime</span>
                 </p>
               </div>
               <div className="text-right">
-                <p
-                  className="text-[11px] font-semibold uppercase tracking-[0.18em]"
-                  style={{ color: "var(--text-secondary)" }}
-                >
+                <p className="text-[11px] font-semibold uppercase tracking-[0.18em] text-slate-500">
                   Score global
                 </p>
-                <p
-                  className="mt-1 font-mono text-3xl font-bold"
-                  style={{ color: "var(--accent)" }}
-                >
+                <p className="mt-1 font-mono text-3xl font-bold text-brand-300">
                   6
-                  <span
-                    className="text-base font-normal"
-                    style={{ color: "var(--text-secondary)" }}
-                  >
+                  <span className="text-base font-normal text-slate-500">
                     /10
                   </span>
                 </p>
@@ -415,35 +303,22 @@ export default function GuidePage() {
 
             {/* Drops */}
             <div className="p-5 sm:p-6">
-              <p
-                className="mb-4 text-xs font-semibold uppercase tracking-[0.2em]"
-                style={{ color: "var(--text-secondary)" }}
-              >
+              <p className="mb-4 text-xs font-semibold uppercase tracking-[0.2em] text-slate-500">
                 Chutes d&apos;attention détectées
               </p>
               <div className="space-y-3">
                 {exampleDrops.map((drop) => (
                   <div
                     key={drop.time}
-                    className="rounded-xl p-4"
-                    style={{
-                      background: "var(--bg-elevated)",
-                      border: "1px solid var(--border)",
-                    }}
+                    className="rounded-xl p-4 bg-white/[0.04] border border-white/[0.06]"
                   >
                     <div className="flex flex-wrap items-center gap-3 mb-2">
-                      <span
-                        className="font-mono text-sm font-semibold"
-                        style={{ color: "var(--text-primary)" }}
-                      >
+                      <span className="font-mono text-sm font-semibold text-white">
                         {drop.time}
                       </span>
                       <SeverityBadge level={drop.severity} />
                     </div>
-                    <p
-                      className="text-sm leading-6"
-                      style={{ color: "var(--text-secondary)" }}
-                    >
+                    <p className="text-sm leading-6 text-slate-400">
                       {drop.cause}
                     </p>
                   </div>
@@ -451,38 +326,20 @@ export default function GuidePage() {
               </div>
 
               {/* Summary */}
-              <div
-                className="mt-5 grid gap-3 rounded-xl p-4 sm:grid-cols-2"
-                style={{
-                  background: "var(--bg-elevated)",
-                  border: "1px solid var(--border)",
-                }}
-              >
+              <div className="mt-5 grid gap-3 rounded-xl p-4 sm:grid-cols-2 bg-white/[0.04] border border-white/[0.06]">
                 <div>
-                  <p
-                    className="mb-1.5 text-xs font-semibold uppercase tracking-[0.18em]"
-                    style={{ color: "var(--text-secondary)" }}
-                  >
+                  <p className="mb-1.5 text-xs font-semibold uppercase tracking-[0.18em] text-slate-500">
                     Règle de décrochage
                   </p>
-                  <p
-                    className="text-sm font-medium leading-6"
-                    style={{ color: "var(--text-primary)" }}
-                  >
+                  <p className="text-sm font-medium leading-6 text-white">
                     Promesse retardée + répétitions mid-vidéo
                   </p>
                 </div>
                 <div>
-                  <p
-                    className="mb-1.5 text-xs font-semibold uppercase tracking-[0.18em]"
-                    style={{ color: "var(--text-secondary)" }}
-                  >
+                  <p className="mb-1.5 text-xs font-semibold uppercase tracking-[0.18em] text-slate-500">
                     Perception spectateur
                   </p>
-                  <p
-                    className="text-sm font-medium leading-6"
-                    style={{ color: "var(--text-primary)" }}
-                  >
+                  <p className="text-sm font-medium leading-6 text-white">
                     Créateur compétent mais vidéo qui manque de rythme
                   </p>
                 </div>
@@ -490,29 +347,16 @@ export default function GuidePage() {
 
               {/* Actions */}
               <div className="mt-4">
-                <p
-                  className="mb-3 text-xs font-semibold uppercase tracking-[0.2em]"
-                  style={{ color: "var(--text-secondary)" }}
-                >
+                <p className="mb-3 text-xs font-semibold uppercase tracking-[0.2em] text-slate-500">
                   Actions pour la prochaine vidéo
                 </p>
                 <ol className="space-y-2.5">
                   {exampleActions.map((action, i) => (
                     <li key={i} className="flex items-start gap-3">
-                      <span
-                        className="flex h-6 w-6 shrink-0 items-center justify-center rounded-full font-mono text-xs font-bold"
-                        style={{
-                          background: "var(--accent-dim)",
-                          color: "var(--accent)",
-                          border: "1px solid var(--border-accent)",
-                        }}
-                      >
+                      <span className="flex h-6 w-6 shrink-0 items-center justify-center rounded-full font-mono text-xs font-bold bg-brand-600/10 text-brand-300 border border-brand-600/30">
                         {i + 1}
                       </span>
-                      <p
-                        className="text-sm leading-6"
-                        style={{ color: "var(--text-secondary)" }}
-                      >
+                      <p className="text-sm leading-6 text-slate-400">
                         {action}
                       </p>
                     </li>
@@ -525,51 +369,29 @@ export default function GuidePage() {
 
         {/* CTA */}
         <section className="pb-10">
-          <div
-            className="rise rounded-2xl px-6 py-12 text-center sm:py-16"
-            style={{
-              background: "var(--bg-surface)",
-              border: "1px solid var(--border-accent)",
-            }}
-          >
-            <h2
-              className="mb-3 text-2xl font-semibold tracking-[-0.04em] sm:text-3xl"
-              style={{ color: "var(--text-primary)" }}
-            >
+          <div className="rise rounded-2xl px-6 py-12 text-center sm:py-16 bg-white/[0.03] border border-brand-600/30">
+            <h2 className="mb-3 text-2xl font-semibold tracking-[-0.04em] sm:text-3xl text-white">
               Prêt à voir ce que cache votre vidéo ?
             </h2>
-            <p
-              className="mb-8 text-base leading-7"
-              style={{ color: "var(--text-secondary)" }}
-            >
+            <p className="mb-8 text-base leading-7 text-slate-400">
               Collez une URL. L&apos;analyse prend 90 secondes.
             </p>
             <Link
               href="/analyze"
-              className="inline-flex items-center justify-center rounded-full px-8 py-4 text-base font-semibold transition hover:opacity-90"
-              style={{ background: "var(--accent)", color: "#060a0f" }}
+              className="inline-flex items-center justify-center rounded-full px-8 py-4 text-base font-semibold transition hover:opacity-90 bg-brand-600 text-white"
             >
               Analyser ma vidéo gratuitement
             </Link>
-            <p
-              className="mt-4 text-sm"
-              style={{ color: "var(--text-secondary)" }}
-            >
+            <p className="mt-4 text-sm text-slate-400">
               Aucune création de compte requise.
             </p>
           </div>
         </section>
 
         {/* Footer */}
-        <footer
-          className="border-t py-8"
-          style={{ borderColor: "var(--border)" }}
-        >
+        <footer className="border-t border-white/[0.06] py-8">
           <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
-            <p
-              className="text-sm font-medium"
-              style={{ color: "var(--text-secondary)" }}
-            >
+            <p className="text-sm font-medium text-slate-400">
               Attentiq — Diagnostic IA de rétention vidéo
             </p>
             <nav className="flex flex-wrap gap-4">
@@ -581,8 +403,7 @@ export default function GuidePage() {
                 <Link
                   key={link.href}
                   href={link.href}
-                  className="text-sm transition hover:opacity-80"
-                  style={{ color: "var(--text-secondary)" }}
+                  className="text-sm transition hover:opacity-80 text-slate-400"
                 >
                   {link.label}
                 </Link>
