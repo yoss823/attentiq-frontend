@@ -21,13 +21,21 @@ export type AttentiqOffer = {
 
 export const LAUNCH_DISCOUNT_PERCENT = 20;
 
+function trimEnv(value: string | undefined) {
+  return value?.trim() || undefined;
+}
+
 /** Stripe Price IDs — canonical names + Railway aliases (sans renommer les vars). */
 const STRIPE_PRICE_SINGLE_RESOLVED =
-  process.env.STRIPE_PRICE_SINGLE_REPORT ||
-  process.env.STRIPE_PRICE_SINGLE_REPORT_9;
+  trimEnv(process.env.STRIPE_PRICE_SINGLE_REPORT) ||
+  trimEnv(process.env.STRIPE_PRICE_SINGLE_REPORT_9);
 const STRIPE_PRICE_PACK_15_RESOLVED =
-  process.env.STRIPE_PRICE_PACK_15 ||
-  process.env.STRIPE_PRICE_MONTHLY_89;
+  trimEnv(process.env.STRIPE_PRICE_PACK_15) ||
+  trimEnv(process.env.STRIPE_PRICE_MONTHLY_89);
+/** Abonnement 5 rapports : historique `MONTHLY_29` + alias Railway `MONTHLY_35`. */
+const STRIPE_PRICE_MONTHLY_5_RESOLVED =
+  trimEnv(process.env.STRIPE_PRICE_MONTHLY_29) ||
+  trimEnv(process.env.STRIPE_PRICE_MONTHLY_35);
 
 // Stripe payment links — set in env when you create products in Stripe Dashboard.
 // Fallback URLs are placeholders; replace with real Payment Links before launch.
@@ -89,7 +97,7 @@ export const ATTENTIQ_OFFERS: AttentiqOffer[] = [
       "Assistant : jusqu'à 3 réponses personnalisées par rapport",
     ],
     stripePriceId:
-      process.env.STRIPE_PRICE_MONTHLY_29 || "price_1TNxfxKXvWnroW3IUCapqAK5",
+      STRIPE_PRICE_MONTHLY_5_RESOLVED || "price_1TNxfxKXvWnroW3IUCapqAK5",
     stripeUrl: STRIPE_MONTHLY5_URL,
     checkoutPath: "/checkout/monthly-5",
     createsAccount: true,
