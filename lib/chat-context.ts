@@ -1,3 +1,4 @@
+import { polishDiagnosticFrenchForDisplay } from "@/lib/diagnostic-locale-fr";
 import {
   formatAttentiqReport,
   mockSalesWithEvaResponse,
@@ -47,12 +48,12 @@ export function getDemoChatDiagnosticContext(): ChatDiagnosticContext {
 export function getPrimaryIssue(context: ChatDiagnosticContext): string {
   const diagnostic = context.diagnostic;
 
-  return (
+  const raw =
     diagnostic?.attention_drops?.[0]?.cause?.trim() ||
     diagnostic?.drop_off_rule?.trim() ||
     diagnostic?.global_summary?.trim() ||
-    "Le diagnostic ne contient pas encore de problème principal exploitable."
-  );
+    "Le diagnostic ne contient pas encore de problème principal exploitable.";
+  return polishDiagnosticFrenchForDisplay(raw);
 }
 
 export function getScoreLabel(score: number | null | undefined): string {
@@ -69,14 +70,15 @@ export function buildWelcomeMessage(
   const score = diagnostic?.retention_score;
   const action = diagnostic?.corrective_actions?.[0];
 
+  const actionFr = action ? polishDiagnosticFrenchForDisplay(action) : "";
   const lines = [
     "J'ai votre diagnostic actuel en contexte.",
     `Le point le plus sensible relevé ici est : ${getPrimaryIssue(context)}`,
     score != null
       ? `Votre score de rétention est ${score.toFixed(1)}/10, donc la priorité est d'agir avant d'élargir le plan.`
       : "Je vais rester strictement sur ce qui est présent dans le rapport.",
-    action
-      ? `Première action déjà visible dans le rapport : ${action}`
+    actionFr
+      ? `Première action déjà visible dans le rapport : ${actionFr}`
       : "Posez votre question et je vous répondrai uniquement à partir du rapport.",
   ];
 

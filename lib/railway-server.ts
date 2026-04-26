@@ -3,6 +3,7 @@ import "server-only";
 import {
   URL_PIPELINE_VERSION,
   buildCanonicalTikTokUrl,
+  detectVideoPlatformFromUrl,
   parseGenericVideoUrlInput,
   parseTikTokUrlInput,
   type ParsedTikTokUrl,
@@ -82,7 +83,7 @@ function buildAnalyzePayload(videoUrl: string): AnalyzeRequest {
   return {
     request_id: crypto.randomUUID(),
     url: videoUrl,
-    platform: "tiktok",
+    platform: detectVideoPlatformFromUrl(videoUrl),
     max_duration_seconds: 60,
     requested_at: new Date().toISOString(),
   };

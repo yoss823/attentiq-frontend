@@ -10,6 +10,8 @@
 
 // Uses built-in crypto.randomUUID() — no external dependency needed
 
+import { detectVideoPlatformFromUrl } from "@/lib/url-intake";
+
 // ─── Outbound request ──────────────────────────────────────────────────────
 
 export interface AnalyzeRequest {
@@ -110,16 +112,6 @@ export class TimeoutError extends Error {
   }
 }
 
-// ─── Platform detection ───────────────────────────────────────────────────
-
-function detectPlatform(url: string): string {
-  if (/tiktok\.com/i.test(url)) return "tiktok";
-  if (/instagram\.com/i.test(url)) return "instagram";
-  if (/youtube\.com|youtu\.be/i.test(url)) return "youtube";
-  if (/twitter\.com|x\.com/i.test(url)) return "twitter";
-  return "unknown";
-}
-
 // ─── Railway HTTP worker ───────────────────────────────────────────────────
 
 /**
@@ -146,7 +138,7 @@ export async function callRailwayAnalyze(
   const payload: AnalyzeRequest = {
     request_id: crypto.randomUUID(),
     url: videoUrl,
-    platform: detectPlatform(videoUrl),
+    platform: detectVideoPlatformFromUrl(videoUrl),
     max_duration_seconds: options.max_duration_seconds ?? 60,
     requested_at: new Date().toISOString(),
   };

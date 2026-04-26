@@ -14,6 +14,10 @@ import {
   resolvePremiumAccessState,
   type PremiumEntitlement,
 } from "@/lib/premium";
+import {
+  formatAttentionDiagnosticEyebrow,
+  polishDiagnosticFrenchForDisplay,
+} from "@/lib/diagnostic-locale-fr";
 import type { AttentiqReport, AttentionDrop } from "@/lib/railway-client";
 
 type ResultReportProps = {
@@ -416,7 +420,7 @@ function StatCard({
   helper,
 }: {
   label: string;
-  value: string;
+  value: ReactNode;
   helper: string;
 }) {
   return (
@@ -676,9 +680,38 @@ export default function ResultReport({
     isPremiumUnlocked,
     isAudioOnly
   );
-  const summary =
+  const summary = polishDiagnosticFrenchForDisplay(
     diagnostic?.global_summary ??
-    "Attentiq a prepare un diagnostic d'attention limite pour vous aider a decider si le rapport complet vaut le deblocage.";
+      "Attentiq a prepare un diagnostic d'attention limite pour vous aider a decider si le rapport complet vaut le deblocage."
+  );
+  const dropOffRuleDisplay = polishDiagnosticFrenchForDisplay(
+    diagnostic?.drop_off_rule ?? ""
+  );
+  const teaserDropStatValue: ReactNode =
+    isPremiumUnlocked || previewDrops.length > 0
+      ? `${isPremiumUnlocked ? allDrops.length : previewDrops.length}`
+      : "—";
+  const teaserDropStatHelper =
+    isPremiumUnlocked
+      ? "timeline complete visible, avec toute la chronologie detectee"
+      : previewDrops.length === 0
+        ? `Aucune chute listée dans cet aperçu ; le score et le résumé restent utiles. Jusqu'à ${FREE_TEASER_LIMITS.drops} chutes chronologiques après déblocage.`
+        : `jusqu'a ${FREE_TEASER_LIMITS.drops} chutes visibles avant le deblocage`;
+  const hiddenPreviewTotal = hiddenDropsCount + hiddenActionsCount;
+  const teaserHiddenStatValue: ReactNode =
+    isPremiumUnlocked
+      ? isAudioOnly
+        ? "Audio"
+        : "360°"
+      : hiddenPreviewTotal > 0
+        ? `${hiddenPreviewTotal}+`
+        : "—";
+  const teaserHiddenStatHelper =
+    isPremiumUnlocked
+      ? "resume structurel, perception et impact relus ensemble"
+      : hiddenPreviewTotal === 0
+        ? "Même sans détail masqué ici, le rapport complet ajoute timeline, sévérités et plan priorisé."
+        : "les parties detaillees restent reservees au rapport complet";
 
   return (
     <main
@@ -842,7 +875,7 @@ export default function ResultReport({
                   color: "var(--text-secondary)",
                 }}
               >
-                Diagnostic d&apos;attention TikTok
+                {formatAttentionDiagnosticEyebrow(metadata?.platform)}
               </p>
               <h1
                 style={{
@@ -940,12 +973,8 @@ export default function ResultReport({
         >
           <StatCard
             label={isPremiumUnlocked ? "Chutes detectees" : "Teaser gratuit"}
-            value={`${isPremiumUnlocked ? allDrops.length : previewDrops.length}`}
-            helper={
-              isPremiumUnlocked
-                ? "timeline complete visible, avec toute la chronologie detectee"
-                : `jusqu'a ${FREE_TEASER_LIMITS.drops} chutes visibles avant le deblocage`
-            }
+            value={teaserDropStatValue}
+            helper={teaserDropStatHelper}
           />
           <StatCard
             label={isPremiumUnlocked ? "Actions priorisees" : "Actions visibles"}
@@ -958,20 +987,8 @@ export default function ResultReport({
           />
           <StatCard
             label={isPremiumUnlocked ? "Lecture structurelle" : "Sections masquees"}
-            value={
-              isPremiumUnlocked
-                ? isAudioOnly
-                  ? "Audio"
-                  : "360°"
-                : hiddenDropsCount + hiddenActionsCount > 0
-                  ? `${hiddenDropsCount + hiddenActionsCount}+`
-                  : "0"
-            }
-            helper={
-              isPremiumUnlocked
-                ? "resume structurel, perception et impact relus ensemble"
-                : "les parties detaillees restent reservees au rapport complet"
-            }
+            value={teaserHiddenStatValue}
+            helper={teaserHiddenStatHelper}
           />
         </div>
 
@@ -990,7 +1007,7 @@ export default function ResultReport({
           >
             {summary}
           </p>
-          {diagnostic?.drop_off_rule && (
+          {dropOffRuleDisplay.trim() && (
             <div
               style={{
                 marginTop: "16px",
@@ -1020,7 +1037,7 @@ export default function ResultReport({
                   color: "rgba(237, 242, 247, 0.86)",
                 }}
               >
-                {diagnostic.drop_off_rule}
+                {dropOffRuleDisplay}
               </p>
             </div>
           )}
@@ -1427,8 +1444,10 @@ export default function ResultReport({
                     color: "var(--text-secondary)",
                   }}
                 >
-                  Aucune chute nette n&apos;est visible dans le teaser gratuit pour cette
-                  video.
+                  Dans cet aperçu gratuit, aucune chute n&apos;est affichée avec une
+                  chronologie (souvent le cas en mode audio ou si le modèle ne
+                  segmente pas encore finement). Le résumé ci-dessus et les
+                  actions listées restent le cœur du diagnostic.
                 </p>
               )}
 

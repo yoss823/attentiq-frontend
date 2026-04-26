@@ -150,7 +150,7 @@ export default function PremiumPaywall({
               }}
             >
               Relancez l&apos;analyse depuis le rapport en cours avant de payer,
-              pour rattacher automatiquement l&apos;achat au bon job TikTok.
+              pour rattacher automatiquement l&apos;achat au bon diagnostic.
             </p>
           </div>
         )}

@@ -173,3 +173,20 @@ export function parseGenericVideoUrlInput(rawValue: string): GenericVideoUrlResu
       "URL non reconnue. Utilisez TikTok, YouTube, Instagram (Reel) ou Snapchat, ou importez la vidéo.",
   };
 }
+
+/** Plateforme d'affichage / payload API — dérivée de l'URL analysée. */
+export function detectVideoPlatformFromUrl(rawUrl: string): string {
+  try {
+    const host = new URL(rawUrl.trim()).hostname.toLowerCase();
+    if (host.includes("tiktok")) return "tiktok";
+    if (host.includes("instagram")) return "instagram";
+    if (host.includes("youtube") || host === "youtu.be") return "youtube";
+    if (host.includes("snapchat")) return "snapchat";
+    if (host.includes("twitter") || host === "x.com" || host.endsWith(".x.com")) {
+      return "twitter";
+    }
+  } catch {
+    /* ignore */
+  }
+  return "unknown";
+}
