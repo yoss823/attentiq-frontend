@@ -34,6 +34,7 @@ export default function AnalyzeExperience({
   const [elapsedMs, setElapsedMs] = useState(0);
   const [error, setError] = useState<string | null>(null);
   const [needsUpload, setNeedsUpload] = useState(false);
+  const [paywallPath, setPaywallPath] = useState<string | null>(null);
   const startedAtRef = useRef<number | null>(null);
   const timerRef = useRef<ReturnType<typeof setInterval> | null>(null);
 
@@ -102,6 +103,7 @@ export default function AnalyzeExperience({
     setIsAnalyzing(true);
     setError(null);
     setNeedsUpload(false);
+    setPaywallPath(null);
     startTimer();
 
     try {
@@ -116,6 +118,9 @@ export default function AnalyzeExperience({
       if (!res.ok) {
         setError(data.userMessage ?? "Erreur lors du lancement de l'analyse.");
         setNeedsUpload(data.needsUpload ?? false);
+        setPaywallPath(
+          typeof data.paywallPath === "string" ? data.paywallPath : null
+        );
         return;
       }
 
@@ -151,6 +156,7 @@ export default function AnalyzeExperience({
     setIsAnalyzing(true);
     setError(null);
     setNeedsUpload(false);
+    setPaywallPath(null);
     startTimer();
 
     try {
@@ -166,6 +172,9 @@ export default function AnalyzeExperience({
 
       if (!res.ok) {
         setError(data.userMessage ?? "Erreur lors de l'upload de la video.");
+        setPaywallPath(
+          typeof data.paywallPath === "string" ? data.paywallPath : null
+        );
         return;
       }
 
@@ -623,6 +632,7 @@ export default function AnalyzeExperience({
                     setInputMode("upload");
                     setError(null);
                     setNeedsUpload(false);
+                    setPaywallPath(null);
                   }}
                   style={{
                     display: "block",
@@ -638,6 +648,20 @@ export default function AnalyzeExperience({
                 >
                   Passer en mode Upload →
                 </button>
+              )}
+              {paywallPath && (
+                <Link
+                  href={paywallPath}
+                  style={{
+                    display: "block",
+                    marginTop: "8px",
+                    fontSize: "13px",
+                    color: "var(--accent)",
+                    textDecoration: "underline",
+                  }}
+                >
+                  Debloquer une offre →
+                </Link>
               )}
             </div>
           )}
