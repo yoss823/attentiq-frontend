@@ -741,7 +741,7 @@ export default function HomePage() {
             {[
               { label: "Transparence", href: "/transparence" },
               { label: "Guide", href: "/guide" },
-              { label: "Tarifs", href: "/checkout/rapport-complet" },
+              { label: "Tarifs", href: "/checkout/single" },
             ].map((l) => (
               <Link
                 key={l.href}
