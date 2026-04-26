@@ -7,6 +7,9 @@ import AnalysisLoadingState from "@/components/analysis-loading-state";
 import { persistAnalyzeResult } from "@/lib/analyze-session";
 
 const ANALYZE_ROUTE = "/api/analyze";
+const UPLOAD_ROUTE = "/api/analyze/upload";
+
+type InputMode = "url" | "upload";
 
 type AnalyzeExperienceProps = {
   initialJobId?: string | null;
@@ -21,9 +24,12 @@ export default function AnalyzeExperience({
 }: AnalyzeExperienceProps) {
   const router = useRouter();
   const searchParams = useSearchParams();
+  const [inputMode, setInputMode] = useState<InputMode>("url");
   const [videoUrl, setVideoUrl] = useState(
     initialVideoUrl ?? searchParams.get("videoUrl") ?? searchParams.get("url") ?? ""
   );
+  const [selectedFile, setSelectedFile] = useState<File | null>(null);
+  const fileInputRef = useRef<HTMLInputElement>(null);
   const [isAnalyzing, setIsAnalyzing] = useState(false);
   const [elapsedMs, setElapsedMs] = useState(0);
   const [error, setError] = useState<string | null>(null);
@@ -126,6 +132,56 @@ export default function AnalyzeExperience({
       if (data.report) {
         persistAnalyzeResult({ report: data.report, url: trimmedUrl });
         router.push(`/analyze/result?videoUrl=${encodeURIComponent(trimmedUrl)}`);
+        return;
+      }
+
+      setError("Reponse inattendue du service. Reessayez.");
+    } catch {
+      setError("Impossible de joindre le service d'analyse. Verifiez votre connexion.");
+    } finally {
+      stopTimer();
+      setIsAnalyzing(false);
+    }
+  }
+
+  async function handleUpload(e: React.FormEvent) {
+    e.preventDefault();
+    if (!selectedFile) return;
+
+    setIsAnalyzing(true);
+    setError(null);
+    setNeedsUpload(false);
+    startTimer();
+
+    try {
+      const form = new FormData();
+      form.append("file", selectedFile, selectedFile.name);
+
+      const res = await fetch(UPLOAD_ROUTE, {
+        method: "POST",
+        body: form,
+      });
+
+      const data = await res.json();
+
+      if (!res.ok) {
+        setError(data.userMessage ?? "Erreur lors de l'upload de la video.");
+        return;
+      }
+
+      const newJobId = typeof data.job_id === "string" ? data.job_id : null;
+
+      if (newJobId) {
+        stopTimer();
+        setIsAnalyzing(false);
+        router.push(`/analyze/result?jobId=${newJobId}`);
+        return;
+      }
+
+      // Fallback: direct report in response
+      if (data.report) {
+        persistAnalyzeResult({ report: data.report, url: selectedFile.name });
+        router.push(`/analyze/result`);
         return;
       }
 
@@ -342,66 +398,209 @@ export default function AnalyzeExperience({
               maxWidth: "38rem",
             }}
           >
-            Collez une URL TikTok publique. Le diagnostic de retention arrive en
-            60 a 90 secondes — gratuitement.
+            {inputMode === "url"
+              ? "Collez une URL TikTok publique. Le diagnostic de retention arrive en 60 a 90 secondes — gratuitement."
+              : "Importez votre video directement (MP4, MOV, WebM). Le diagnostic arrive en 60 a 90 secondes — gratuitement."}
           </p>
 
-          <form onSubmit={handleSubmit}>
-            <div
-              style={{
-                display: "grid",
-                gap: "12px",
-                gridTemplateColumns: "minmax(0, 1fr) auto",
-              }}
-            >
-              <input
-                type="url"
-                value={videoUrl}
-                onChange={(e) => setVideoUrl(e.target.value)}
-                placeholder="https://www.tiktok.com/@..."
-                required
-                style={{
-                  minHeight: "54px",
-                  borderRadius: "18px",
-                  border: "1px solid var(--border)",
-                  background: "rgba(5, 9, 14, 0.78)",
-                  color: "var(--text-primary)",
-                  fontSize: "15px",
-                  padding: "0 16px",
-                  outline: "none",
-                }}
-              />
+          {/* Mode toggle */}
+          <div
+            style={{
+              display: "inline-flex",
+              borderRadius: "999px",
+              border: "1px solid rgba(255,255,255,0.08)",
+              background: "rgba(255,255,255,0.04)",
+              padding: "3px",
+              marginBottom: "18px",
+              gap: "2px",
+            }}
+          >
+            {(["url", "upload"] as const).map((mode) => (
               <button
-                type="submit"
-                disabled={isAnalyzing || !videoUrl.trim()}
+                key={mode}
+                type="button"
+                onClick={() => {
+                  setInputMode(mode);
+                  setError(null);
+                  setNeedsUpload(false);
+                }}
                 style={{
-                  minHeight: "54px",
+                  padding: "7px 18px",
                   borderRadius: "999px",
                   border: "none",
-                  padding: "0 22px",
+                  fontSize: "13px",
+                  fontWeight: 700,
+                  cursor: "pointer",
+                  transition: "background 0.15s, color 0.15s",
                   background:
-                    isAnalyzing || !videoUrl.trim()
-                      ? "rgba(255,255,255,0.08)"
-                      : "linear-gradient(135deg, var(--accent), #79e7ff)",
+                    inputMode === mode
+                      ? "rgba(0, 212, 255, 0.14)"
+                      : "transparent",
                   color:
-                    isAnalyzing || !videoUrl.trim()
-                      ? "var(--text-secondary)"
-                      : "#041017",
-                  fontSize: "15px",
-                  fontWeight: 900,
-                  cursor:
-                    isAnalyzing || !videoUrl.trim() ? "not-allowed" : "pointer",
-                  whiteSpace: "nowrap",
+                    inputMode === mode
+                      ? "var(--accent)"
+                      : "var(--text-secondary)",
                   boxShadow:
-                    isAnalyzing || !videoUrl.trim()
-                      ? "none"
-                      : "0 18px 52px rgba(0, 212, 255, 0.18)",
+                    inputMode === mode
+                      ? "0 0 0 1px rgba(0, 212, 255, 0.22)"
+                      : "none",
                 }}
               >
-                Analyser →
+                {mode === "url" ? "URL" : "Upload"}
               </button>
-            </div>
-          </form>
+            ))}
+          </div>
+
+          {inputMode === "url" ? (
+            <form onSubmit={handleSubmit}>
+              <div
+                style={{
+                  display: "grid",
+                  gap: "12px",
+                  gridTemplateColumns: "minmax(0, 1fr) auto",
+                }}
+              >
+                <input
+                  type="url"
+                  value={videoUrl}
+                  onChange={(e) => setVideoUrl(e.target.value)}
+                  placeholder="https://www.tiktok.com/@..."
+                  required
+                  style={{
+                    minHeight: "54px",
+                    borderRadius: "18px",
+                    border: "1px solid var(--border)",
+                    background: "rgba(5, 9, 14, 0.78)",
+                    color: "var(--text-primary)",
+                    fontSize: "15px",
+                    padding: "0 16px",
+                    outline: "none",
+                  }}
+                />
+                <button
+                  type="submit"
+                  disabled={isAnalyzing || !videoUrl.trim()}
+                  style={{
+                    minHeight: "54px",
+                    borderRadius: "999px",
+                    border: "none",
+                    padding: "0 22px",
+                    background:
+                      isAnalyzing || !videoUrl.trim()
+                        ? "rgba(255,255,255,0.08)"
+                        : "linear-gradient(135deg, var(--accent), #79e7ff)",
+                    color:
+                      isAnalyzing || !videoUrl.trim()
+                        ? "var(--text-secondary)"
+                        : "#041017",
+                    fontSize: "15px",
+                    fontWeight: 900,
+                    cursor:
+                      isAnalyzing || !videoUrl.trim() ? "not-allowed" : "pointer",
+                    whiteSpace: "nowrap",
+                    boxShadow:
+                      isAnalyzing || !videoUrl.trim()
+                        ? "none"
+                        : "0 18px 52px rgba(0, 212, 255, 0.18)",
+                  }}
+                >
+                  Analyser →
+                </button>
+              </div>
+            </form>
+          ) : (
+            <form onSubmit={handleUpload}>
+              <div style={{ display: "grid", gap: "12px" }}>
+                {/* Hidden native file input */}
+                <input
+                  ref={fileInputRef}
+                  type="file"
+                  accept="video/mp4,video/quicktime,video/webm,.mp4,.mov,.webm"
+                  style={{ display: "none" }}
+                  onChange={(e) => {
+                    const file = e.target.files?.[0] ?? null;
+                    setSelectedFile(file);
+                    setError(null);
+                  }}
+                />
+
+                {/* Custom file picker row */}
+                <div
+                  style={{
+                    display: "grid",
+                    gap: "12px",
+                    gridTemplateColumns: "minmax(0, 1fr) auto",
+                  }}
+                >
+                  <button
+                    type="button"
+                    onClick={() => fileInputRef.current?.click()}
+                    style={{
+                      minHeight: "54px",
+                      borderRadius: "18px",
+                      border: "1px solid var(--border)",
+                      background: "rgba(5, 9, 14, 0.78)",
+                      color: selectedFile
+                        ? "var(--text-primary)"
+                        : "var(--text-secondary)",
+                      fontSize: "15px",
+                      padding: "0 16px",
+                      textAlign: "left",
+                      cursor: "pointer",
+                      overflow: "hidden",
+                      textOverflow: "ellipsis",
+                      whiteSpace: "nowrap",
+                    }}
+                  >
+                    {selectedFile
+                      ? selectedFile.name
+                      : "Choisir un fichier video…"}
+                  </button>
+
+                  <button
+                    type="submit"
+                    disabled={isAnalyzing || !selectedFile}
+                    style={{
+                      minHeight: "54px",
+                      borderRadius: "999px",
+                      border: "none",
+                      padding: "0 22px",
+                      background:
+                        isAnalyzing || !selectedFile
+                          ? "rgba(255,255,255,0.08)"
+                          : "linear-gradient(135deg, var(--accent), #79e7ff)",
+                      color:
+                        isAnalyzing || !selectedFile
+                          ? "var(--text-secondary)"
+                          : "#041017",
+                      fontSize: "15px",
+                      fontWeight: 900,
+                      cursor:
+                        isAnalyzing || !selectedFile ? "not-allowed" : "pointer",
+                      whiteSpace: "nowrap",
+                      boxShadow:
+                        isAnalyzing || !selectedFile
+                          ? "none"
+                          : "0 18px 52px rgba(0, 212, 255, 0.18)",
+                    }}
+                  >
+                    Analyser →
+                  </button>
+                </div>
+
+                <p
+                  style={{
+                    margin: 0,
+                    fontSize: "12px",
+                    color: "var(--text-muted)",
+                    lineHeight: 1.5,
+                  }}
+                >
+                  Formats acceptes : MP4, MOV, WebM · Max 500 Mo · Max 60 s
+                </p>
+              </div>
+            </form>
+          )}
 
           {error && (
             <div
@@ -418,16 +617,27 @@ export default function AnalyzeExperience({
             >
               {error}
               {needsUpload && (
-                <p
+                <button
+                  type="button"
+                  onClick={() => {
+                    setInputMode("upload");
+                    setError(null);
+                    setNeedsUpload(false);
+                  }}
                   style={{
-                    margin: "8px 0 0",
+                    display: "block",
+                    marginTop: "8px",
                     fontSize: "13px",
-                    color: "var(--text-secondary)",
+                    color: "var(--accent)",
+                    background: "none",
+                    border: "none",
+                    padding: 0,
+                    cursor: "pointer",
+                    textDecoration: "underline",
                   }}
                 >
-                  Seules les URLs TikTok publiques sont supportees pour
-                  l&apos;instant.
-                </p>
+                  Passer en mode Upload →
+                </button>
               )}
             </div>
           )}
