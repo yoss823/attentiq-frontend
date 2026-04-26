@@ -38,7 +38,7 @@ const VIDEO: GuideCopy = {
     },
     {
       number: "02",
-      title: "L'IA transcrit et inspecte le signal disponible",
+      title: "Attentiq transcrit et inspecte le signal disponible",
       description:
         "Audio systématique ; visuel lorsque les images sont exploitables. Repérage des ruptures d'attention quand le signal le permet.",
     },
@@ -79,7 +79,7 @@ const TEXT: GuideCopy = {
     },
     {
       number: "02",
-      title: "L'IA lit clarté, promesse, preuve et appel à l'action",
+      title: "Attentiq lit clarté, promesse, preuve et appel à l'action",
       description:
         "Densité, rythme de lecture, risques de confusion ou d'abandon avant la fin.",
     },
@@ -119,7 +119,7 @@ const IMAGE: GuideCopy = {
     },
     {
       number: "02",
-      title: "L'IA analyse hiérarchie, lisibilité et intention",
+      title: "Attentiq analyse hiérarchie, lisibilité et intention",
       description:
         "Point focal, surcharge, CTA visible ou non, cohérence avec la promesse.",
     },

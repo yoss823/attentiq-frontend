@@ -685,7 +685,7 @@ export default function TransparencePage() {
               color: "var(--text-secondary)",
             }}
           >
-            Attentiq — Diagnostic IA de retention video
+            Attentiq — Analyse d&apos;attention multi-formats
           </p>
           <nav style={{ display: "flex", gap: "16px", flexWrap: "wrap" }}>
             {[
