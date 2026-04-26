@@ -55,9 +55,20 @@ function ResultContent() {
 
   if (error) {
     return (
-      <main className="min-h-screen bg-black flex flex-col items-center justify-center px-4 text-center">
-        <p className="text-red-400 text-sm mb-4">{error}</p>
-        <a href="/analyze" className="text-white text-sm underline hover:text-gray-300">
+      <main
+        className="min-h-screen flex flex-col items-center justify-center px-4 text-center"
+        style={{
+          background:
+            "radial-gradient(circle at top, rgba(0, 212, 255, 0.16), transparent 28%), radial-gradient(circle at 82% 16%, rgba(251, 146, 60, 0.12), transparent 18%), var(--bg-base)",
+          color: "var(--text-primary)",
+        }}
+      >
+        <p className="text-sm mb-4" style={{ color: "#f87171" }}>{error}</p>
+        <a
+          href="/analyze"
+          className="text-sm underline transition-colors"
+          style={{ color: "var(--accent)" }}
+        >
           ← Retourner à l'analyse
         </a>
       </main>
@@ -66,10 +77,22 @@ function ResultContent() {
 
   if (!result) {
     return (
-      <main className="min-h-screen bg-black flex items-center justify-center">
+      <main
+        className="min-h-screen flex items-center justify-center"
+        style={{
+          background:
+            "radial-gradient(circle at top, rgba(0, 212, 255, 0.16), transparent 28%), radial-gradient(circle at 82% 16%, rgba(251, 146, 60, 0.12), transparent 18%), var(--bg-base)",
+        }}
+      >
         <div className="text-center">
-          <div className="w-8 h-8 border-2 border-gray-700 border-t-white rounded-full animate-spin mx-auto mb-4" />
-          <p className="text-gray-500 text-sm">Chargement du diagnostic...</p>
+          <div
+            className="w-8 h-8 border-2 rounded-full animate-spin mx-auto mb-4"
+            style={{
+              borderColor: "var(--border)",
+              borderTopColor: "var(--accent)",
+            }}
+          />
+          <p className="text-sm" style={{ color: "var(--text-secondary)" }}>Chargement du diagnostic...</p>
         </div>
       </main>
     );
@@ -82,10 +105,22 @@ export default function ResultPage() {
   return (
     <Suspense
       fallback={
-        <main className="min-h-screen bg-black flex items-center justify-center">
+        <main
+          className="min-h-screen flex items-center justify-center"
+          style={{
+            background:
+              "radial-gradient(circle at top, rgba(0, 212, 255, 0.16), transparent 28%), radial-gradient(circle at 82% 16%, rgba(251, 146, 60, 0.12), transparent 18%), var(--bg-base)",
+          }}
+        >
           <div className="text-center">
-            <div className="w-8 h-8 border-2 border-gray-700 border-t-white rounded-full animate-spin mx-auto mb-4" />
-            <p className="text-gray-500 text-sm animate-pulse">Chargement du diagnostic...</p>
+            <div
+              className="w-8 h-8 border-2 rounded-full animate-spin mx-auto mb-4"
+              style={{
+                borderColor: "var(--border)",
+                borderTopColor: "var(--accent)",
+              }}
+            />
+            <p className="text-sm animate-pulse" style={{ color: "var(--text-secondary)" }}>Chargement du diagnostic...</p>
           </div>
         </main>
       }

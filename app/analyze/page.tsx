@@ -294,11 +294,20 @@ export default function AnalyzePage() {
   };
 
   return (
-    <main className="min-h-screen bg-black text-white flex flex-col items-center justify-center px-4 py-8">
+    <main
+      className="min-h-screen flex flex-col items-center justify-center px-4 py-8"
+      style={{
+        background:
+          "radial-gradient(circle at top, rgba(0, 212, 255, 0.16), transparent 28%), radial-gradient(circle at 82% 16%, rgba(251, 146, 60, 0.12), transparent 18%), var(--bg-base)",
+        color: "var(--text-primary)",
+      }}
+    >
       <div className="w-full max-w-md">
         <div className="mb-8 text-center">
-          <h1 className="text-3xl font-bold mb-2">Analysez votre contenu</h1>
-          <p className="text-gray-400 text-sm">
+          <h1 className="text-3xl font-bold mb-2 tracking-tight" style={{ color: "var(--text-primary)" }}>
+            Analysez votre contenu
+          </h1>
+          <p className="text-sm" style={{ color: "var(--text-secondary)" }}>
             Vidéo, texte ou image. Le diagnostic arrive en 60 à 90 secondes.
           </p>
         </div>
@@ -318,11 +327,20 @@ export default function AnalyzePage() {
                     setFile(null);
                     setError('');
                   }}
-                  className={`flex-1 py-2 rounded-xl text-sm font-medium transition-colors ${
+                  className="flex-1 py-2 rounded-xl text-sm font-medium transition-all"
+                  style={
                     inputFormat === format
-                      ? 'bg-white text-black'
-                      : 'bg-gray-900 text-gray-400 border border-gray-700 hover:border-gray-500'
-                  }`}
+                      ? {
+                          background: "var(--accent)",
+                          color: "#060a0f",
+                          border: "1px solid var(--accent)",
+                        }
+                      : {
+                          background: "var(--bg-surface)",
+                          color: "var(--text-secondary)",
+                          border: "1px solid var(--border)",
+                        }
+                  }
                 >
                   {format === 'video' && '🎬 Vidéo'}
                   {format === 'text' && '📝 Texte'}
@@ -344,11 +362,20 @@ export default function AnalyzePage() {
                         setUrl('');
                         setError('');
                       }}
-                      className={`flex-1 py-2 rounded-xl text-xs font-medium transition-colors ${
+                      className="flex-1 py-2 rounded-xl text-xs font-medium transition-all"
+                      style={
                         selectedPlatform === platform.id
-                          ? 'bg-white text-black'
-                          : 'bg-gray-900 text-gray-400 border border-gray-700 hover:border-gray-500'
-                      }`}
+                          ? {
+                              background: "var(--accent-dim)",
+                              color: "var(--accent)",
+                              border: "1px solid var(--border-accent)",
+                            }
+                          : {
+                              background: "var(--bg-surface)",
+                              color: "var(--text-secondary)",
+                              border: "1px solid var(--border)",
+                            }
+                      }
                     >
                       {platform.label}
                     </button>
@@ -365,11 +392,20 @@ export default function AnalyzePage() {
                       setVideoFile(null);
                       setError('');
                     }}
-                    className={`flex-1 py-2 rounded-xl text-xs font-medium transition-colors ${
+                    className="flex-1 py-2 rounded-xl text-xs font-medium transition-all"
+                    style={
                       videoMode === 'url'
-                        ? 'bg-white text-black'
-                        : 'bg-gray-900 text-gray-400 border border-gray-700 hover:border-gray-500'
-                    }`}
+                        ? {
+                            background: "var(--accent-dim)",
+                            color: "var(--accent)",
+                            border: "1px solid var(--border-accent)",
+                          }
+                        : {
+                            background: "var(--bg-surface)",
+                            color: "var(--text-secondary)",
+                            border: "1px solid var(--border)",
+                          }
+                    }
                   >
                     🔗 URL
                   </button>
@@ -381,11 +417,20 @@ export default function AnalyzePage() {
                       setVideoFile(null);
                       setError('');
                     }}
-                    className={`flex-1 py-2 rounded-xl text-xs font-medium transition-colors ${
+                    className="flex-1 py-2 rounded-xl text-xs font-medium transition-all"
+                    style={
                       videoMode === 'upload'
-                        ? 'bg-white text-black'
-                        : 'bg-gray-900 text-gray-400 border border-gray-700 hover:border-gray-500'
-                    }`}
+                        ? {
+                            background: "var(--accent-dim)",
+                            color: "var(--accent)",
+                            border: "1px solid var(--border-accent)",
+                          }
+                        : {
+                            background: "var(--bg-surface)",
+                            color: "var(--text-secondary)",
+                            border: "1px solid var(--border)",
+                          }
+                    }
                   >
                     📤 Upload
                   </button>
@@ -401,20 +446,29 @@ export default function AnalyzePage() {
                         setError('');
                       }}
                       placeholder={PLATFORMS.find((p) => p.id === selectedPlatform)?.placeholder}
-                      className="w-full bg-gray-900 border border-gray-700 text-white placeholder-gray-600 rounded-xl px-4 py-4 text-sm focus:outline-none focus:border-gray-400 transition-colors"
+                      className="w-full rounded-xl px-4 py-4 text-sm focus:outline-none transition-colors"
+                      style={{
+                        background: "var(--bg-surface)",
+                        border: "1px solid var(--border)",
+                        color: "var(--text-primary)",
+                      }}
                     />
-                    {error && <p className="mt-2 text-red-400 text-xs leading-relaxed">{error}</p>}
+                    {error && <p className="mt-2 text-xs leading-relaxed" style={{ color: "#f87171" }}>{error}</p>}
                   </div>
                 ) : (
                   <div>
                     <div
                       onClick={() => videoFileInputRef.current?.click()}
-                      className="border-2 border-dashed border-gray-700 rounded-xl p-8 text-center cursor-pointer hover:border-gray-500 transition-colors"
+                      className="rounded-xl p-8 text-center cursor-pointer transition-all"
+                      style={{
+                        border: "2px dashed var(--border-accent)",
+                        background: "var(--bg-surface)",
+                      }}
                     >
-                      <p className="text-gray-400 text-sm mb-2">
+                      <p className="text-sm mb-2" style={{ color: "var(--text-secondary)" }}>
                         {videoFile ? `✓ ${videoFile.name}` : '🎬 Cliquez pour sélectionner une vidéo'}
                       </p>
-                      <p className="text-gray-600 text-xs">MP4, MOV ou WebM (max 500 MB)</p>
+                      <p className="text-xs" style={{ color: "var(--text-muted)" }}>MP4, MOV ou WebM (max 500 MB)</p>
                     </div>
                     <input
                       ref={videoFileInputRef}
@@ -428,17 +482,22 @@ export default function AnalyzePage() {
                       }}
                       className="hidden"
                     />
-                    {error && <p className="mt-2 text-red-400 text-xs leading-relaxed">{error}</p>}
+                    {error && <p className="mt-2 text-xs leading-relaxed" style={{ color: "#f87171" }}>{error}</p>}
                   </div>
                 )}
 
                 <button
                   type="submit"
-                  className="w-full bg-white text-black font-semibold py-4 rounded-xl hover:bg-gray-100 transition-colors text-sm"
+                  className="w-full font-semibold py-4 rounded-xl text-sm transition-opacity hover:opacity-90"
+                  style={{
+                    background: "linear-gradient(135deg, #0891b2, #0e7490)",
+                    color: "#fff",
+                    boxShadow: "0 0 24px var(--accent-glow)",
+                  }}
                 >
                   Lancer l'analyse →
                 </button>
-                <p className="text-center text-xs text-gray-600">
+                <p className="text-center text-xs" style={{ color: "var(--text-muted)" }}>
                   Vos données ne sont pas stockées. Le contenu est analysé puis supprimé.
                 </p>
               </form>
@@ -455,17 +514,27 @@ export default function AnalyzePage() {
                       setError('');
                     }}
                     placeholder="Collez votre texte ici (min. 10 caractères)..."
-                    className="w-full bg-gray-900 border border-gray-700 text-white placeholder-gray-600 rounded-xl px-4 py-4 text-sm focus:outline-none focus:border-gray-400 transition-colors resize-none h-32"
+                    className="w-full rounded-xl px-4 py-4 text-sm focus:outline-none transition-colors resize-none h-32"
+                    style={{
+                      background: "var(--bg-surface)",
+                      border: "1px solid var(--border)",
+                      color: "var(--text-primary)",
+                    }}
                   />
-                  {error && <p className="mt-2 text-red-400 text-xs leading-relaxed">{error}</p>}
+                  {error && <p className="mt-2 text-xs leading-relaxed" style={{ color: "#f87171" }}>{error}</p>}
                 </div>
                 <button
                   type="submit"
-                  className="w-full bg-white text-black font-semibold py-4 rounded-xl hover:bg-gray-100 transition-colors text-sm"
+                  className="w-full font-semibold py-4 rounded-xl text-sm transition-opacity hover:opacity-90"
+                  style={{
+                    background: "linear-gradient(135deg, #0891b2, #0e7490)",
+                    color: "#fff",
+                    boxShadow: "0 0 24px var(--accent-glow)",
+                  }}
                 >
                   Analyser le texte →
                 </button>
-                <p className="text-center text-xs text-gray-600">
+                <p className="text-center text-xs" style={{ color: "var(--text-muted)" }}>
                   Vos données ne sont pas stockées. Le texte est analysé puis supprimé.
                 </p>
               </form>
@@ -476,12 +545,16 @@ export default function AnalyzePage() {
               <form onSubmit={handleSubmitImage} className="space-y-4">
                 <div
                   onClick={() => fileInputRef.current?.click()}
-                  className="border-2 border-dashed border-gray-700 rounded-xl p-8 text-center cursor-pointer hover:border-gray-500 transition-colors"
+                  className="rounded-xl p-8 text-center cursor-pointer transition-all"
+                  style={{
+                    border: "2px dashed var(--border-accent)",
+                    background: "var(--bg-surface)",
+                  }}
                 >
-                  <p className="text-gray-400 text-sm mb-2">
+                  <p className="text-sm mb-2" style={{ color: "var(--text-secondary)" }}>
                     {file ? `✓ ${file.name}` : '🖼️ Cliquez pour sélectionner une image'}
                   </p>
-                  <p className="text-gray-600 text-xs">JPG, PNG ou WebP (max 10 MB)</p>
+                  <p className="text-xs" style={{ color: "var(--text-muted)" }}>JPG, PNG ou WebP (max 10 MB)</p>
                 </div>
                 <input
                   ref={fileInputRef}
@@ -495,14 +568,19 @@ export default function AnalyzePage() {
                   }}
                   className="hidden"
                 />
-                {error && <p className="text-red-400 text-xs leading-relaxed">{error}</p>}
+                {error && <p className="text-xs leading-relaxed" style={{ color: "#f87171" }}>{error}</p>}
                 <button
                   type="submit"
-                  className="w-full bg-white text-black font-semibold py-4 rounded-xl hover:bg-gray-100 transition-colors text-sm"
+                  className="w-full font-semibold py-4 rounded-xl text-sm transition-opacity hover:opacity-90"
+                  style={{
+                    background: "linear-gradient(135deg, #0891b2, #0e7490)",
+                    color: "#fff",
+                    boxShadow: "0 0 24px var(--accent-glow)",
+                  }}
                 >
                   Analyser l'image →
                 </button>
-                <p className="text-center text-xs text-gray-600">
+                <p className="text-center text-xs" style={{ color: "var(--text-muted)" }}>
                   Vos données ne sont pas stockées. L'image est analysée puis supprimée.
                 </p>
               </form>
@@ -511,13 +589,19 @@ export default function AnalyzePage() {
         ) : (
           <div className="text-center space-y-6">
             <div className="flex justify-center">
-              <div className="w-12 h-12 border-2 border-gray-700 border-t-white rounded-full animate-spin" />
+              <div
+                className="w-12 h-12 border-2 rounded-full animate-spin"
+                style={{
+                  borderColor: "var(--border)",
+                  borderTopColor: "var(--accent)",
+                }}
+              />
             </div>
             <div>
-              <p className="text-white font-medium text-lg">
+              <p className="font-medium text-lg" style={{ color: "var(--text-primary)" }}>
                 {LOADING_STEPS[stepIndex].message}
               </p>
-              <p className="text-gray-500 text-sm mt-1">
+              <p className="text-sm mt-1" style={{ color: "var(--text-secondary)" }}>
                 {elapsedSeconds}s écoulées
               </p>
             </div>
@@ -525,13 +609,14 @@ export default function AnalyzePage() {
               {LOADING_STEPS.map((_, i) => (
                 <div
                   key={i}
-                  className={`h-1 w-8 rounded-full transition-colors ${
-                    i <= stepIndex ? 'bg-white' : 'bg-gray-700'
-                  }`}
+                  className="h-1 w-8 rounded-full transition-colors"
+                  style={{
+                    background: i <= stepIndex ? "var(--accent)" : "var(--border)",
+                  }}
                 />
               ))}
             </div>
-            <p className="text-gray-600 text-xs">
+            <p className="text-xs" style={{ color: "var(--text-muted)" }}>
               L'analyse prend généralement 60 à 90 secondes.
             </p>
           </div>
