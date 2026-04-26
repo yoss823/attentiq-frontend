@@ -240,7 +240,7 @@ export default function HomePage() {
               marginBottom: 32,
             }}
           >
-            Ce que TikTok ne vous dit pas
+            Ce que les plateformes ne vous disent pas
           </h2>
           <div
             style={{
@@ -251,7 +251,7 @@ export default function HomePage() {
           >
             {[
               {
-                label: "Ce que TikTok vous donne",
+                label: "Ce que les plateformes vous donnent",
                 color: "#64748b",
                 items: [
                   "Vues totales",
@@ -741,7 +741,7 @@ export default function HomePage() {
             {[
               { label: "Transparence", href: "/transparence" },
               { label: "Guide", href: "/guide" },
-              { label: "Tarifs", href: "/checkout/rapport-complet" },
+              { label: "Tarifs", href: "/checkout/single" },
             ].map((l) => (
               <Link
                 key={l.href}
