@@ -27,8 +27,8 @@ const plans = [
       "Score d'impact visuel détaillé",
       "Plan d'actions personnalisé",
     ],
-    ctaLabel: "Choisir 9€",
-    ctaHref: "/checkout/single",
+    ctaLabel: "Choisir 9€ (image)",
+    ctaHref: "/images#tarifs",
     featured: false,
   },
   {
@@ -41,8 +41,8 @@ const plans = [
       "Même profondeur d'analyse",
       "Idéal pour une routine créative",
     ],
-    ctaLabel: "Choisir 29€/mois",
-    ctaHref: "/checkout/monthly-5",
+    ctaLabel: "Choisir 29€/mois (image)",
+    ctaHref: "/images#tarifs",
     featured: true,
   },
   {
@@ -55,8 +55,8 @@ const plans = [
       "Aucune limite de volume",
       "Pensé pour une production soutenue",
     ],
-    ctaLabel: "Choisir 59€/mois",
-    ctaHref: "/checkout/unlimited",
+    ctaLabel: "Choisir 59€/mois (image)",
+    ctaHref: "/images#tarifs",
     featured: false,
   },
 ];
@@ -169,7 +169,7 @@ export default function ImagesPage() {
               Transparence
             </Link>
             <Link
-              href="/analyze"
+              href="/videos"
               style={{
                 display: "inline-flex",
                 alignItems: "center",
@@ -185,7 +185,7 @@ export default function ImagesPage() {
                 boxShadow: "0 12px 36px rgba(0, 212, 255, 0.18)",
               }}
             >
-              Analyser
+              Videos
             </Link>
           </div>
         </nav>
@@ -258,7 +258,7 @@ export default function ImagesPage() {
 
           <div style={{ display: "flex", gap: "12px", flexWrap: "wrap" }}>
             <Link
-              href="/analyze"
+              href="/images#tarifs"
               style={{
                 display: "inline-flex",
                 alignItems: "center",
@@ -273,7 +273,7 @@ export default function ImagesPage() {
                 boxShadow: "0 18px 52px rgba(0, 212, 255, 0.2)",
               }}
             >
-              Analyser gratuitement →
+              Voir les offres image →
             </Link>
             <Link
               href="/guide"
@@ -373,7 +373,7 @@ export default function ImagesPage() {
         </section>
 
         {/* Pricing */}
-        <section className="rise d4" style={{ marginBottom: "56px" }}>
+        <section id="tarifs" className="rise d4" style={{ marginBottom: "56px" }}>
           <p
             style={{
               margin: "0 0 8px",
@@ -565,6 +565,17 @@ export default function ImagesPage() {
               </article>
             ))}
           </div>
+          <p
+            style={{
+              margin: "14px 0 0",
+              fontSize: "13px",
+              lineHeight: 1.7,
+              color: "var(--text-secondary)",
+            }}
+          >
+            Paiement image en cours de raccordement. En attendant, contactez-nous
+            depuis le chat pour activer votre formule.
+          </p>
         </section>
 
         {/* CTA */}
@@ -601,7 +612,7 @@ export default function ImagesPage() {
               Importez votre visuel. L&apos;analyse prend quelques secondes.
             </p>
             <Link
-              href="/analyze"
+              href="/images#tarifs"
               style={{
                 display: "inline-flex",
                 alignItems: "center",
@@ -616,7 +627,7 @@ export default function ImagesPage() {
                 boxShadow: "0 18px 52px rgba(0, 212, 255, 0.2)",
               }}
             >
-              Analyser gratuitement
+              Voir les offres image
             </Link>
             <p
               style={{
@@ -649,7 +660,7 @@ export default function ImagesPage() {
               color: "var(--text-secondary)",
             }}
           >
-            Attentiq — Diagnostic IA de retention video
+            Attentiq — Analyse d&apos;attention multi-formats
           </p>
           <nav style={{ display: "flex", gap: "16px", flexWrap: "wrap" }}>
             {[
