@@ -20,179 +20,57 @@ const FAQ = [
 
 export default function HomePage() {
   return (
-    <main
-      style={{
-        minHeight: "100vh",
-        background:
-          "radial-gradient(circle at top, rgba(0, 212, 255, 0.16), transparent 28%), radial-gradient(circle at 82% 16%, rgba(251, 146, 60, 0.12), transparent 18%), var(--bg-base)",
-        color: "var(--text-primary)",
-        fontFamily: "var(--font-dm-sans, sans-serif)",
-      }}
-    >
-      <div style={{ maxWidth: 1100, margin: "0 auto", padding: "0 24px" }}>
+    <main className="min-h-screen bg-gradient-to-br from-slate-950 via-brand-950 to-slate-900 text-white">
+      <div className="max-w-5xl mx-auto px-6">
         {/* Nav */}
-        <nav
-          style={{
-            display: "flex",
-            alignItems: "center",
-            justifyContent: "space-between",
-            padding: "20px 8px",
-          }}
-        >
-          <span
-            style={{
-              display: "inline-flex",
-              alignItems: "center",
-              gap: 8,
-              fontWeight: 700,
-              fontSize: 18,
-              letterSpacing: "-0.02em",
-              color: "var(--text-primary)",
-            }}
-          >
-            <span
-              style={{
-                background: "linear-gradient(135deg, var(--accent), #f97316)",
-                borderRadius: 8,
-                padding: "2px 8px",
-                fontSize: 13,
-                fontWeight: 800,
-                color: "#fff",
-                letterSpacing: "0.04em",
-              }}
-            >
+        <nav className="flex items-center justify-between py-5 px-2">
+          <span className="inline-flex items-center gap-2 font-bold text-lg tracking-tight text-white">
+            <span className="bg-gradient-to-br from-brand-600 to-brand-700 rounded-lg px-2 py-0.5 text-xs font-extrabold text-white tracking-widest">
               AT
             </span>
             Attentiq
           </span>
           <Link
             href="/analyze"
-            style={{
-              background: "rgba(0, 212, 255, 0.1)",
-              border: "1px solid var(--border-accent)",
-              color: "var(--accent)",
-              borderRadius: 10,
-              padding: "8px 18px",
-              fontSize: 13,
-              fontWeight: 600,
-              textDecoration: "none",
-            }}
+            className="bg-brand-600/10 border border-brand-600/30 text-brand-300 rounded-xl px-4 py-2 text-sm font-semibold hover:bg-brand-600/20 transition-colors"
           >
             Lancer un diagnostic
           </Link>
         </nav>
 
         {/* Hero */}
-        <section
-          style={{
-            maxWidth: 780,
-            margin: "0 auto",
-            padding: "72px 0 56px",
-            textAlign: "center",
-          }}
-        >
-          <p
-            style={{
-              fontSize: 11,
-              fontWeight: 700,
-              letterSpacing: "0.18em",
-              textTransform: "uppercase",
-              color: "#f97316",
-              marginBottom: 20,
-            }}
-          >
+        <section className="max-w-3xl mx-auto py-18 pb-14 text-center">
+          <p className="text-xs font-bold tracking-[0.18em] uppercase text-orange-400 mb-5">
             Diagnostic de rétention IA
           </p>
-          <h1
-            style={{
-              fontSize: "clamp(2rem, 5vw, 3.4rem)",
-              fontWeight: 800,
-              lineHeight: 1.1,
-              letterSpacing: "-0.03em",
-              marginBottom: 20,
-              color: "var(--text-primary)",
-            }}
-          >
+          <h1 className="text-4xl sm:text-5xl lg:text-6xl font-extrabold leading-tight tracking-tight mb-5 text-white">
             Sachez où votre vidéo{" "}
-            <span
-              style={{
-                background: "linear-gradient(90deg, #f97316, #fb923c)",
-                WebkitBackgroundClip: "text",
-                WebkitTextFillColor: "transparent",
-              }}
-            >
+            <span className="bg-gradient-to-r from-orange-400 to-orange-300 bg-clip-text text-transparent">
               fait décrocher
             </span>
           </h1>
-          <p
-            style={{
-              fontSize: 17,
-              color: "var(--text-secondary)",
-              lineHeight: 1.65,
-              maxWidth: 560,
-              margin: "0 auto 36px",
-            }}
-          >
+          <p className="text-lg text-slate-400 leading-relaxed max-w-xl mx-auto mb-9">
             Attentiq analyse votre contenu et identifie les secondes exactes où
             l&apos;attention chute — avec les causes et un plan d&apos;actions concret.
           </p>
           <Link
             href="/analyze"
-            style={{
-              display: "inline-block",
-              background: "linear-gradient(135deg, #0891b2, #0e7490)",
-              color: "#fff",
-              fontWeight: 700,
-              fontSize: 15,
-              borderRadius: 12,
-              padding: "14px 28px",
-              textDecoration: "none",
-              boxShadow: "0 0 32px var(--accent-glow)",
-            }}
+            className="inline-block bg-gradient-to-br from-brand-600 to-brand-700 text-white font-bold text-base rounded-xl px-7 py-4 shadow-lg shadow-brand-900/40 hover:opacity-90 transition-opacity"
           >
             Analyser une vidéo/photo/texte par exemple →
           </Link>
         </section>
 
         {/* Teaser gratuit */}
-        <section
-          style={{
-            maxWidth: 860,
-            margin: "0 auto 80px",
-          }}
-        >
-          <div
-            style={{
-              background: "rgba(255,255,255,0.03)",
-              border: "1px solid var(--border)",
-              borderRadius: 20,
-              padding: "36px 40px",
-            }}
-          >
-            <p
-              style={{
-                fontSize: 11,
-                fontWeight: 700,
-                letterSpacing: "0.16em",
-                textTransform: "uppercase",
-                color: "var(--accent)",
-                marginBottom: 10,
-              }}
-            >
+        <section className="max-w-4xl mx-auto mb-20">
+          <div className="bg-white/[0.03] border border-white/[0.06] rounded-2xl p-9 px-10">
+            <p className="text-xs font-bold tracking-[0.16em] uppercase text-brand-300 mb-2.5">
               Teaser gratuit
             </p>
-            <h2
-              style={{
-                fontSize: "clamp(1.3rem, 3vw, 1.9rem)",
-                fontWeight: 800,
-                letterSpacing: "-0.02em",
-                marginBottom: 10,
-                color: "var(--text-primary)",
-              }}
-            >
+            <h2 className="text-2xl sm:text-3xl font-extrabold tracking-tight mb-2.5 text-white">
               2 min max pour décider
             </h2>
-            <p style={{ color: "var(--text-secondary)", fontSize: 15, lineHeight: 1.6 }}>
+            <p className="text-slate-400 text-base leading-relaxed">
               Lancez une analyse gratuite. Vous voyez immédiatement les 3
               premières chutes d&apos;attention et 2 actions prioritaires — sans
               carte bancaire. Le rapport complet se débloque en un clic si vous
@@ -202,31 +80,11 @@ export default function HomePage() {
         </section>
 
         {/* Differentiation */}
-        <section
-          style={{
-            maxWidth: 860,
-            margin: "0 auto 80px",
-          }}
-        >
-          <h2
-            style={{
-              textAlign: "center",
-              fontSize: "clamp(1.2rem, 2.5vw, 1.6rem)",
-              fontWeight: 800,
-              letterSpacing: "-0.02em",
-              marginBottom: 32,
-              color: "var(--text-primary)",
-            }}
-          >
+        <section className="max-w-4xl mx-auto mb-20">
+          <h2 className="text-center text-2xl sm:text-3xl font-extrabold tracking-tight mb-8 text-white">
             Ce que les plateformes ne vous disent pas
           </h2>
-          <div
-            style={{
-              display: "grid",
-              gridTemplateColumns: "repeat(auto-fit, minmax(280px, 1fr))",
-              gap: 16,
-            }}
-          >
+          <div className="grid sm:grid-cols-2 gap-4">
             {[
               {
                 label: "Ce que les plateformes vous donnent",
@@ -251,62 +109,31 @@ export default function HomePage() {
             ].map((col) => (
               <div
                 key={col.label}
-                style={{
-                  background: "rgba(255,255,255,0.03)",
-                  border: col.isAccent
-                    ? "1px solid var(--border-accent)"
-                    : "1px solid var(--border)",
-                  borderRadius: 16,
-                  padding: "28px",
-                }}
+                className={`bg-white/[0.03] rounded-2xl p-7 ${
+                  col.isAccent
+                    ? "border border-brand-600/30"
+                    : "border border-white/[0.06]"
+                }`}
               >
                 <p
-                  style={{
-                    fontSize: 11,
-                    fontWeight: 700,
-                    letterSpacing: "0.14em",
-                    textTransform: "uppercase",
-                    color: col.isAccent ? "var(--accent)" : "var(--text-secondary)",
-                    marginBottom: 16,
-                  }}
+                  className={`text-xs font-bold tracking-[0.14em] uppercase mb-4 ${
+                    col.isAccent ? "text-brand-300" : "text-slate-500"
+                  }`}
                 >
                   {col.label}
                 </p>
-                <div style={{ display: "grid", gap: 8 }}>
+                <div className="grid gap-2">
                   {col.items.map((item) => (
                     <div
                       key={item}
-                      style={{
-                        display: "flex",
-                        alignItems: "center",
-                        gap: 10,
-                        padding: "10px 12px",
-                        borderRadius: 12,
-                        border: "1px solid var(--border)",
-                        background: "rgba(255,255,255,0.02)",
-                        fontSize: 14,
-                        color: "var(--text-primary)",
-                      }}
+                      className="flex items-center gap-2.5 px-3 py-2.5 rounded-xl border border-white/[0.06] bg-white/[0.02] text-sm text-white"
                     >
                       <span
-                        style={{
-                          width: 18,
-                          height: 18,
-                          borderRadius: "50%",
-                          background: col.isAccent
-                            ? "rgba(0, 212, 255, 0.12)"
-                            : "rgba(255,255,255,0.06)",
-                          border: col.isAccent
-                            ? "1px solid rgba(0, 212, 255, 0.22)"
-                            : "1px solid var(--border)",
-                          color: col.isAccent ? "var(--accent)" : "var(--text-secondary)",
-                          display: "inline-flex",
-                          alignItems: "center",
-                          justifyContent: "center",
-                          fontWeight: 800,
-                          fontSize: 11,
-                          flexShrink: 0,
-                        }}
+                        className={`w-4.5 h-4.5 rounded-full inline-flex items-center justify-center font-extrabold text-xs shrink-0 ${
+                          col.isAccent
+                            ? "bg-brand-600/10 border border-brand-600/20 text-brand-300"
+                            : "bg-white/[0.06] border border-white/[0.06] text-slate-500"
+                        }`}
                       >
                         {col.isAccent ? "✓" : "·"}
                       </span>
@@ -320,96 +147,29 @@ export default function HomePage() {
         </section>
 
         {/* Anonymized preview */}
-        <section
-          style={{
-            maxWidth: 860,
-            margin: "0 auto 80px",
-          }}
-        >
-          <h2
-            style={{
-              textAlign: "center",
-              fontSize: "clamp(1.2rem, 2.5vw, 1.6rem)",
-              fontWeight: 800,
-              letterSpacing: "-0.02em",
-              marginBottom: 8,
-              color: "var(--text-primary)",
-            }}
-          >
+        <section className="max-w-4xl mx-auto mb-20">
+          <h2 className="text-center text-2xl sm:text-3xl font-extrabold tracking-tight mb-2 text-white">
             À quoi ressemble un rapport ?
           </h2>
-          <p
-            style={{
-              textAlign: "center",
-              color: "var(--text-muted)",
-              fontSize: 13,
-              marginBottom: 28,
-            }}
-          >
+          <p className="text-center text-slate-600 text-sm mb-7">
             Exemple anonymisé — données réelles d&apos;une vidéo analysée
           </p>
-          <div
-            style={{
-              background: "rgba(255,255,255,0.03)",
-              border: "1px solid var(--border)",
-              borderRadius: 20,
-              padding: "32px",
-            }}
-          >
+          <div className="bg-white/[0.03] border border-white/[0.06] rounded-2xl p-8">
             {/* Score */}
-            <div
-              style={{
-                display: "flex",
-                alignItems: "center",
-                gap: 20,
-                marginBottom: 28,
-              }}
-            >
-              <div
-                style={{
-                  width: 72,
-                  height: 72,
-                  borderRadius: "50%",
-                  border: "3px solid #f97316",
-                  display: "flex",
-                  alignItems: "center",
-                  justifyContent: "center",
-                  flexShrink: 0,
-                }}
-              >
-                <span
-                  style={{ fontSize: 22, fontWeight: 800, color: "#f97316" }}
-                >
-                  6.4
-                </span>
+            <div className="flex items-center gap-5 mb-7">
+              <div className="w-18 h-18 rounded-full border-[3px] border-orange-400 flex items-center justify-center shrink-0">
+                <span className="text-2xl font-extrabold text-orange-400">6.4</span>
               </div>
               <div>
-                <p
-                  style={{
-                    fontSize: 13,
-                    color: "var(--text-secondary)",
-                    marginBottom: 4,
-                  }}
-                >
-                  Score de rétention
-                </p>
-                <p style={{ fontSize: 15, fontWeight: 600, color: "var(--text-primary)" }}>
+                <p className="text-sm text-slate-400 mb-1">Score de rétention</p>
+                <p className="text-base font-semibold text-white">
                   Rétention fragile — 3 chutes critiques détectées
                 </p>
               </div>
             </div>
 
             {/* Drops */}
-            <p
-              style={{
-                fontSize: 11,
-                fontWeight: 700,
-                letterSpacing: "0.14em",
-                textTransform: "uppercase",
-                color: "#f97316",
-                marginBottom: 12,
-              }}
-            >
+            <p className="text-xs font-bold tracking-[0.14em] uppercase text-orange-400 mb-3">
               Chutes d&apos;attention
             </p>
             {[
@@ -431,47 +191,20 @@ export default function HomePage() {
             ].map((drop) => (
               <div
                 key={drop.time}
-                style={{
-                  display: "flex",
-                  gap: 14,
-                  marginBottom: 12,
-                  padding: "12px 16px",
-                  background: "rgba(249,115,22,0.07)",
-                  borderRadius: 10,
-                  border: "1px solid rgba(249,115,22,0.18)",
-                }}
+                className="flex gap-3.5 mb-3 px-4 py-3 bg-orange-500/[0.07] rounded-xl border border-orange-500/[0.18]"
               >
-                <span
-                  style={{
-                    fontSize: 12,
-                    fontWeight: 700,
-                    color: "#f97316",
-                    minWidth: 36,
-                    paddingTop: 1,
-                  }}
-                >
+                <span className="text-xs font-bold text-orange-400 min-w-[36px] pt-0.5">
                   {drop.time}
                 </span>
                 <div>
-                  <p style={{ fontSize: 13, fontWeight: 600, marginBottom: 2, color: "var(--text-primary)" }}>
-                    {drop.label}
-                  </p>
-                  <p style={{ fontSize: 12, color: "var(--text-secondary)" }}>{drop.desc}</p>
+                  <p className="text-sm font-semibold mb-0.5 text-white">{drop.label}</p>
+                  <p className="text-xs text-slate-400">{drop.desc}</p>
                 </div>
               </div>
             ))}
 
             {/* Actions */}
-            <p
-              style={{
-                fontSize: 11,
-                fontWeight: 700,
-                letterSpacing: "0.14em",
-                textTransform: "uppercase",
-                color: "var(--accent)",
-                margin: "20px 0 12px",
-              }}
-            >
+            <p className="text-xs font-bold tracking-[0.14em] uppercase text-brand-300 mt-5 mb-3">
               Actions prioritaires
             </p>
             {[
@@ -480,192 +213,67 @@ export default function HomePage() {
             ].map((action) => (
               <div
                 key={action}
-                style={{
-                  display: "flex",
-                  gap: 10,
-                  marginBottom: 10,
-                  padding: "10px 14px",
-                  background: "rgba(0, 212, 255, 0.07)",
-                  borderRadius: 10,
-                  border: "1px solid rgba(0, 212, 255, 0.18)",
-                  fontSize: 13,
-                  color: "var(--text-primary)",
-                }}
+                className="flex gap-2.5 mb-2.5 px-3.5 py-2.5 bg-brand-600/[0.07] rounded-xl border border-brand-600/[0.18] text-sm text-white"
               >
-                <span style={{ color: "var(--accent)", fontWeight: 700 }}>→</span>
+                <span className="text-brand-300 font-bold">→</span>
                 {action}
               </div>
             ))}
 
-            <p
-              style={{
-                textAlign: "center",
-                fontSize: 12,
-                color: "var(--text-muted)",
-                marginTop: 20,
-              }}
-            >
+            <p className="text-center text-xs text-slate-700 mt-5">
               + 1 chute et 1 action supplémentaires dans le rapport complet
             </p>
           </div>
         </section>
 
         {/* Pricing */}
-        <section
-          style={{
-            maxWidth: 960,
-            margin: "0 auto 80px",
-          }}
-        >
-          <p
-            style={{
-              textAlign: "center",
-              fontSize: 11,
-              fontWeight: 700,
-              letterSpacing: "0.16em",
-              textTransform: "uppercase",
-              color: "#f97316",
-              marginBottom: 10,
-            }}
-          >
+        <section className="max-w-5xl mx-auto mb-20">
+          <p className="text-center text-xs font-bold tracking-[0.16em] uppercase text-orange-400 mb-2.5">
             Offres Sprint 1
           </p>
-          <h2
-            style={{
-              textAlign: "center",
-              fontSize: "clamp(1.2rem, 2.5vw, 1.6rem)",
-              fontWeight: 800,
-              letterSpacing: "-0.02em",
-              marginBottom: 36,
-              color: "var(--text-primary)",
-            }}
-          >
+          <h2 className="text-center text-2xl sm:text-3xl font-extrabold tracking-tight mb-9 text-white">
             Choisissez votre formule
           </h2>
-          <div
-            style={{
-              display: "grid",
-              gridTemplateColumns: "repeat(auto-fit, minmax(260px, 1fr))",
-              gap: 20,
-            }}
-          >
+          <div className="grid sm:grid-cols-3 gap-5">
             {ATTENTIQ_OFFERS.map((offer) => (
               <div
                 key={offer.slug}
-                style={{
-                  background: offer.featured
-                    ? "linear-gradient(180deg, rgba(0, 212, 255, 0.1) 0%, rgba(10, 14, 20, 0.96) 100%)"
-                    : "rgba(255,255,255,0.03)",
-                  border: offer.featured
-                    ? "1px solid rgba(0, 212, 255, 0.26)"
-                    : "1px solid var(--border)",
-                  borderRadius: 18,
-                  padding: "28px 24px",
-                  position: "relative",
-                }}
+                className={`relative rounded-2xl px-6 py-7 ${
+                  offer.featured
+                    ? "bg-gradient-to-b from-brand-600/10 to-slate-950/95 border border-brand-600/30"
+                    : "bg-white/[0.03] border border-white/[0.06]"
+                }`}
               >
                 {offer.featured && (
-                  <span
-                    style={{
-                      position: "absolute",
-                      top: -12,
-                      left: "50%",
-                      transform: "translateX(-50%)",
-                      background: "linear-gradient(90deg, #0891b2, #0e7490)",
-                      color: "#fff",
-                      fontSize: 10,
-                      fontWeight: 700,
-                      letterSpacing: "0.12em",
-                      textTransform: "uppercase",
-                      borderRadius: 20,
-                      padding: "4px 14px",
-                    }}
-                  >
+                  <span className="absolute -top-3 left-1/2 -translate-x-1/2 bg-gradient-to-r from-brand-600 to-brand-700 text-white text-[10px] font-bold tracking-[0.12em] uppercase rounded-full px-3.5 py-1">
                     Recommandé
                   </span>
                 )}
                 <p
-                  style={{
-                    fontSize: 11,
-                    fontWeight: 700,
-                    letterSpacing: "0.14em",
-                    textTransform: "uppercase",
-                    color: offer.featured ? "var(--accent)" : "var(--text-secondary)",
-                    marginBottom: 6,
-                  }}
+                  className={`text-xs font-bold tracking-[0.14em] uppercase mb-1.5 ${
+                    offer.featured ? "text-brand-300" : "text-slate-500"
+                  }`}
                 >
                   {offer.kicker}
                 </p>
-                <p
-                  style={{
-                    fontSize: 26,
-                    fontWeight: 800,
-                    letterSpacing: "-0.02em",
-                    marginBottom: 4,
-                    color: "var(--text-primary)",
-                  }}
-                >
+                <p className="text-3xl font-extrabold tracking-tight mb-1 text-white">
                   {offer.priceLabel}
                   {offer.cadenceLabel && (
-                    <span
-                      style={{
-                        fontSize: 14,
-                        fontWeight: 500,
-                        color: "var(--text-secondary)",
-                      }}
-                    >
+                    <span className="text-sm font-medium text-slate-400">
                       {offer.cadenceLabel}
                     </span>
                   )}
                 </p>
-                <p
-                  style={{
-                    fontSize: 13,
-                    color: "var(--text-secondary)",
-                    marginBottom: 20,
-                    lineHeight: 1.5,
-                  }}
-                >
+                <p className="text-sm text-slate-400 mb-5 leading-relaxed">
                   {offer.summary}
                 </p>
-                <div
-                  style={{
-                    display: "grid",
-                    gap: 8,
-                    marginBottom: 24,
-                  }}
-                >
+                <div className="grid gap-2 mb-6">
                   {offer.featureList.map((f) => (
                     <div
                       key={f}
-                      style={{
-                        display: "flex",
-                        alignItems: "center",
-                        gap: 10,
-                        padding: "10px 12px",
-                        borderRadius: 12,
-                        border: "1px solid var(--border)",
-                        background: "rgba(255,255,255,0.02)",
-                        fontSize: 13,
-                        color: "var(--text-primary)",
-                      }}
+                      className="flex items-center gap-2.5 px-3 py-2.5 rounded-xl border border-white/[0.06] bg-white/[0.02] text-sm text-white"
                     >
-                      <span
-                        style={{
-                          width: 18,
-                          height: 18,
-                          borderRadius: "50%",
-                          background: "rgba(0, 212, 255, 0.12)",
-                          border: "1px solid rgba(0, 212, 255, 0.22)",
-                          color: "var(--accent)",
-                          display: "inline-flex",
-                          alignItems: "center",
-                          justifyContent: "center",
-                          fontWeight: 800,
-                          fontSize: 11,
-                          flexShrink: 0,
-                        }}
-                      >
+                      <span className="w-4.5 h-4.5 rounded-full bg-brand-600/10 border border-brand-600/20 text-brand-300 inline-flex items-center justify-center font-extrabold text-xs shrink-0">
                         ✓
                       </span>
                       {f}
@@ -674,22 +282,11 @@ export default function HomePage() {
                 </div>
                 <Link
                   href={offer.checkoutPath}
-                  style={{
-                    display: "block",
-                    textAlign: "center",
-                    background: offer.featured
-                      ? "linear-gradient(135deg, #0891b2, #0e7490)"
-                      : "rgba(255,255,255,0.06)",
-                    color: "#fff",
-                    fontWeight: 700,
-                    fontSize: 14,
-                    borderRadius: 12,
-                    padding: "12px",
-                    textDecoration: "none",
-                    border: offer.featured
-                      ? "none"
-                      : "1px solid var(--border)",
-                  }}
+                  className={`block text-center font-bold text-sm rounded-xl py-3 text-white transition-opacity hover:opacity-90 ${
+                    offer.featured
+                      ? "bg-gradient-to-br from-brand-600 to-brand-700"
+                      : "bg-white/[0.06] border border-white/[0.06]"
+                  }`}
                 >
                   {offer.ctaLabel}
                 </Link>
@@ -699,67 +296,27 @@ export default function HomePage() {
         </section>
 
         {/* FAQ */}
-        <section
-          style={{
-            maxWidth: 680,
-            margin: "0 auto 80px",
-          }}
-        >
-          <h2
-            style={{
-              textAlign: "center",
-              fontSize: "clamp(1.2rem, 2.5vw, 1.6rem)",
-              fontWeight: 800,
-              letterSpacing: "-0.02em",
-              marginBottom: 32,
-              color: "var(--text-primary)",
-            }}
-          >
+        <section className="max-w-2xl mx-auto mb-20">
+          <h2 className="text-center text-2xl sm:text-3xl font-extrabold tracking-tight mb-8 text-white">
             Questions fréquentes
           </h2>
-          <div style={{ display: "flex", flexDirection: "column", gap: 14 }}>
+          <div className="flex flex-col gap-3.5">
             {FAQ.map((item) => (
               <div
                 key={item.q}
-                style={{
-                  background: "rgba(255,255,255,0.03)",
-                  border: "1px solid var(--border)",
-                  borderRadius: 14,
-                  padding: "20px 24px",
-                }}
+                className="bg-white/[0.03] border border-white/[0.06] rounded-2xl px-6 py-5"
               >
-                <p
-                  style={{
-                    fontWeight: 700,
-                    fontSize: 14,
-                    marginBottom: 8,
-                    color: "var(--text-primary)",
-                  }}
-                >
-                  {item.q}
-                </p>
-                <p style={{ fontSize: 13, color: "var(--text-secondary)", lineHeight: 1.6 }}>
-                  {item.a}
-                </p>
+                <p className="font-bold text-sm mb-2 text-white">{item.q}</p>
+                <p className="text-sm text-slate-400 leading-relaxed">{item.a}</p>
               </div>
             ))}
           </div>
         </section>
 
         {/* Footer */}
-        <footer
-          style={{
-            borderTop: "1px solid var(--border)",
-            padding: "28px 8px",
-            display: "flex",
-            alignItems: "center",
-            justifyContent: "space-between",
-            flexWrap: "wrap",
-            gap: 12,
-          }}
-        >
-          <span style={{ fontWeight: 700, fontSize: 15, color: "var(--text-primary)" }}>Attentiq</span>
-          <div style={{ display: "flex", gap: 24 }}>
+        <footer className="border-t border-white/[0.06] py-7 px-2 flex items-center justify-between flex-wrap gap-3">
+          <span className="font-bold text-base text-white">Attentiq</span>
+          <div className="flex gap-6">
             {[
               { label: "Transparence", href: "/transparence" },
               { label: "Guide", href: "/guide" },
@@ -768,17 +325,13 @@ export default function HomePage() {
               <Link
                 key={l.href}
                 href={l.href}
-                style={{
-                  fontSize: 13,
-                  color: "var(--text-secondary)",
-                  textDecoration: "none",
-                }}
+                className="text-sm text-slate-500 hover:text-slate-300 transition-colors"
               >
                 {l.label}
               </Link>
             ))}
           </div>
-          <p style={{ fontSize: 12, color: "var(--text-muted)" }}>
+          <p className="text-xs text-slate-700">
             © {new Date().getFullYear()} Attentiq
           </p>
         </footer>

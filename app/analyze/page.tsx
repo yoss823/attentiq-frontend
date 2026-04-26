@@ -294,20 +294,13 @@ export default function AnalyzePage() {
   };
 
   return (
-    <main
-      className="min-h-screen flex flex-col items-center justify-center px-4 py-8"
-      style={{
-        background:
-          "radial-gradient(circle at top, rgba(0, 212, 255, 0.16), transparent 28%), radial-gradient(circle at 82% 16%, rgba(251, 146, 60, 0.12), transparent 18%), var(--bg-base)",
-        color: "var(--text-primary)",
-      }}
-    >
+    <main className="min-h-screen bg-black text-white flex flex-col items-center justify-center px-4 py-8">
       <div className="w-full max-w-md">
         <div className="mb-8 text-center">
-          <h1 className="text-3xl font-bold mb-2 tracking-tight" style={{ color: "var(--text-primary)" }}>
+          <h1 className="text-3xl font-bold mb-2 tracking-tight text-white">
             Analysez votre contenu
           </h1>
-          <p className="text-sm" style={{ color: "var(--text-secondary)" }}>
+          <p className="text-sm text-slate-400">
             Vidéo, texte ou image. Le diagnostic arrive en 60 à 90 secondes.
           </p>
         </div>
@@ -331,14 +324,14 @@ export default function AnalyzePage() {
                   style={
                     inputFormat === format
                       ? {
-                          background: "var(--accent)",
-                          color: "#060a0f",
-                          border: "1px solid var(--accent)",
+                          background: "#3340f5",
+                          color: "#fff",
+                          border: "1px solid #3340f5",
                         }
                       : {
-                          background: "var(--bg-surface)",
-                          color: "var(--text-secondary)",
-                          border: "1px solid var(--border)",
+                          background: "rgba(255,255,255,0.05)",
+                          color: "#94a3b8",
+                          border: "1px solid rgba(255,255,255,0.08)",
                         }
                   }
                 >
@@ -366,14 +359,14 @@ export default function AnalyzePage() {
                       style={
                         selectedPlatform === platform.id
                           ? {
-                              background: "var(--accent-dim)",
-                              color: "var(--accent)",
-                              border: "1px solid var(--border-accent)",
+                              background: "rgba(51,64,245,0.15)",
+                              color: "#9db2ff",
+                              border: "1px solid rgba(51,64,245,0.3)",
                             }
                           : {
-                              background: "var(--bg-surface)",
-                              color: "var(--text-secondary)",
-                              border: "1px solid var(--border)",
+                              background: "rgba(255,255,255,0.05)",
+                              color: "#94a3b8",
+                              border: "1px solid rgba(255,255,255,0.08)",
                             }
                       }
                     >
@@ -396,14 +389,14 @@ export default function AnalyzePage() {
                     style={
                       videoMode === 'url'
                         ? {
-                            background: "var(--accent-dim)",
-                            color: "var(--accent)",
-                            border: "1px solid var(--border-accent)",
+                            background: "rgba(51,64,245,0.15)",
+                            color: "#9db2ff",
+                            border: "1px solid rgba(51,64,245,0.3)",
                           }
                         : {
-                            background: "var(--bg-surface)",
-                            color: "var(--text-secondary)",
-                            border: "1px solid var(--border)",
+                            background: "rgba(255,255,255,0.05)",
+                            color: "#94a3b8",
+                            border: "1px solid rgba(255,255,255,0.08)",
                           }
                     }
                   >
@@ -421,14 +414,14 @@ export default function AnalyzePage() {
                     style={
                       videoMode === 'upload'
                         ? {
-                            background: "var(--accent-dim)",
-                            color: "var(--accent)",
-                            border: "1px solid var(--border-accent)",
+                            background: "rgba(51,64,245,0.15)",
+                            color: "#9db2ff",
+                            border: "1px solid rgba(51,64,245,0.3)",
                           }
                         : {
-                            background: "var(--bg-surface)",
-                            color: "var(--text-secondary)",
-                            border: "1px solid var(--border)",
+                            background: "rgba(255,255,255,0.05)",
+                            color: "#94a3b8",
+                            border: "1px solid rgba(255,255,255,0.08)",
                           }
                     }
                   >
@@ -446,12 +439,7 @@ export default function AnalyzePage() {
                         setError('');
                       }}
                       placeholder={PLATFORMS.find((p) => p.id === selectedPlatform)?.placeholder}
-                      className="w-full rounded-xl px-4 py-4 text-sm focus:outline-none transition-colors"
-                      style={{
-                        background: "var(--bg-surface)",
-                        border: "1px solid var(--border)",
-                        color: "var(--text-primary)",
-                      }}
+                      className="w-full rounded-xl px-4 py-4 text-sm focus:outline-none transition-colors bg-white/[0.05] border border-white/[0.08] text-white placeholder:text-slate-600"
                     />
                     {error && <p className="mt-2 text-xs leading-relaxed" style={{ color: "#f87171" }}>{error}</p>}
                   </div>
@@ -459,16 +447,12 @@ export default function AnalyzePage() {
                   <div>
                     <div
                       onClick={() => videoFileInputRef.current?.click()}
-                      className="rounded-xl p-8 text-center cursor-pointer transition-all"
-                      style={{
-                        border: "2px dashed var(--border-accent)",
-                        background: "var(--bg-surface)",
-                      }}
+                      className="rounded-xl p-8 text-center cursor-pointer transition-all border-2 border-dashed border-brand-600/30 bg-white/[0.03]"
                     >
-                      <p className="text-sm mb-2" style={{ color: "var(--text-secondary)" }}>
+                      <p className="text-sm mb-2 text-slate-400">
                         {videoFile ? `✓ ${videoFile.name}` : '🎬 Cliquez pour sélectionner une vidéo'}
                       </p>
-                      <p className="text-xs" style={{ color: "var(--text-muted)" }}>MP4, MOV ou WebM (max 500 MB)</p>
+                      <p className="text-xs text-slate-600">MP4, MOV ou WebM (max 500 MB)</p>
                     </div>
                     <input
                       ref={videoFileInputRef}
@@ -488,16 +472,11 @@ export default function AnalyzePage() {
 
                 <button
                   type="submit"
-                  className="w-full font-semibold py-4 rounded-xl text-sm transition-opacity hover:opacity-90"
-                  style={{
-                    background: "linear-gradient(135deg, #0891b2, #0e7490)",
-                    color: "#fff",
-                    boxShadow: "0 0 24px var(--accent-glow)",
-                  }}
+                  className="w-full font-semibold py-4 rounded-xl text-sm transition-opacity hover:opacity-90 bg-gradient-to-br from-brand-600 to-brand-700 text-white"
                 >
                   Lancer l'analyse →
                 </button>
-                <p className="text-center text-xs" style={{ color: "var(--text-muted)" }}>
+                <p className="text-center text-xs text-slate-600">
                   Vos données ne sont pas stockées. Le contenu est analysé puis supprimé.
                 </p>
               </form>
@@ -514,27 +493,17 @@ export default function AnalyzePage() {
                       setError('');
                     }}
                     placeholder="Collez votre texte ici (min. 10 caractères)..."
-                    className="w-full rounded-xl px-4 py-4 text-sm focus:outline-none transition-colors resize-none h-32"
-                    style={{
-                      background: "var(--bg-surface)",
-                      border: "1px solid var(--border)",
-                      color: "var(--text-primary)",
-                    }}
+                    className="w-full rounded-xl px-4 py-4 text-sm focus:outline-none transition-colors resize-none h-32 bg-white/[0.05] border border-white/[0.08] text-white placeholder:text-slate-600"
                   />
                   {error && <p className="mt-2 text-xs leading-relaxed" style={{ color: "#f87171" }}>{error}</p>}
                 </div>
                 <button
                   type="submit"
-                  className="w-full font-semibold py-4 rounded-xl text-sm transition-opacity hover:opacity-90"
-                  style={{
-                    background: "linear-gradient(135deg, #0891b2, #0e7490)",
-                    color: "#fff",
-                    boxShadow: "0 0 24px var(--accent-glow)",
-                  }}
+                  className="w-full font-semibold py-4 rounded-xl text-sm transition-opacity hover:opacity-90 bg-gradient-to-br from-brand-600 to-brand-700 text-white"
                 >
                   Analyser le texte →
                 </button>
-                <p className="text-center text-xs" style={{ color: "var(--text-muted)" }}>
+                <p className="text-center text-xs text-slate-600">
                   Vos données ne sont pas stockées. Le texte est analysé puis supprimé.
                 </p>
               </form>
@@ -545,16 +514,12 @@ export default function AnalyzePage() {
               <form onSubmit={handleSubmitImage} className="space-y-4">
                 <div
                   onClick={() => fileInputRef.current?.click()}
-                  className="rounded-xl p-8 text-center cursor-pointer transition-all"
-                  style={{
-                    border: "2px dashed var(--border-accent)",
-                    background: "var(--bg-surface)",
-                  }}
+                  className="rounded-xl p-8 text-center cursor-pointer transition-all border-2 border-dashed border-brand-600/30 bg-white/[0.03]"
                 >
-                  <p className="text-sm mb-2" style={{ color: "var(--text-secondary)" }}>
+                  <p className="text-sm mb-2 text-slate-400">
                     {file ? `✓ ${file.name}` : '🖼️ Cliquez pour sélectionner une image'}
                   </p>
-                  <p className="text-xs" style={{ color: "var(--text-muted)" }}>JPG, PNG ou WebP (max 10 MB)</p>
+                  <p className="text-xs text-slate-600">JPG, PNG ou WebP (max 10 MB)</p>
                 </div>
                 <input
                   ref={fileInputRef}
@@ -571,16 +536,11 @@ export default function AnalyzePage() {
                 {error && <p className="text-xs leading-relaxed" style={{ color: "#f87171" }}>{error}</p>}
                 <button
                   type="submit"
-                  className="w-full font-semibold py-4 rounded-xl text-sm transition-opacity hover:opacity-90"
-                  style={{
-                    background: "linear-gradient(135deg, #0891b2, #0e7490)",
-                    color: "#fff",
-                    boxShadow: "0 0 24px var(--accent-glow)",
-                  }}
+                  className="w-full font-semibold py-4 rounded-xl text-sm transition-opacity hover:opacity-90 bg-gradient-to-br from-brand-600 to-brand-700 text-white"
                 >
                   Analyser l'image →
                 </button>
-                <p className="text-center text-xs" style={{ color: "var(--text-muted)" }}>
+                <p className="text-center text-xs text-slate-600">
                   Vos données ne sont pas stockées. L'image est analysée puis supprimée.
                 </p>
               </form>
@@ -589,19 +549,13 @@ export default function AnalyzePage() {
         ) : (
           <div className="text-center space-y-6">
             <div className="flex justify-center">
-              <div
-                className="w-12 h-12 border-2 rounded-full animate-spin"
-                style={{
-                  borderColor: "var(--border)",
-                  borderTopColor: "var(--accent)",
-                }}
-              />
+              <div className="w-12 h-12 border-2 border-white/10 border-t-brand-400 rounded-full animate-spin" />
             </div>
             <div>
-              <p className="font-medium text-lg" style={{ color: "var(--text-primary)" }}>
+              <p className="font-medium text-lg text-white">
                 {LOADING_STEPS[stepIndex].message}
               </p>
-              <p className="text-sm mt-1" style={{ color: "var(--text-secondary)" }}>
+              <p className="text-sm mt-1 text-slate-400">
                 {elapsedSeconds}s écoulées
               </p>
             </div>
@@ -609,14 +563,11 @@ export default function AnalyzePage() {
               {LOADING_STEPS.map((_, i) => (
                 <div
                   key={i}
-                  className="h-1 w-8 rounded-full transition-colors"
-                  style={{
-                    background: i <= stepIndex ? "var(--accent)" : "var(--border)",
-                  }}
+                  className={`h-1 w-8 rounded-full transition-colors ${i <= stepIndex ? "bg-brand-400" : "bg-white/10"}`}
                 />
               ))}
             </div>
-            <p className="text-xs" style={{ color: "var(--text-muted)" }}>
+            <p className="text-xs text-slate-600">
               L'analyse prend généralement 60 à 90 secondes.
             </p>
           </div>
