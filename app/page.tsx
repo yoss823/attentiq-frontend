@@ -1,198 +1,776 @@
-import Link from 'next/link';
-import type { Metadata } from 'next';
+"use client";
 
-export const metadata: Metadata = {
-  title: 'Attentiq — Comprenez ce qui capte l\'attention sur TikTok',
-  description:
-    'Diagnostic structurel de la rétention sur les formats courts. Analysez vos vidéos TikTok et comprenez pourquoi votre audience décroche.',
-};
+import Link from "next/link";
+import { ATTENTIQ_OFFERS } from "@/lib/offer-config";
 
-const features = [
+const FAQ = [
   {
-    icon: '🎯',
-    title: 'Diagnostic de rétention',
-    description:
-      'Identifiez les secondes exactes où votre audience décroche et pourquoi.',
+    q: "C'est quoi exactement un diagnostic Attentiq ?",
+    a: "On analyse votre contenu (vidéo, photo ou texte) et on identifie les moments précis où l'attention chute — avec les causes et un plan d'actions concret.",
   },
   {
-    icon: '🔍',
-    title: 'Analyse frame par frame',
-    description:
-      'Transcription audio, analyse visuelle, détection des moments de décrochage.',
+    q: "Est-ce que mes données sont partagées ?",
+    a: "Non. Vos contenus sont analysés de façon anonymisée et ne sont jamais revendus ni utilisés pour entraîner des modèles tiers.",
   },
   {
-    icon: '⚡',
-    title: 'Actions concrètes',
-    description:
-      'Recevez 3 à 5 recommandations précises pour vos prochaines vidéos.',
+    q: "Combien de temps prend l'analyse ?",
+    a: "Moins de 2 minutes pour obtenir votre teaser gratuit. Le rapport complet est disponible immédiatement après paiement.",
   },
-];
-
-const socialProof = [
-  { handle: '@marieclaire_content', followers: '142K', niche: 'Lifestyle' },
-  { handle: '@thomasfitpro', followers: '89K', niche: 'Fitness' },
-  { handle: '@juliettecooks', followers: '203K', niche: 'Food' },
-  { handle: '@alexbusiness', followers: '67K', niche: 'Business' },
-  { handle: '@sophiavlog', followers: '315K', niche: 'Vlog' },
-  { handle: '@maximetech', followers: '54K', niche: 'Tech' },
 ];
 
 export default function HomePage() {
   return (
-    <main className="min-h-screen bg-gradient-to-br from-slate-950 via-brand-950 to-slate-900 text-white">
-      {/* Nav */}
-      <nav className="flex items-center justify-between px-6 py-5 max-w-6xl mx-auto">
-        <span className="text-xl font-bold tracking-tight text-white">
-          Attentiq
-        </span>
-        <div className="flex items-center gap-4">
-          <Link
-            href="/guide"
-            className="text-sm text-slate-400 hover:text-white transition-colors hidden sm:block"
-          >
-            Comment ça marche
-          </Link>
-          <Link
-            href="/analyze"
-            className="text-sm font-semibold text-brand-300 hover:text-white transition-colors"
-          >
-            Analyser une vidéo →
-          </Link>
-        </div>
-      </nav>
+    <main
+      style={{
+        minHeight: "100vh",
+        background:
+          "radial-gradient(ellipse at 60% 0%, #0e7490 0%, #0f172a 55%, #431407 100%)",
+        color: "#f8fafc",
+        fontFamily: "var(--font-dm-sans, sans-serif)",
+        position: "relative",
+        overflow: "hidden",
+      }}
+    >
+      {/* Grid texture overlay */}
+      <div
+        aria-hidden
+        style={{
+          position: "fixed",
+          inset: 0,
+          backgroundImage:
+            "linear-gradient(rgba(255,255,255,.03) 1px, transparent 1px), linear-gradient(90deg, rgba(255,255,255,.03) 1px, transparent 1px)",
+          backgroundSize: "40px 40px",
+          WebkitMaskImage:
+            "radial-gradient(ellipse at 50% 0%, black 30%, transparent 80%)",
+          maskImage:
+            "radial-gradient(ellipse at 50% 0%, black 30%, transparent 80%)",
+          pointerEvents: "none",
+          zIndex: 0,
+        }}
+      />
 
-      {/* Hero */}
-      <section className="max-w-6xl mx-auto px-6 pt-20 pb-24 text-center">
-        <div className="inline-flex items-center gap-2 bg-brand-950/60 border border-brand-800/50 rounded-full px-4 py-1.5 mb-8">
-          <span className="w-2 h-2 rounded-full bg-brand-400 animate-pulse" />
-          <span className="text-xs font-semibold text-brand-300 uppercase tracking-widest">
-            Diagnostic IA en 90 secondes
+      <div style={{ position: "relative", zIndex: 1 }}>
+        {/* Nav */}
+        <nav
+          style={{
+            display: "flex",
+            alignItems: "center",
+            justifyContent: "space-between",
+            padding: "20px 32px",
+            maxWidth: 1100,
+            margin: "0 auto",
+          }}
+        >
+          <span
+            style={{
+              display: "inline-flex",
+              alignItems: "center",
+              gap: 8,
+              fontWeight: 700,
+              fontSize: 18,
+              letterSpacing: "-0.02em",
+            }}
+          >
+            <span
+              style={{
+                background: "linear-gradient(135deg,#06b6d4,#f97316)",
+                borderRadius: 8,
+                padding: "2px 8px",
+                fontSize: 13,
+                fontWeight: 800,
+                color: "#fff",
+                letterSpacing: "0.04em",
+              }}
+            >
+              AT
+            </span>
+            Attentiq
           </span>
-        </div>
-
-        <h1 className="text-4xl sm:text-5xl lg:text-6xl font-bold tracking-tight text-white mb-6 max-w-4xl mx-auto leading-tight">
-          Comprenez ce qui capte{' '}
-          <span className="text-brand-300">l&apos;attention</span> sur TikTok
-        </h1>
-
-        <p className="text-lg text-slate-400 max-w-2xl mx-auto mb-10 leading-relaxed">
-          Attentiq analyse vos vidéos et identifie les secondes exactes où votre
-          audience décroche — avec les causes et les actions pour y remédier.
-        </p>
-
-        <div className="flex flex-col sm:flex-row items-center justify-center gap-4">
           <Link
             href="/analyze"
-            className="inline-flex items-center gap-2 bg-brand-500 hover:bg-brand-400 text-white font-semibold py-4 px-8 rounded-xl transition-colors text-base shadow-lg shadow-brand-900/50"
+            style={{
+              background: "rgba(6,182,212,.15)",
+              border: "1px solid rgba(6,182,212,.35)",
+              color: "#67e8f9",
+              borderRadius: 10,
+              padding: "8px 18px",
+              fontSize: 13,
+              fontWeight: 600,
+              textDecoration: "none",
+              transition: "background .2s",
+            }}
           >
-            Analyser une vidéo/photo/texte par exemple
-            <span aria-hidden="true">→</span>
+            Lancer un diagnostic
           </Link>
-          <Link
-            href="/guide"
-            className="text-sm text-slate-400 hover:text-white transition-colors"
+        </nav>
+
+        {/* Hero */}
+        <section
+          style={{
+            maxWidth: 780,
+            margin: "0 auto",
+            padding: "72px 24px 56px",
+            textAlign: "center",
+          }}
+        >
+          <p
+            style={{
+              fontSize: 11,
+              fontWeight: 700,
+              letterSpacing: "0.18em",
+              textTransform: "uppercase",
+              color: "#f97316",
+              marginBottom: 20,
+            }}
           >
-            Comment ça marche ?
-          </Link>
-        </div>
-      </section>
-
-      {/* Features Grid */}
-      <section className="max-w-6xl mx-auto px-6 pb-24">
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-          {features.map((feature) => (
-            <div
-              key={feature.title}
-              className="bg-white/5 border border-white/10 rounded-2xl p-6 hover:bg-white/8 transition-colors"
-            >
-              <div className="text-3xl mb-4">{feature.icon}</div>
-              <h3 className="text-lg font-semibold text-white mb-2">
-                {feature.title}
-              </h3>
-              <p className="text-sm text-slate-400 leading-relaxed">
-                {feature.description}
-              </p>
-            </div>
-          ))}
-        </div>
-      </section>
-
-      {/* Social Proof */}
-      <section className="max-w-6xl mx-auto px-6 pb-24">
-        <p className="text-center text-xs font-semibold text-slate-500 uppercase tracking-widest mb-8">
-          Utilisé par des créateurs TikTok
-        </p>
-        <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-6 gap-3">
-          {socialProof.map((creator) => (
-            <div
-              key={creator.handle}
-              className="bg-white/5 border border-white/10 rounded-xl p-3 text-center"
-            >
-              <p className="text-xs font-semibold text-brand-300 truncate">
-                {creator.handle}
-              </p>
-              <p className="text-xs text-slate-500 mt-1">{creator.followers}</p>
-              <p className="text-xs text-slate-600">{creator.niche}</p>
-            </div>
-          ))}
-        </div>
-      </section>
-
-      {/* CTA Banner */}
-      <section className="max-w-6xl mx-auto px-6 pb-24">
-        <div className="bg-brand-950/60 border border-brand-800/50 rounded-3xl p-10 sm:p-14 text-center">
-          <h2 className="text-3xl sm:text-4xl font-bold text-white mb-4 tracking-tight">
-            Prêt à comprendre votre audience ?
-          </h2>
-          <p className="text-slate-400 mb-8 max-w-xl mx-auto">
-            Obtenez un diagnostic complet de votre vidéo TikTok en moins de 2
-            minutes.
+            Diagnostic de rétention IA
           </p>
-          <div className="flex flex-col sm:flex-row items-center justify-center gap-4">
-            <Link
-              href="/analyze"
-              className="inline-flex items-center gap-2 bg-brand-500 hover:bg-brand-400 text-white font-semibold py-4 px-8 rounded-xl transition-colors text-base shadow-lg shadow-brand-900/50"
+          <h1
+            style={{
+              fontSize: "clamp(2rem, 5vw, 3.4rem)",
+              fontWeight: 800,
+              lineHeight: 1.1,
+              letterSpacing: "-0.03em",
+              marginBottom: 20,
+            }}
+          >
+            Sachez où votre vidéo{" "}
+            <span
+              style={{
+                background: "linear-gradient(90deg,#f97316,#fb923c)",
+                WebkitBackgroundClip: "text",
+                WebkitTextFillColor: "transparent",
+              }}
             >
-              Analyser une vidéo/photo/texte par exemple
-              <span aria-hidden="true">→</span>
-            </Link>
-            <Link
-              href="/checkout/rapport-complet"
-              className="text-sm font-medium text-brand-300 hover:text-white border border-brand-800 hover:border-brand-500 rounded-xl px-6 py-4 transition-all"
-            >
-              Voir les tarifs
-            </Link>
-          </div>
-        </div>
-      </section>
+              fait décrocher
+            </span>
+          </h1>
+          <p
+            style={{
+              fontSize: 17,
+              color: "#94a3b8",
+              lineHeight: 1.65,
+              maxWidth: 560,
+              margin: "0 auto 36px",
+            }}
+          >
+            Attentiq analyse votre contenu et identifie les secondes exactes où
+            l&apos;attention chute — avec les causes et un plan d&apos;actions concret.
+          </p>
+          <Link
+            href="/analyze"
+            style={{
+              display: "inline-block",
+              background: "linear-gradient(135deg,#0891b2,#0e7490)",
+              color: "#fff",
+              fontWeight: 700,
+              fontSize: 15,
+              borderRadius: 12,
+              padding: "14px 28px",
+              textDecoration: "none",
+              boxShadow: "0 0 32px rgba(6,182,212,.35)",
+              transition: "opacity .2s",
+            }}
+          >
+            Analyser une vidéo/photo/texte par exemple →
+          </Link>
+        </section>
 
-      {/* Footer */}
-      <footer className="border-t border-white/10 max-w-6xl mx-auto px-6 py-8">
-        <div className="flex flex-col sm:flex-row items-center justify-between gap-4">
-          <span className="text-sm font-bold text-white">Attentiq</span>
-          <div className="flex items-center gap-6 text-xs text-slate-500">
-            <Link href="/guide" className="hover:text-white transition-colors">
-              Guide
-            </Link>
-            <Link
-              href="/transparence"
-              className="hover:text-white transition-colors"
+        {/* Teaser gratuit */}
+        <section
+          style={{
+            maxWidth: 860,
+            margin: "0 auto 80px",
+            padding: "0 24px",
+          }}
+        >
+          <div
+            style={{
+              background: "rgba(255,255,255,.04)",
+              border: "1px solid rgba(255,255,255,.09)",
+              borderRadius: 20,
+              padding: "36px 40px",
+            }}
+          >
+            <p
+              style={{
+                fontSize: 11,
+                fontWeight: 700,
+                letterSpacing: "0.16em",
+                textTransform: "uppercase",
+                color: "#06b6d4",
+                marginBottom: 10,
+              }}
             >
-              Transparence
-            </Link>
-            <Link
-              href="/checkout/rapport-complet"
-              className="hover:text-white transition-colors"
+              Teaser gratuit
+            </p>
+            <h2
+              style={{
+                fontSize: "clamp(1.3rem, 3vw, 1.9rem)",
+                fontWeight: 800,
+                letterSpacing: "-0.02em",
+                marginBottom: 10,
+              }}
             >
-              Tarifs
-            </Link>
+              2 min max pour décider
+            </h2>
+            <p style={{ color: "#94a3b8", fontSize: 15, lineHeight: 1.6 }}>
+              Lancez une analyse gratuite. Vous voyez immédiatement les 3
+              premières chutes d&apos;attention et 2 actions prioritaires — sans
+              carte bancaire. Le rapport complet se débloque en un clic si vous
+              voulez aller plus loin.
+            </p>
           </div>
-          <p className="text-xs text-slate-600">
+        </section>
+
+        {/* Differentiation */}
+        <section
+          style={{
+            maxWidth: 860,
+            margin: "0 auto 80px",
+            padding: "0 24px",
+          }}
+        >
+          <h2
+            style={{
+              textAlign: "center",
+              fontSize: "clamp(1.2rem, 2.5vw, 1.6rem)",
+              fontWeight: 800,
+              letterSpacing: "-0.02em",
+              marginBottom: 32,
+            }}
+          >
+            Ce que TikTok ne vous dit pas
+          </h2>
+          <div
+            style={{
+              display: "grid",
+              gridTemplateColumns: "repeat(auto-fit, minmax(280px, 1fr))",
+              gap: 16,
+            }}
+          >
+            {[
+              {
+                label: "Ce que TikTok vous donne",
+                color: "#64748b",
+                items: [
+                  "Vues totales",
+                  "Taux de complétion global",
+                  "Likes / partages",
+                  "Portée estimée",
+                ],
+              },
+              {
+                label: "Ce qu'Attentiq ajoute",
+                color: "#06b6d4",
+                items: [
+                  "Secondes exactes de décrochage",
+                  "Cause identifiée pour chaque chute",
+                  "Plan d'actions priorisé",
+                  "Comparaison avec vos autres vidéos",
+                ],
+              },
+            ].map((col) => (
+              <div
+                key={col.label}
+                style={{
+                  background: "rgba(255,255,255,.04)",
+                  border: `1px solid ${col.color}33`,
+                  borderRadius: 16,
+                  padding: "28px 28px",
+                }}
+              >
+                <p
+                  style={{
+                    fontSize: 11,
+                    fontWeight: 700,
+                    letterSpacing: "0.14em",
+                    textTransform: "uppercase",
+                    color: col.color,
+                    marginBottom: 16,
+                  }}
+                >
+                  {col.label}
+                </p>
+                <ul style={{ listStyle: "none", padding: 0, margin: 0 }}>
+                  {col.items.map((item) => (
+                    <li
+                      key={item}
+                      style={{
+                        display: "flex",
+                        alignItems: "center",
+                        gap: 10,
+                        fontSize: 14,
+                        color: "#cbd5e1",
+                        marginBottom: 10,
+                      }}
+                    >
+                      <span style={{ color: col.color, fontSize: 16 }}>
+                        {col.color === "#06b6d4" ? "✓" : "·"}
+                      </span>
+                      {item}
+                    </li>
+                  ))}
+                </ul>
+              </div>
+            ))}
+          </div>
+        </section>
+
+        {/* Anonymized preview */}
+        <section
+          style={{
+            maxWidth: 860,
+            margin: "0 auto 80px",
+            padding: "0 24px",
+          }}
+        >
+          <h2
+            style={{
+              textAlign: "center",
+              fontSize: "clamp(1.2rem, 2.5vw, 1.6rem)",
+              fontWeight: 800,
+              letterSpacing: "-0.02em",
+              marginBottom: 8,
+            }}
+          >
+            À quoi ressemble un rapport ?
+          </h2>
+          <p
+            style={{
+              textAlign: "center",
+              color: "#64748b",
+              fontSize: 13,
+              marginBottom: 28,
+            }}
+          >
+            Exemple anonymisé — données réelles d&apos;une vidéo analysée
+          </p>
+          <div
+            style={{
+              background: "rgba(255,255,255,.04)",
+              border: "1px solid rgba(255,255,255,.09)",
+              borderRadius: 20,
+              padding: "32px",
+            }}
+          >
+            {/* Score */}
+            <div
+              style={{
+                display: "flex",
+                alignItems: "center",
+                gap: 20,
+                marginBottom: 28,
+              }}
+            >
+              <div
+                style={{
+                  width: 72,
+                  height: 72,
+                  borderRadius: "50%",
+                  border: "3px solid #f97316",
+                  display: "flex",
+                  alignItems: "center",
+                  justifyContent: "center",
+                  flexShrink: 0,
+                }}
+              >
+                <span
+                  style={{ fontSize: 22, fontWeight: 800, color: "#f97316" }}
+                >
+                  6.4
+                </span>
+              </div>
+              <div>
+                <p
+                  style={{
+                    fontSize: 13,
+                    color: "#94a3b8",
+                    marginBottom: 4,
+                  }}
+                >
+                  Score de rétention
+                </p>
+                <p style={{ fontSize: 15, fontWeight: 600 }}>
+                  Rétention fragile — 3 chutes critiques détectées
+                </p>
+              </div>
+            </div>
+
+            {/* Drops */}
+            <p
+              style={{
+                fontSize: 11,
+                fontWeight: 700,
+                letterSpacing: "0.14em",
+                textTransform: "uppercase",
+                color: "#f97316",
+                marginBottom: 12,
+              }}
+            >
+              Chutes d&apos;attention
+            </p>
+            {[
+              {
+                time: "0:04",
+                label: "Hook trop lent",
+                desc: "Aucune promesse claire dans les 3 premières secondes.",
+              },
+              {
+                time: "0:11",
+                label: "Transition abrupte",
+                desc: "Coupure visuelle sans lien narratif — perte de contexte.",
+              },
+              {
+                time: "0:23",
+                label: "Fin sans CTA",
+                desc: "L'audience ne sait pas quoi faire après avoir regardé.",
+              },
+            ].map((drop) => (
+              <div
+                key={drop.time}
+                style={{
+                  display: "flex",
+                  gap: 14,
+                  marginBottom: 12,
+                  padding: "12px 16px",
+                  background: "rgba(249,115,22,.07)",
+                  borderRadius: 10,
+                  border: "1px solid rgba(249,115,22,.18)",
+                }}
+              >
+                <span
+                  style={{
+                    fontSize: 12,
+                    fontWeight: 700,
+                    color: "#f97316",
+                    minWidth: 36,
+                    paddingTop: 1,
+                  }}
+                >
+                  {drop.time}
+                </span>
+                <div>
+                  <p style={{ fontSize: 13, fontWeight: 600, marginBottom: 2 }}>
+                    {drop.label}
+                  </p>
+                  <p style={{ fontSize: 12, color: "#94a3b8" }}>{drop.desc}</p>
+                </div>
+              </div>
+            ))}
+
+            {/* Actions */}
+            <p
+              style={{
+                fontSize: 11,
+                fontWeight: 700,
+                letterSpacing: "0.14em",
+                textTransform: "uppercase",
+                color: "#06b6d4",
+                margin: "20px 0 12px",
+              }}
+            >
+              Actions prioritaires
+            </p>
+            {[
+              "Reformuler le hook avec une promesse explicite dès la 1re seconde.",
+              "Ajouter un texte de transition entre les séquences 2 et 3.",
+            ].map((action) => (
+              <div
+                key={action}
+                style={{
+                  display: "flex",
+                  gap: 10,
+                  marginBottom: 10,
+                  padding: "10px 14px",
+                  background: "rgba(6,182,212,.07)",
+                  borderRadius: 10,
+                  border: "1px solid rgba(6,182,212,.18)",
+                  fontSize: 13,
+                  color: "#cbd5e1",
+                }}
+              >
+                <span style={{ color: "#06b6d4", fontWeight: 700 }}>→</span>
+                {action}
+              </div>
+            ))}
+
+            <p
+              style={{
+                textAlign: "center",
+                fontSize: 12,
+                color: "#475569",
+                marginTop: 20,
+              }}
+            >
+              + 1 chute et 1 action supplémentaires dans le rapport complet
+            </p>
+          </div>
+        </section>
+
+        {/* Pricing */}
+        <section
+          style={{
+            maxWidth: 960,
+            margin: "0 auto 80px",
+            padding: "0 24px",
+          }}
+        >
+          <p
+            style={{
+              textAlign: "center",
+              fontSize: 11,
+              fontWeight: 700,
+              letterSpacing: "0.16em",
+              textTransform: "uppercase",
+              color: "#f97316",
+              marginBottom: 10,
+            }}
+          >
+            Offres Sprint 1
+          </p>
+          <h2
+            style={{
+              textAlign: "center",
+              fontSize: "clamp(1.2rem, 2.5vw, 1.6rem)",
+              fontWeight: 800,
+              letterSpacing: "-0.02em",
+              marginBottom: 36,
+            }}
+          >
+            Choisissez votre formule
+          </h2>
+          <div
+            style={{
+              display: "grid",
+              gridTemplateColumns: "repeat(auto-fit, minmax(260px, 1fr))",
+              gap: 20,
+            }}
+          >
+            {ATTENTIQ_OFFERS.map((offer) => (
+              <div
+                key={offer.slug}
+                style={{
+                  background: offer.featured
+                    ? "linear-gradient(160deg,rgba(6,182,212,.12),rgba(14,116,144,.08))"
+                    : "rgba(255,255,255,.04)",
+                  border: offer.featured
+                    ? "1px solid rgba(6,182,212,.4)"
+                    : "1px solid rgba(255,255,255,.09)",
+                  borderRadius: 18,
+                  padding: "28px 24px",
+                  position: "relative",
+                }}
+              >
+                {offer.featured && (
+                  <span
+                    style={{
+                      position: "absolute",
+                      top: -12,
+                      left: "50%",
+                      transform: "translateX(-50%)",
+                      background: "linear-gradient(90deg,#0891b2,#0e7490)",
+                      color: "#fff",
+                      fontSize: 10,
+                      fontWeight: 700,
+                      letterSpacing: "0.12em",
+                      textTransform: "uppercase",
+                      borderRadius: 20,
+                      padding: "4px 14px",
+                    }}
+                  >
+                    Recommandé
+                  </span>
+                )}
+                <p
+                  style={{
+                    fontSize: 11,
+                    fontWeight: 700,
+                    letterSpacing: "0.14em",
+                    textTransform: "uppercase",
+                    color: "#94a3b8",
+                    marginBottom: 6,
+                  }}
+                >
+                  {offer.kicker}
+                </p>
+                <p
+                  style={{
+                    fontSize: 26,
+                    fontWeight: 800,
+                    letterSpacing: "-0.02em",
+                    marginBottom: 4,
+                  }}
+                >
+                  {offer.priceLabel}
+                  {offer.cadenceLabel && (
+                    <span
+                      style={{
+                        fontSize: 14,
+                        fontWeight: 500,
+                        color: "#64748b",
+                      }}
+                    >
+                      {offer.cadenceLabel}
+                    </span>
+                  )}
+                </p>
+                <p
+                  style={{
+                    fontSize: 13,
+                    color: "#94a3b8",
+                    marginBottom: 20,
+                    lineHeight: 1.5,
+                  }}
+                >
+                  {offer.summary}
+                </p>
+                <ul
+                  style={{
+                    listStyle: "none",
+                    padding: 0,
+                    margin: "0 0 24px",
+                  }}
+                >
+                  {offer.featureList.map((f) => (
+                    <li
+                      key={f}
+                      style={{
+                        display: "flex",
+                        alignItems: "flex-start",
+                        gap: 8,
+                        fontSize: 13,
+                        color: "#cbd5e1",
+                        marginBottom: 8,
+                      }}
+                    >
+                      <span style={{ color: "#06b6d4", marginTop: 1 }}>✓</span>
+                      {f}
+                    </li>
+                  ))}
+                </ul>
+                <Link
+                  href={offer.checkoutPath}
+                  style={{
+                    display: "block",
+                    textAlign: "center",
+                    background: offer.featured
+                      ? "linear-gradient(135deg,#0891b2,#0e7490)"
+                      : "rgba(255,255,255,.08)",
+                    color: "#fff",
+                    fontWeight: 700,
+                    fontSize: 14,
+                    borderRadius: 10,
+                    padding: "12px",
+                    textDecoration: "none",
+                    border: offer.featured
+                      ? "none"
+                      : "1px solid rgba(255,255,255,.12)",
+                  }}
+                >
+                  {offer.ctaLabel}
+                </Link>
+              </div>
+            ))}
+          </div>
+        </section>
+
+        {/* FAQ */}
+        <section
+          style={{
+            maxWidth: 680,
+            margin: "0 auto 80px",
+            padding: "0 24px",
+          }}
+        >
+          <h2
+            style={{
+              textAlign: "center",
+              fontSize: "clamp(1.2rem, 2.5vw, 1.6rem)",
+              fontWeight: 800,
+              letterSpacing: "-0.02em",
+              marginBottom: 32,
+            }}
+          >
+            Questions fréquentes
+          </h2>
+          <div style={{ display: "flex", flexDirection: "column", gap: 14 }}>
+            {FAQ.map((item) => (
+              <div
+                key={item.q}
+                style={{
+                  background: "rgba(255,255,255,.04)",
+                  border: "1px solid rgba(255,255,255,.09)",
+                  borderRadius: 14,
+                  padding: "20px 24px",
+                }}
+              >
+                <p
+                  style={{
+                    fontWeight: 700,
+                    fontSize: 14,
+                    marginBottom: 8,
+                  }}
+                >
+                  {item.q}
+                </p>
+                <p style={{ fontSize: 13, color: "#94a3b8", lineHeight: 1.6 }}>
+                  {item.a}
+                </p>
+              </div>
+            ))}
+          </div>
+        </section>
+
+        {/* Footer */}
+        <footer
+          style={{
+            borderTop: "1px solid rgba(255,255,255,.07)",
+            maxWidth: 1100,
+            margin: "0 auto",
+            padding: "28px 32px",
+            display: "flex",
+            alignItems: "center",
+            justifyContent: "space-between",
+            flexWrap: "wrap",
+            gap: 12,
+          }}
+        >
+          <span style={{ fontWeight: 700, fontSize: 15 }}>Attentiq</span>
+          <div style={{ display: "flex", gap: 24 }}>
+            {[
+              { label: "Transparence", href: "/transparence" },
+              { label: "Guide", href: "/guide" },
+              { label: "Tarifs", href: "/checkout/rapport-complet" },
+            ].map((l) => (
+              <Link
+                key={l.href}
+                href={l.href}
+                style={{
+                  fontSize: 13,
+                  color: "#64748b",
+                  textDecoration: "none",
+                }}
+              >
+                {l.label}
+              </Link>
+            ))}
+          </div>
+          <p style={{ fontSize: 12, color: "#334155" }}>
             © {new Date().getFullYear()} Attentiq
           </p>
-        </div>
-      </footer>
+        </footer>
+      </div>
+
+      <style>{`
+        @keyframes rise {
+          from { opacity: 0; transform: translateY(18px); }
+          to   { opacity: 1; transform: translateY(0); }
+        }
+        main > div > section, main > div > nav {
+          animation: rise .55s ease both;
+        }
+      `}</style>
     </main>
   );
 }
-
