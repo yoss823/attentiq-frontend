@@ -24,41 +24,19 @@ export default function HomePage() {
       style={{
         minHeight: "100vh",
         background:
-          "radial-gradient(ellipse at 60% 0%, #0e7490 0%, #0f172a 55%, #431407 100%)",
-        color: "#f8fafc",
+          "radial-gradient(circle at top, rgba(0, 212, 255, 0.16), transparent 28%), radial-gradient(circle at 82% 16%, rgba(251, 146, 60, 0.12), transparent 18%), var(--bg-base)",
+        color: "var(--text-primary)",
         fontFamily: "var(--font-dm-sans, sans-serif)",
-        position: "relative",
-        overflow: "hidden",
       }}
     >
-      {/* Grid texture overlay */}
-      <div
-        aria-hidden
-        style={{
-          position: "fixed",
-          inset: 0,
-          backgroundImage:
-            "linear-gradient(rgba(255,255,255,.03) 1px, transparent 1px), linear-gradient(90deg, rgba(255,255,255,.03) 1px, transparent 1px)",
-          backgroundSize: "40px 40px",
-          WebkitMaskImage:
-            "radial-gradient(ellipse at 50% 0%, black 30%, transparent 80%)",
-          maskImage:
-            "radial-gradient(ellipse at 50% 0%, black 30%, transparent 80%)",
-          pointerEvents: "none",
-          zIndex: 0,
-        }}
-      />
-
-      <div style={{ position: "relative", zIndex: 1 }}>
+      <div style={{ maxWidth: 1100, margin: "0 auto", padding: "0 24px" }}>
         {/* Nav */}
         <nav
           style={{
             display: "flex",
             alignItems: "center",
             justifyContent: "space-between",
-            padding: "20px 32px",
-            maxWidth: 1100,
-            margin: "0 auto",
+            padding: "20px 8px",
           }}
         >
           <span
@@ -69,11 +47,12 @@ export default function HomePage() {
               fontWeight: 700,
               fontSize: 18,
               letterSpacing: "-0.02em",
+              color: "var(--text-primary)",
             }}
           >
             <span
               style={{
-                background: "linear-gradient(135deg,#06b6d4,#f97316)",
+                background: "linear-gradient(135deg, var(--accent), #f97316)",
                 borderRadius: 8,
                 padding: "2px 8px",
                 fontSize: 13,
@@ -89,15 +68,14 @@ export default function HomePage() {
           <Link
             href="/analyze"
             style={{
-              background: "rgba(6,182,212,.15)",
-              border: "1px solid rgba(6,182,212,.35)",
-              color: "#67e8f9",
+              background: "rgba(0, 212, 255, 0.1)",
+              border: "1px solid var(--border-accent)",
+              color: "var(--accent)",
               borderRadius: 10,
               padding: "8px 18px",
               fontSize: 13,
               fontWeight: 600,
               textDecoration: "none",
-              transition: "background .2s",
             }}
           >
             Lancer un diagnostic
@@ -109,7 +87,7 @@ export default function HomePage() {
           style={{
             maxWidth: 780,
             margin: "0 auto",
-            padding: "72px 24px 56px",
+            padding: "72px 0 56px",
             textAlign: "center",
           }}
         >
@@ -132,12 +110,13 @@ export default function HomePage() {
               lineHeight: 1.1,
               letterSpacing: "-0.03em",
               marginBottom: 20,
+              color: "var(--text-primary)",
             }}
           >
             Sachez où votre vidéo{" "}
             <span
               style={{
-                background: "linear-gradient(90deg,#f97316,#fb923c)",
+                background: "linear-gradient(90deg, #f97316, #fb923c)",
                 WebkitBackgroundClip: "text",
                 WebkitTextFillColor: "transparent",
               }}
@@ -148,7 +127,7 @@ export default function HomePage() {
           <p
             style={{
               fontSize: 17,
-              color: "#94a3b8",
+              color: "var(--text-secondary)",
               lineHeight: 1.65,
               maxWidth: 560,
               margin: "0 auto 36px",
@@ -161,15 +140,14 @@ export default function HomePage() {
             href="/analyze"
             style={{
               display: "inline-block",
-              background: "linear-gradient(135deg,#0891b2,#0e7490)",
+              background: "linear-gradient(135deg, #0891b2, #0e7490)",
               color: "#fff",
               fontWeight: 700,
               fontSize: 15,
               borderRadius: 12,
               padding: "14px 28px",
               textDecoration: "none",
-              boxShadow: "0 0 32px rgba(6,182,212,.35)",
-              transition: "opacity .2s",
+              boxShadow: "0 0 32px var(--accent-glow)",
             }}
           >
             Analyser une vidéo/photo/texte par exemple →
@@ -181,13 +159,12 @@ export default function HomePage() {
           style={{
             maxWidth: 860,
             margin: "0 auto 80px",
-            padding: "0 24px",
           }}
         >
           <div
             style={{
-              background: "rgba(255,255,255,.04)",
-              border: "1px solid rgba(255,255,255,.09)",
+              background: "rgba(255,255,255,0.03)",
+              border: "1px solid var(--border)",
               borderRadius: 20,
               padding: "36px 40px",
             }}
@@ -198,7 +175,7 @@ export default function HomePage() {
                 fontWeight: 700,
                 letterSpacing: "0.16em",
                 textTransform: "uppercase",
-                color: "#06b6d4",
+                color: "var(--accent)",
                 marginBottom: 10,
               }}
             >
@@ -210,11 +187,12 @@ export default function HomePage() {
                 fontWeight: 800,
                 letterSpacing: "-0.02em",
                 marginBottom: 10,
+                color: "var(--text-primary)",
               }}
             >
               2 min max pour décider
             </h2>
-            <p style={{ color: "#94a3b8", fontSize: 15, lineHeight: 1.6 }}>
+            <p style={{ color: "var(--text-secondary)", fontSize: 15, lineHeight: 1.6 }}>
               Lancez une analyse gratuite. Vous voyez immédiatement les 3
               premières chutes d&apos;attention et 2 actions prioritaires — sans
               carte bancaire. Le rapport complet se débloque en un clic si vous
@@ -228,7 +206,6 @@ export default function HomePage() {
           style={{
             maxWidth: 860,
             margin: "0 auto 80px",
-            padding: "0 24px",
           }}
         >
           <h2
@@ -238,6 +215,7 @@ export default function HomePage() {
               fontWeight: 800,
               letterSpacing: "-0.02em",
               marginBottom: 32,
+              color: "var(--text-primary)",
             }}
           >
             Ce que les plateformes ne vous disent pas
@@ -252,7 +230,7 @@ export default function HomePage() {
             {[
               {
                 label: "Ce que les plateformes vous donnent",
-                color: "#64748b",
+                isAccent: false,
                 items: [
                   "Vues totales",
                   "Taux de complétion global",
@@ -262,7 +240,7 @@ export default function HomePage() {
               },
               {
                 label: "Ce qu'Attentiq ajoute",
-                color: "#06b6d4",
+                isAccent: true,
                 items: [
                   "Secondes exactes de décrochage",
                   "Cause identifiée pour chaque chute",
@@ -274,10 +252,12 @@ export default function HomePage() {
               <div
                 key={col.label}
                 style={{
-                  background: "rgba(255,255,255,.04)",
-                  border: `1px solid ${col.color}33`,
+                  background: "rgba(255,255,255,0.03)",
+                  border: col.isAccent
+                    ? "1px solid var(--border-accent)"
+                    : "1px solid var(--border)",
                   borderRadius: 16,
-                  padding: "28px 28px",
+                  padding: "28px",
                 }}
               >
                 <p
@@ -286,32 +266,54 @@ export default function HomePage() {
                     fontWeight: 700,
                     letterSpacing: "0.14em",
                     textTransform: "uppercase",
-                    color: col.color,
+                    color: col.isAccent ? "var(--accent)" : "var(--text-secondary)",
                     marginBottom: 16,
                   }}
                 >
                   {col.label}
                 </p>
-                <ul style={{ listStyle: "none", padding: 0, margin: 0 }}>
+                <div style={{ display: "grid", gap: 8 }}>
                   {col.items.map((item) => (
-                    <li
+                    <div
                       key={item}
                       style={{
                         display: "flex",
                         alignItems: "center",
                         gap: 10,
+                        padding: "10px 12px",
+                        borderRadius: 12,
+                        border: "1px solid var(--border)",
+                        background: "rgba(255,255,255,0.02)",
                         fontSize: 14,
-                        color: "#cbd5e1",
-                        marginBottom: 10,
+                        color: "var(--text-primary)",
                       }}
                     >
-                      <span style={{ color: col.color, fontSize: 16 }}>
-                        {col.color === "#06b6d4" ? "✓" : "·"}
+                      <span
+                        style={{
+                          width: 18,
+                          height: 18,
+                          borderRadius: "50%",
+                          background: col.isAccent
+                            ? "rgba(0, 212, 255, 0.12)"
+                            : "rgba(255,255,255,0.06)",
+                          border: col.isAccent
+                            ? "1px solid rgba(0, 212, 255, 0.22)"
+                            : "1px solid var(--border)",
+                          color: col.isAccent ? "var(--accent)" : "var(--text-secondary)",
+                          display: "inline-flex",
+                          alignItems: "center",
+                          justifyContent: "center",
+                          fontWeight: 800,
+                          fontSize: 11,
+                          flexShrink: 0,
+                        }}
+                      >
+                        {col.isAccent ? "✓" : "·"}
                       </span>
                       {item}
-                    </li>
+                    </div>
                   ))}
-                </ul>
+                </div>
               </div>
             ))}
           </div>
@@ -322,7 +324,6 @@ export default function HomePage() {
           style={{
             maxWidth: 860,
             margin: "0 auto 80px",
-            padding: "0 24px",
           }}
         >
           <h2
@@ -332,6 +333,7 @@ export default function HomePage() {
               fontWeight: 800,
               letterSpacing: "-0.02em",
               marginBottom: 8,
+              color: "var(--text-primary)",
             }}
           >
             À quoi ressemble un rapport ?
@@ -339,7 +341,7 @@ export default function HomePage() {
           <p
             style={{
               textAlign: "center",
-              color: "#64748b",
+              color: "var(--text-muted)",
               fontSize: 13,
               marginBottom: 28,
             }}
@@ -348,8 +350,8 @@ export default function HomePage() {
           </p>
           <div
             style={{
-              background: "rgba(255,255,255,.04)",
-              border: "1px solid rgba(255,255,255,.09)",
+              background: "rgba(255,255,255,0.03)",
+              border: "1px solid var(--border)",
               borderRadius: 20,
               padding: "32px",
             }}
@@ -385,13 +387,13 @@ export default function HomePage() {
                 <p
                   style={{
                     fontSize: 13,
-                    color: "#94a3b8",
+                    color: "var(--text-secondary)",
                     marginBottom: 4,
                   }}
                 >
                   Score de rétention
                 </p>
-                <p style={{ fontSize: 15, fontWeight: 600 }}>
+                <p style={{ fontSize: 15, fontWeight: 600, color: "var(--text-primary)" }}>
                   Rétention fragile — 3 chutes critiques détectées
                 </p>
               </div>
@@ -434,9 +436,9 @@ export default function HomePage() {
                   gap: 14,
                   marginBottom: 12,
                   padding: "12px 16px",
-                  background: "rgba(249,115,22,.07)",
+                  background: "rgba(249,115,22,0.07)",
                   borderRadius: 10,
-                  border: "1px solid rgba(249,115,22,.18)",
+                  border: "1px solid rgba(249,115,22,0.18)",
                 }}
               >
                 <span
@@ -451,10 +453,10 @@ export default function HomePage() {
                   {drop.time}
                 </span>
                 <div>
-                  <p style={{ fontSize: 13, fontWeight: 600, marginBottom: 2 }}>
+                  <p style={{ fontSize: 13, fontWeight: 600, marginBottom: 2, color: "var(--text-primary)" }}>
                     {drop.label}
                   </p>
-                  <p style={{ fontSize: 12, color: "#94a3b8" }}>{drop.desc}</p>
+                  <p style={{ fontSize: 12, color: "var(--text-secondary)" }}>{drop.desc}</p>
                 </div>
               </div>
             ))}
@@ -466,7 +468,7 @@ export default function HomePage() {
                 fontWeight: 700,
                 letterSpacing: "0.14em",
                 textTransform: "uppercase",
-                color: "#06b6d4",
+                color: "var(--accent)",
                 margin: "20px 0 12px",
               }}
             >
@@ -483,14 +485,14 @@ export default function HomePage() {
                   gap: 10,
                   marginBottom: 10,
                   padding: "10px 14px",
-                  background: "rgba(6,182,212,.07)",
+                  background: "rgba(0, 212, 255, 0.07)",
                   borderRadius: 10,
-                  border: "1px solid rgba(6,182,212,.18)",
+                  border: "1px solid rgba(0, 212, 255, 0.18)",
                   fontSize: 13,
-                  color: "#cbd5e1",
+                  color: "var(--text-primary)",
                 }}
               >
-                <span style={{ color: "#06b6d4", fontWeight: 700 }}>→</span>
+                <span style={{ color: "var(--accent)", fontWeight: 700 }}>→</span>
                 {action}
               </div>
             ))}
@@ -499,7 +501,7 @@ export default function HomePage() {
               style={{
                 textAlign: "center",
                 fontSize: 12,
-                color: "#475569",
+                color: "var(--text-muted)",
                 marginTop: 20,
               }}
             >
@@ -513,7 +515,6 @@ export default function HomePage() {
           style={{
             maxWidth: 960,
             margin: "0 auto 80px",
-            padding: "0 24px",
           }}
         >
           <p
@@ -536,6 +537,7 @@ export default function HomePage() {
               fontWeight: 800,
               letterSpacing: "-0.02em",
               marginBottom: 36,
+              color: "var(--text-primary)",
             }}
           >
             Choisissez votre formule
@@ -552,11 +554,11 @@ export default function HomePage() {
                 key={offer.slug}
                 style={{
                   background: offer.featured
-                    ? "linear-gradient(160deg,rgba(6,182,212,.12),rgba(14,116,144,.08))"
-                    : "rgba(255,255,255,.04)",
+                    ? "linear-gradient(180deg, rgba(0, 212, 255, 0.1) 0%, rgba(10, 14, 20, 0.96) 100%)"
+                    : "rgba(255,255,255,0.03)",
                   border: offer.featured
-                    ? "1px solid rgba(6,182,212,.4)"
-                    : "1px solid rgba(255,255,255,.09)",
+                    ? "1px solid rgba(0, 212, 255, 0.26)"
+                    : "1px solid var(--border)",
                   borderRadius: 18,
                   padding: "28px 24px",
                   position: "relative",
@@ -569,7 +571,7 @@ export default function HomePage() {
                       top: -12,
                       left: "50%",
                       transform: "translateX(-50%)",
-                      background: "linear-gradient(90deg,#0891b2,#0e7490)",
+                      background: "linear-gradient(90deg, #0891b2, #0e7490)",
                       color: "#fff",
                       fontSize: 10,
                       fontWeight: 700,
@@ -588,7 +590,7 @@ export default function HomePage() {
                     fontWeight: 700,
                     letterSpacing: "0.14em",
                     textTransform: "uppercase",
-                    color: "#94a3b8",
+                    color: offer.featured ? "var(--accent)" : "var(--text-secondary)",
                     marginBottom: 6,
                   }}
                 >
@@ -600,6 +602,7 @@ export default function HomePage() {
                     fontWeight: 800,
                     letterSpacing: "-0.02em",
                     marginBottom: 4,
+                    color: "var(--text-primary)",
                   }}
                 >
                   {offer.priceLabel}
@@ -608,7 +611,7 @@ export default function HomePage() {
                       style={{
                         fontSize: 14,
                         fontWeight: 500,
-                        color: "#64748b",
+                        color: "var(--text-secondary)",
                       }}
                     >
                       {offer.cadenceLabel}
@@ -618,54 +621,74 @@ export default function HomePage() {
                 <p
                   style={{
                     fontSize: 13,
-                    color: "#94a3b8",
+                    color: "var(--text-secondary)",
                     marginBottom: 20,
                     lineHeight: 1.5,
                   }}
                 >
                   {offer.summary}
                 </p>
-                <ul
+                <div
                   style={{
-                    listStyle: "none",
-                    padding: 0,
-                    margin: "0 0 24px",
+                    display: "grid",
+                    gap: 8,
+                    marginBottom: 24,
                   }}
                 >
                   {offer.featureList.map((f) => (
-                    <li
+                    <div
                       key={f}
                       style={{
                         display: "flex",
-                        alignItems: "flex-start",
-                        gap: 8,
+                        alignItems: "center",
+                        gap: 10,
+                        padding: "10px 12px",
+                        borderRadius: 12,
+                        border: "1px solid var(--border)",
+                        background: "rgba(255,255,255,0.02)",
                         fontSize: 13,
-                        color: "#cbd5e1",
-                        marginBottom: 8,
+                        color: "var(--text-primary)",
                       }}
                     >
-                      <span style={{ color: "#06b6d4", marginTop: 1 }}>✓</span>
+                      <span
+                        style={{
+                          width: 18,
+                          height: 18,
+                          borderRadius: "50%",
+                          background: "rgba(0, 212, 255, 0.12)",
+                          border: "1px solid rgba(0, 212, 255, 0.22)",
+                          color: "var(--accent)",
+                          display: "inline-flex",
+                          alignItems: "center",
+                          justifyContent: "center",
+                          fontWeight: 800,
+                          fontSize: 11,
+                          flexShrink: 0,
+                        }}
+                      >
+                        ✓
+                      </span>
                       {f}
-                    </li>
+                    </div>
                   ))}
-                </ul>
+                </div>
                 <Link
                   href={offer.checkoutPath}
                   style={{
                     display: "block",
                     textAlign: "center",
                     background: offer.featured
-                      ? "linear-gradient(135deg,#0891b2,#0e7490)"
-                      : "rgba(255,255,255,.08)",
+                      ? "linear-gradient(135deg, #0891b2, #0e7490)"
+                      : "rgba(255,255,255,0.06)",
                     color: "#fff",
                     fontWeight: 700,
                     fontSize: 14,
-                    borderRadius: 10,
+                    borderRadius: 12,
                     padding: "12px",
                     textDecoration: "none",
                     border: offer.featured
                       ? "none"
-                      : "1px solid rgba(255,255,255,.12)",
+                      : "1px solid var(--border)",
                   }}
                 >
                   {offer.ctaLabel}
@@ -680,7 +703,6 @@ export default function HomePage() {
           style={{
             maxWidth: 680,
             margin: "0 auto 80px",
-            padding: "0 24px",
           }}
         >
           <h2
@@ -690,6 +712,7 @@ export default function HomePage() {
               fontWeight: 800,
               letterSpacing: "-0.02em",
               marginBottom: 32,
+              color: "var(--text-primary)",
             }}
           >
             Questions fréquentes
@@ -699,8 +722,8 @@ export default function HomePage() {
               <div
                 key={item.q}
                 style={{
-                  background: "rgba(255,255,255,.04)",
-                  border: "1px solid rgba(255,255,255,.09)",
+                  background: "rgba(255,255,255,0.03)",
+                  border: "1px solid var(--border)",
                   borderRadius: 14,
                   padding: "20px 24px",
                 }}
@@ -710,11 +733,12 @@ export default function HomePage() {
                     fontWeight: 700,
                     fontSize: 14,
                     marginBottom: 8,
+                    color: "var(--text-primary)",
                   }}
                 >
                   {item.q}
                 </p>
-                <p style={{ fontSize: 13, color: "#94a3b8", lineHeight: 1.6 }}>
+                <p style={{ fontSize: 13, color: "var(--text-secondary)", lineHeight: 1.6 }}>
                   {item.a}
                 </p>
               </div>
@@ -725,10 +749,8 @@ export default function HomePage() {
         {/* Footer */}
         <footer
           style={{
-            borderTop: "1px solid rgba(255,255,255,.07)",
-            maxWidth: 1100,
-            margin: "0 auto",
-            padding: "28px 32px",
+            borderTop: "1px solid var(--border)",
+            padding: "28px 8px",
             display: "flex",
             alignItems: "center",
             justifyContent: "space-between",
@@ -736,7 +758,7 @@ export default function HomePage() {
             gap: 12,
           }}
         >
-          <span style={{ fontWeight: 700, fontSize: 15 }}>Attentiq</span>
+          <span style={{ fontWeight: 700, fontSize: 15, color: "var(--text-primary)" }}>Attentiq</span>
           <div style={{ display: "flex", gap: 24 }}>
             {[
               { label: "Transparence", href: "/transparence" },
@@ -748,7 +770,7 @@ export default function HomePage() {
                 href={l.href}
                 style={{
                   fontSize: 13,
-                  color: "#64748b",
+                  color: "var(--text-secondary)",
                   textDecoration: "none",
                 }}
               >
@@ -756,21 +778,11 @@ export default function HomePage() {
               </Link>
             ))}
           </div>
-          <p style={{ fontSize: 12, color: "#334155" }}>
+          <p style={{ fontSize: 12, color: "var(--text-muted)" }}>
             © {new Date().getFullYear()} Attentiq
           </p>
         </footer>
       </div>
-
-      <style>{`
-        @keyframes rise {
-          from { opacity: 0; transform: translateY(18px); }
-          to   { opacity: 1; transform: translateY(0); }
-        }
-        main > div > section, main > div > nav {
-          animation: rise .55s ease both;
-        }
-      `}</style>
     </main>
   );
 }
