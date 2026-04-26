@@ -10,15 +10,21 @@ function offerDisplayName(offerSlug: string) {
  * E-mail de remerciement après paiement Stripe (idempotence par session_id).
  * Configurez RESEND_API_KEY + RESEND_FROM_EMAIL sur Railway.
  */
+export type CheckoutThankYouEmailResult =
+  | { ok: true; skipped: true; reason: "missing_api_key" }
+  | { ok: true; resendEmailId: string }
+  | { ok: false; error: string };
+
 export async function sendCheckoutThankYouEmail(params: {
   to: string;
   offerSlug: string;
   sessionId: string;
   appBaseUrl?: string | null;
-}): Promise<{ ok: boolean; skipped?: boolean; error?: string }> {
+}): Promise<CheckoutThankYouEmailResult> {
   const apiKey = process.env.RESEND_API_KEY?.trim();
   if (!apiKey) {
-    return { ok: true, skipped: true };
+    console.warn("[checkout-email] skip: RESEND_API_KEY is empty on server");
+    return { ok: true, skipped: true, reason: "missing_api_key" };
   }
 
   const from =
@@ -44,7 +50,7 @@ export async function sendCheckoutThankYouEmail(params: {
   try {
     const { Resend } = await import("resend");
     const resend = new Resend(apiKey);
-    const { error } = await resend.emails.send(
+    const { data, error } = await resend.emails.send(
       {
         from,
         to: params.to.trim(),
@@ -58,9 +64,28 @@ export async function sendCheckoutThankYouEmail(params: {
 
     if (error) {
       console.error("[checkout-email] Resend error:", error);
-      return { ok: false, error: error.message };
+      const msg =
+        typeof error === "object" &&
+        error &&
+        "message" in error &&
+        typeof (error as { message: unknown }).message === "string"
+          ? (error as { message: string }).message
+          : "resend_error";
+      return { ok: false, error: msg };
     }
-    return { ok: true };
+    const resendEmailId =
+      data &&
+      typeof data === "object" &&
+      "id" in data &&
+      typeof (data as { id: unknown }).id === "string"
+        ? (data as { id: string }).id
+        : null;
+    if (!resendEmailId) {
+      console.error("[checkout-email] Resend returned no id:", data);
+      return { ok: false, error: "empty_resend_response" };
+    }
+    console.info("[checkout-email] sent", { resendEmailId, sessionId: params.sessionId });
+    return { ok: true, resendEmailId };
   } catch (e) {
     console.error("[checkout-email] send failed:", e);
     return { ok: false, error: e instanceof Error ? e.message : "send_failed" };

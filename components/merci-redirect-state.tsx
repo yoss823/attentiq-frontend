@@ -26,6 +26,11 @@ type SetPremiumSuccess = {
   jobId: string | null;
   videoUrl: string | null;
   customerEmail: string | null;
+  thankYouEmail?: {
+    status: "sent" | "skipped_no_recipient" | "skipped_no_resend_key" | "failed";
+    resendEmailId?: string;
+    message?: string;
+  };
 };
 
 type SetPremiumFailure = {

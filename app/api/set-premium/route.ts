@@ -34,6 +34,19 @@ function checkoutCustomerEmail(session: Stripe.Checkout.Session) {
   if (typeof session.customer_email === "string" && session.customer_email.trim()) {
     return session.customer_email.trim();
   }
+  const cust = session.customer;
+  if (cust && typeof cust === "object") {
+    if ("deleted" in cust && cust.deleted === true) {
+      return null;
+    }
+    if (
+      "email" in cust &&
+      typeof cust.email === "string" &&
+      cust.email.trim()
+    ) {
+      return cust.email.trim();
+    }
+  }
   return null;
 }
 
@@ -79,19 +92,48 @@ export async function POST(req: NextRequest) {
 
     const customerEmail = checkoutCustomerEmail(session);
 
-    if (customerEmail) {
+    let thankYouEmail:
+      | {
+          status: "sent" | "skipped_no_recipient" | "skipped_no_resend_key" | "failed";
+          resendEmailId?: string;
+          message?: string;
+        }
+      | undefined;
+
+    if (!customerEmail) {
+      console.warn(
+        "[set-premium] thank-you email skipped: no email on Stripe session (customer_details / customer_email / customer)"
+      );
+      thankYouEmail = { status: "skipped_no_recipient" };
+    } else {
       const host =
         req.headers.get("x-forwarded-host") ?? req.headers.get("host");
       const proto = req.headers.get("x-forwarded-proto") ?? "https";
       const appBaseUrl = host ? `${proto}://${host}` : null;
-      void sendCheckoutThankYouEmail({
+
+      const sendResult = await sendCheckoutThankYouEmail({
         to: customerEmail,
         offerSlug: resolvedOfferSlug,
         sessionId,
         appBaseUrl,
-      }).catch((err) =>
-        console.error("[set-premium] thank-you email failed:", err)
-      );
+      });
+
+      if ("skipped" in sendResult && sendResult.skipped) {
+        thankYouEmail = { status: "skipped_no_resend_key" };
+      } else if (!sendResult.ok) {
+        thankYouEmail = {
+          status: "failed",
+          message: sendResult.error,
+        };
+        console.error("[set-premium] thank-you email failed:", sendResult.error);
+      } else if ("resendEmailId" in sendResult) {
+        thankYouEmail = {
+          status: "sent",
+          resendEmailId: sendResult.resendEmailId,
+        };
+      } else {
+        thankYouEmail = { status: "failed", message: "unexpected_send_result" };
+      }
     }
 
     return NextResponse.json({
@@ -102,6 +144,7 @@ export async function POST(req: NextRequest) {
       jobId: resolvedJobId,
       videoUrl: resolvedVideoUrl,
       customerEmail,
+      thankYouEmail,
     });
   } catch (error) {
     console.error("[set-premium] error:", error);
