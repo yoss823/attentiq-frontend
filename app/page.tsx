@@ -191,7 +191,7 @@ export default function HomePage() {
               maxWidth: "14ch",
             }}
           >
-            Comprenez ou votre contenu fait decrocher.
+            Comprenez pourquoi votre contenu perd l&apos;attention.
           </h1>
 
           <p
@@ -203,9 +203,8 @@ export default function HomePage() {
               maxWidth: "44rem",
             }}
           >
-            Attentiq analyse vos videos, visuels et textes pour expliquer
-            precisement ce qui ne va pas et comment l&apos;ameliorer sur les
-            prochains contenus.
+            Attentiq analyse vos vidéos, images et textes pour identifier ce
+            qui ne fonctionne pas et vous dire quoi améliorer, concrètement.
           </p>
 
           <div style={{ display: "flex", gap: "12px", flexWrap: "wrap" }}>

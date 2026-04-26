@@ -76,13 +76,13 @@ export const ATTENTIQ_OFFERS: AttentiqOffer[] = [
     name: "5 rapports / mois",
     shortLabel: "Creator",
     kicker: "Pour publier chaque semaine",
-    priceCents: 2900,
-    priceLabel: "29€",
+    priceCents: 3500,
+    priceLabel: "35€",
     cadenceLabel: "/mois",
     summary:
-      "5 rapports complets / mois — près de 2 analyses offertes vs 5 × 9 € à l'unité.",
+      "5 rapports complets / mois — un tarif équilibré pour publier chaque semaine.",
     audience: "Pour les créateurs qui testent plusieurs hooks par mois.",
-    ctaLabel: "Choisir 29€/mois",
+    ctaLabel: "Choisir 35€/mois",
     featureList: [
       "5 rapports complets / mois",
       "Même profondeur d'analyse",

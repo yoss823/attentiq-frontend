@@ -12,7 +12,7 @@ import {
 export const metadata: Metadata = {
   title: "Analysez vos photos — Attentiq",
   description:
-    "Analyse de rétention pour vos visuels. Aperçu gratuit limité, puis 9 €, 29 €/mois ou 89 €/mois (même grille que la vidéo).",
+    "Analyse de rétention pour vos visuels. Aperçu gratuit limité, puis 9 €, 35 €/mois ou 89 €/mois (même grille que la vidéo).",
 };
 
 const features = [

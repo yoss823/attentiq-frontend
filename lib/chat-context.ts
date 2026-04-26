@@ -216,6 +216,20 @@ export function buildOfflineChatReply(
     ]);
   }
 
+  if (/formule|offre|payer|payant|abonnement|premium|achat/.test(q)) {
+    return formatLines([
+      "Oui, le rapport payant peut être utile si vous voulez dépasser le teaser.",
+      `Sur ce diagnostic, le point critique reste : ${getPrimaryIssue(context)}`,
+      actions[0]
+        ? `Le complet vous sert surtout à dérouler et prioriser cette action : ${actions[0]}`
+        : "Le complet vous sert surtout à structurer un plan d'action plus détaillé.",
+      score != null && score < 6
+        ? "Avec ce score, payer a du sens si vous voulez corriger vite et comparer une version retravaillée."
+        : "Avec ce score, payez surtout si vous voulez le détail complet (timeline, causes reliées, priorisation).",
+      "Si vous restez en gratuit, testez aussi les autres formats (texte / image / vidéo) pour comparer vos points faibles.",
+    ]);
+  }
+
   return formatLines([
     "Je reste strictement sur votre diagnostic actuel.",
     `Le point central que je retiens ici est : ${getPrimaryIssue(context)}`,

@@ -32,6 +32,9 @@ type InlineChatbotProps = {
   subtitle?: string;
   suggestedPrompts?: string[];
   footerNote?: string;
+  maxAssistantReplies?: number;
+  paywallHref?: string;
+  showAttentionNudge?: boolean;
 };
 
 export default function InlineChatbot({
@@ -41,13 +44,19 @@ export default function InlineChatbot({
   subtitle = "Posez vos questions sur ce diagnostic précis",
   suggestedPrompts = SUGGESTED_PROMPTS,
   footerNote = "Cet assistant est limité à votre diagnostic actuel.",
+  maxAssistantReplies = 1,
+  paywallHref = "/videos#tarifs",
+  showAttentionNudge = true,
 }: InlineChatbotProps) {
   const [isOpen, setIsOpen] = useState(defaultOpen);
   const [messages, setMessages] = useState<ChatMessage[]>([]);
   const [input, setInput] = useState("");
   const [isSending, setIsSending] = useState(false);
+  const [nudgeDismissed, setNudgeDismissed] = useState(false);
   const messagesEndRef = useRef<HTMLDivElement>(null);
   const hasUserMessages = messages.some((m) => m.role === "user");
+  const assistantRepliesCount = messages.filter((m) => m.role === "assistant").length;
+  const hasReachedReplyLimit = assistantRepliesCount >= maxAssistantReplies;
 
   // Auto-scroll to bottom on new messages
   useEffect(() => {
@@ -59,6 +68,18 @@ export default function InlineChatbot({
   async function submitPrompt(text: string) {
     const trimmed = text.trim();
     if (!trimmed || isSending) return;
+    if (hasReachedReplyLimit) {
+      setMessages((prev) => [
+        ...prev,
+        createMessage(
+          "assistant",
+          maxAssistantReplies <= 1
+            ? "Vous avez déjà votre réponse clé sur le teaser gratuit. Pour aller plus loin (timeline complète, détail des causes, plan étendu), débloquez la formule payante."
+            : "Vous avez atteint la limite de 3 réponses pour cette session. Ouvrez une nouvelle analyse ou le rapport suivant pour continuer."
+        ),
+      ]);
+      return;
+    }
 
     const userMsg = createMessage("user", trimmed);
     setMessages((prev) => [...prev, userMsg]);
@@ -108,6 +129,51 @@ export default function InlineChatbot({
         overflow: "hidden",
       }}
     >
+      {!isOpen && showAttentionNudge && !nudgeDismissed && (
+        <div
+          style={{
+            padding: "12px 16px",
+            borderBottom: "1px solid var(--border)",
+            background: "rgba(0, 212, 255, 0.08)",
+            display: "flex",
+            alignItems: "center",
+            justifyContent: "space-between",
+            gap: "10px",
+            flexWrap: "wrap",
+          }}
+        >
+          <button
+            type="button"
+            onClick={() => setIsOpen(true)}
+            style={{
+              border: "none",
+              background: "none",
+              color: "var(--text-primary)",
+              fontSize: "13px",
+              fontWeight: 800,
+              cursor: "pointer",
+            }}
+          >
+            Tu as des questions sur l&apos;analyse ? Clique ici.
+          </button>
+          <button
+            type="button"
+            onClick={() => setNudgeDismissed(true)}
+            style={{
+              border: "1px solid var(--border)",
+              borderRadius: "999px",
+              background: "rgba(255,255,255,0.04)",
+              color: "var(--text-secondary)",
+              fontSize: "11px",
+              padding: "4px 8px",
+              cursor: "pointer",
+            }}
+          >
+            Masquer
+          </button>
+        </div>
+      )}
+
       {/* accordion header / toggle */}
       <button
         type="button"
@@ -387,6 +453,7 @@ export default function InlineChatbot({
                 }}
                 rows={2}
                 placeholder="Posez une question sur ce diagnostic…"
+                disabled={hasReachedReplyLimit}
                 style={{
                   flex: 1,
                   resize: "none",
@@ -403,24 +470,26 @@ export default function InlineChatbot({
               />
               <button
                 type="submit"
-                disabled={isSending || !input.trim()}
+                disabled={isSending || !input.trim() || hasReachedReplyLimit}
                 style={{
                   flexShrink: 0,
                   border: "none",
                   borderRadius: "14px",
                   background:
-                    isSending || !input.trim()
+                    isSending || !input.trim() || hasReachedReplyLimit
                       ? "rgba(255,255,255,0.08)"
                       : "linear-gradient(135deg, var(--accent), #59d4ff)",
                   color:
-                    isSending || !input.trim()
+                    isSending || !input.trim() || hasReachedReplyLimit
                       ? "var(--text-secondary)"
                       : "#041017",
                   padding: "12px 18px",
                   fontSize: "14px",
                   fontWeight: 800,
                   cursor:
-                    isSending || !input.trim() ? "not-allowed" : "pointer",
+                    isSending || !input.trim() || hasReachedReplyLimit
+                      ? "not-allowed"
+                      : "pointer",
                   whiteSpace: "nowrap",
                   alignSelf: "flex-end",
                   marginBottom: "2px",
@@ -449,7 +518,7 @@ export default function InlineChatbot({
               {footerNote}
             </span>
             <Link
-              href="/analyze"
+              href={paywallHref}
               style={{
                 fontSize: "12px",
                 fontWeight: 700,
@@ -457,7 +526,9 @@ export default function InlineChatbot({
                 textDecoration: "none",
               }}
             >
-              Analyser une autre vidéo →
+              {maxAssistantReplies <= 1
+                ? "Voir les offres premium →"
+                : "Analyser un autre contenu →"}
             </Link>
           </div>
         </div>

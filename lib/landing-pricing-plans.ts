@@ -49,17 +49,17 @@ export const LANDING_PAID_PLANS: LandingPlanCard[] = [
   },
   {
     kicker: "Pour publier chaque semaine",
-    priceCents: 2900,
-    priceLabel: "29€",
+    priceCents: 3500,
+    priceLabel: "35€",
     cadenceLabel: "/mois",
     summary:
-      "5 rapports complets / mois — près de 2 analyses offertes vs 5 × 9 € à l'unité.",
+      "5 rapports complets / mois — un tarif équilibré pour publier chaque semaine.",
     featureList: [
       "5 rapports complets / mois",
       "Même profondeur d'analyse",
       "Idéal pour une routine de publication",
     ],
-    ctaLabel: "Choisir 29€/mois",
+    ctaLabel: "Choisir 35€/mois",
     ctaHref: "/checkout/monthly-5",
     featured: true,
   },

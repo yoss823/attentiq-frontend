@@ -1272,11 +1272,13 @@ export default function ResultReport({
 
             <InlineChatbot
               diagnosticContext={buildChatDiagnosticContext(report)}
-              defaultOpen
+              defaultOpen={false}
               title="Coach Attentiq"
               subtitle="Ouvert par defaut pour traduire le diagnostic en decisions concretes"
               suggestedPrompts={assistantPrompts}
               footerNote="Coach centre sur ce rapport complet et son plan d'action."
+              maxAssistantReplies={3}
+              paywallHref={analyzeHref}
             />
 
             <Panel style={{ marginBottom: "14px" }}>
@@ -1608,11 +1610,19 @@ export default function ResultReport({
 
             <InlineChatbot
               diagnosticContext={buildChatDiagnosticContext(report)}
-              defaultOpen
+              defaultOpen={false}
               title="Assistant Attentiq"
               subtitle="Visible par defaut sous le teaser pour clarifier ce que vous voyez deja"
               suggestedPrompts={assistantPrompts}
               footerNote="Assistant limite a ce teaser et a votre diagnostic actuel."
+              maxAssistantReplies={1}
+              paywallHref={
+                contentKind === "video"
+                  ? "/videos#tarifs"
+                  : contentKind === "text"
+                    ? "/text#tarifs"
+                    : "/images#tarifs"
+              }
             />
 
             <Panel

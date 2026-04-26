@@ -4,7 +4,7 @@ import { PRICING_PLANS } from '@/lib/constants';
 import CheckoutButton from './CheckoutButton';
 
 export const metadata: Metadata = {
-  title: "5 Rapports — 29€/mois",
+  title: "5 Rapports — 35€/mois",
   description:
     "5 diagnostics complets par mois pour vos vidéos courtes. Rapport détaillé et plan d'actions pour vos prochaines publications.",
 };

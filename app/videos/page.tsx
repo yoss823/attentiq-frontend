@@ -10,7 +10,7 @@ import {
 export const metadata: Metadata = {
   title: "Analysez vos vidéos — Attentiq",
   description:
-    "Analyse vidéo pour Shorts, Reels et TikTok : aperçu gratuit limité, puis 9 €, 29 €/mois (5 rapports) ou 89 €/mois (15 rapports).",
+    "Analyse vidéo pour Shorts, Reels et TikTok : aperçu gratuit limité, puis 9 €, 35 €/mois (5 rapports) ou 89 €/mois (15 rapports).",
 };
 
 const platforms = [

@@ -31,7 +31,7 @@ export const PRICING_PLANS: PricingPlan[] = [
   {
     id: "5-rapports",
     name: "5 rapports / mois",
-    price: 29,
+    price: 35,
     currency: "€",
     period: "mois",
     description: "5 diagnostics complets par mois pour garder le rythme.",
