@@ -61,6 +61,71 @@ const privacyPoints = [
   "Des cookies techniques peuvent limiter l'abus d'essai gratuit ; pas de revente de données personnelles.",
 ];
 
+type FormatCompareColumn = {
+  title: string;
+  href: string;
+  observe: string[];
+  notSeen: string[];
+};
+
+const FORMAT_COMPARE_COLUMNS: FormatCompareColumn[] = [
+  {
+    title: "Vidéo",
+    href: "/videos",
+    observe: [
+      "Rythme, accroche, ruptures d'attention sur la timeline",
+      "Repères temporels quand le signal le permet",
+    ],
+    notSeen: [
+      "Vos courbes de rétention analytics",
+      "Pourquoi le feed vous classe ou non",
+    ],
+  },
+  {
+    title: "Texte",
+    href: "/text",
+    observe: [
+      "Promesse, clarté, preuve, appel à l'action",
+      "Passages lourds ou ambigus avant la fin",
+    ],
+    notSeen: [
+      "Le ton exact de chaque lecteur",
+      "La performance SEO ou les stats d'engagement",
+    ],
+  },
+  {
+    title: "Image",
+    href: "/images",
+    observe: [
+      "Hiérarchie visuelle, lisibilité, intention du message",
+      "Friction sur le regard (surcharge, CTA peu visible)",
+    ],
+    notSeen: [
+      "Les tests utilisateurs en conditions réelles",
+      "Le rendu sur tous les écrans et réglages d'accessibilité",
+    ],
+  },
+];
+
+const TRANSPARENCE_FAQ = [
+  {
+    q: "Attentiq remplace un coach ou un monteur ?",
+    a: "Non : il structure un diagnostic à partir du contenu que vous fournissez. La décision et la création restent à vous.",
+  },
+  {
+    q: "Pourquoi trois formats différents ?",
+    a: "Parce que l'attention ne se lit pas pareil sur une timeline vidéo, un texte linéaire ou une image figée — mais la logique (signaux → risques → actions) est la même.",
+  },
+  {
+    q: "L'aperçu gratuit montre quoi exactement ?",
+    a: "Un extrait utile pour décider (souvent 2 à 3 points saillants) ; le complet détaille la timeline ou l'équivalent sur texte et image.",
+  },
+  {
+    q: "Mes données servent à entraîner des modèles ?",
+    a: "Non : vos contenus d'analyse ne sont pas revendus et ne sont pas utilisés pour du ciblage publicitaire. Des cookies techniques peuvent limiter l'abus d'essai.",
+  },
+];
+
 export default function TransparencePage() {
   return (
     <main
@@ -454,6 +519,146 @@ export default function TransparencePage() {
             </div>
           </section>
 
+          {/* Comparatif formats (compact) */}
+          <section
+            className="rise"
+            style={{
+              borderRadius: "22px",
+              border: "1px solid rgba(0, 212, 255, 0.14)",
+              background:
+                "linear-gradient(180deg, rgba(0, 212, 255, 0.06) 0%, rgba(255,255,255,0.02) 100%)",
+              padding: "22px 18px",
+            }}
+          >
+            <p
+              style={{
+                margin: "0 0 10px",
+                fontSize: "11px",
+                fontWeight: 800,
+                letterSpacing: "0.18em",
+                textTransform: "uppercase",
+                color: "var(--accent)",
+              }}
+            >
+              En un coup d&apos;œil
+            </p>
+            <h2
+              style={{
+                margin: "0 0 8px",
+                fontSize: "17px",
+                fontWeight: 800,
+                letterSpacing: "-0.03em",
+                color: "var(--text-primary)",
+              }}
+            >
+              Vidéo · Texte · Image : même logique, signaux différents
+            </h2>
+            <p
+              style={{
+                margin: "0 0 18px",
+                fontSize: "13px",
+                lineHeight: 1.65,
+                color: "var(--text-secondary)",
+                maxWidth: "52rem",
+              }}
+            >
+              Deux repères par format — sans refaire toute la page « Comment ça marche ».
+            </p>
+            <div
+              style={{
+                display: "grid",
+                gap: "12px",
+                gridTemplateColumns: "repeat(auto-fit, minmax(240px, 1fr))",
+              }}
+            >
+              {FORMAT_COMPARE_COLUMNS.map((col) => (
+                <article
+                  key={col.href}
+                  style={{
+                    borderRadius: "18px",
+                    border: "1px solid var(--border)",
+                    background: "rgba(7, 11, 16, 0.65)",
+                    padding: "16px 14px",
+                    display: "grid",
+                    gap: "14px",
+                  }}
+                >
+                  <Link
+                    href={col.href}
+                    style={{
+                      fontSize: "15px",
+                      fontWeight: 800,
+                      color: "var(--text-primary)",
+                      textDecoration: "none",
+                      letterSpacing: "-0.02em",
+                    }}
+                  >
+                    {col.title}
+                    <span style={{ color: "var(--accent)", marginLeft: "6px" }}>→</span>
+                  </Link>
+                  <div>
+                    <p
+                      style={{
+                        margin: "0 0 8px",
+                        fontSize: "10px",
+                        fontWeight: 800,
+                        letterSpacing: "0.14em",
+                        textTransform: "uppercase",
+                        color: "rgba(0, 212, 255, 0.85)",
+                      }}
+                    >
+                      Ce qu&apos;on observe
+                    </p>
+                    <ul
+                      style={{
+                        margin: 0,
+                        paddingLeft: "18px",
+                        fontSize: "13px",
+                        lineHeight: 1.55,
+                        color: "rgba(237, 242, 247, 0.86)",
+                      }}
+                    >
+                      {col.observe.map((line) => (
+                        <li key={line} style={{ marginBottom: "6px" }}>
+                          {line}
+                        </li>
+                      ))}
+                    </ul>
+                  </div>
+                  <div>
+                    <p
+                      style={{
+                        margin: "0 0 8px",
+                        fontSize: "10px",
+                        fontWeight: 800,
+                        letterSpacing: "0.14em",
+                        textTransform: "uppercase",
+                        color: "rgba(248, 113, 113, 0.9)",
+                      }}
+                    >
+                      Ce qu&apos;on ne voit pas
+                    </p>
+                    <ul
+                      style={{
+                        margin: 0,
+                        paddingLeft: "18px",
+                        fontSize: "13px",
+                        lineHeight: 1.55,
+                        color: "rgba(237, 242, 247, 0.72)",
+                      }}
+                    >
+                      {col.notSeen.map((line) => (
+                        <li key={line} style={{ marginBottom: "6px" }}>
+                          {line}
+                        </li>
+                      ))}
+                    </ul>
+                  </div>
+                </article>
+              ))}
+            </div>
+          </section>
+
           {/* Cas limites */}
           <section
             className="rise d4"
@@ -649,6 +854,73 @@ export default function TransparencePage() {
                   </span>
                   {item}
                 </div>
+              ))}
+            </div>
+          </section>
+
+          {/* FAQ courte */}
+          <section
+            className="rise"
+            style={{
+              borderRadius: "22px",
+              border: "1px solid var(--border)",
+              background: "rgba(255,255,255,0.03)",
+              padding: "22px 18px",
+            }}
+          >
+            <h2
+              style={{
+                margin: "0 0 6px",
+                fontSize: "17px",
+                fontWeight: 800,
+                letterSpacing: "-0.03em",
+                color: "var(--text-primary)",
+              }}
+            >
+              Questions fréquentes
+            </h2>
+            <p
+              style={{
+                margin: "0 0 16px",
+                fontSize: "13px",
+                lineHeight: 1.65,
+                color: "var(--text-secondary)",
+              }}
+            >
+              Quatre réponses courtes — cliquez pour déplier.
+            </p>
+            <div style={{ display: "grid", gap: "0" }}>
+              {TRANSPARENCE_FAQ.map((item) => (
+                <details
+                  key={item.q}
+                  style={{
+                    borderBottom: "1px solid var(--border)",
+                    padding: "12px 0",
+                  }}
+                >
+                  <summary
+                    style={{
+                      cursor: "pointer",
+                      fontSize: "14px",
+                      fontWeight: 700,
+                      color: "var(--text-primary)",
+                      listStyle: "none",
+                      paddingRight: "8px",
+                    }}
+                  >
+                    {item.q}
+                  </summary>
+                  <p
+                    style={{
+                      margin: "10px 0 0",
+                      fontSize: "13px",
+                      lineHeight: 1.7,
+                      color: "rgba(237, 242, 247, 0.78)",
+                    }}
+                  >
+                    {item.a}
+                  </p>
+                </details>
               ))}
             </div>
           </section>
