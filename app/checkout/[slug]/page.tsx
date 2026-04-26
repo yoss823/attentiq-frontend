@@ -8,7 +8,6 @@ import {
   getCheckoutContextFromSearchParams,
 } from "@/lib/checkout-context";
 import {
-  ATTENTIQ_OFFERS,
   getOfferBySlug,
   getOfferRouteSlugs,
 } from "@/lib/offer-config";

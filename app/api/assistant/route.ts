@@ -4,7 +4,13 @@ import Groq from 'groq-sdk';
 export const runtime = 'nodejs';
 export const maxDuration = 25;
 
-const groq = new Groq({ apiKey: process.env.GROQ_API_KEY });
+function getGroqClient(): Groq | null {
+  const apiKey = process.env.GROQ_API_KEY?.trim();
+  if (!apiKey) {
+    return null;
+  }
+  return new Groq({ apiKey });
+}
 
 const intentMap: Record<string, string> = {
   clarify: "Clarifie le point principal de ce diagnostic en 5 lignes max.",
@@ -32,6 +38,15 @@ DIAGNOSTIC :
 ${context}`;
 
     const userMessage = user_input?.trim() || intentMap[intent] || "Explique ce diagnostic.";
+    const groq = getGroqClient();
+
+    if (!groq) {
+      return NextResponse.json({
+        response: "L'assistant est temporairement indisponible (configuration manquante).",
+        intent_used: 'config_missing',
+        refused: false,
+      });
+    }
 
     const completion = await groq.chat.completions.create({
       model: 'llama-3.1-8b-instant',

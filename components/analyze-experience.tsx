@@ -40,13 +40,6 @@ export default function AnalyzeExperience({
   const jobId = initialJobId ?? searchParams.get("jobId");
   const paid = initialPaid || searchParams.get("paid") === "1";
 
-  useEffect(() => {
-    if (jobId) {
-      void handleJobId(jobId);
-    }
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [jobId]);
-
   function startTimer() {
     startedAtRef.current = Date.now();
     timerRef.current = setInterval(() => {
@@ -61,7 +54,7 @@ export default function AnalyzeExperience({
     }
   }
 
-  async function handleJobId(jId: string) {
+  const handleJobId = async (jId: string) => {
     setIsAnalyzing(true);
     setError(null);
     startTimer();
@@ -92,7 +85,14 @@ export default function AnalyzeExperience({
       stopTimer();
       setIsAnalyzing(false);
     }
-  }
+  };
+
+  useEffect(() => {
+    if (jobId) {
+      void handleJobId(jobId);
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [jobId]);
 
   async function handleSubmit(e: React.FormEvent) {
     e.preventDefault();
