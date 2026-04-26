@@ -347,6 +347,13 @@ export default function ResultPageShell({
     expectedVideoUrl,
   ]);
 
+  const isResolvingFromJobId =
+    expectStoredResult &&
+    hasResolvedStoredResult &&
+    Boolean(expectedReportJobId) &&
+    !storedReport &&
+    !runtimeMessage;
+
   if (storedReport) {
     return (
       <ResultReport
@@ -358,6 +365,10 @@ export default function ResultPageShell({
   }
 
   if (!hasResolvedStoredResult) {
+    return <ResultLoadingState />;
+  }
+
+  if (isResolvingFromJobId) {
     return <ResultLoadingState />;
   }
 
