@@ -24,7 +24,7 @@ function ResultContent() {
       }
     }
 
-    const jobId = searchParams.get('job_id');
+    const jobId = searchParams.get('jobId') || searchParams.get('job_id');
     if (jobId) {
       const poll = async (attempts = 0) => {
         if (attempts > 20) {
