@@ -7,6 +7,8 @@ import ResultReport from "@/components/result-report";
 import { persistAnalyzeResult, readAnalyzeResult } from "@/lib/analyze-session";
 import type { PremiumEntitlement } from "@/lib/premium";
 import type { AttentiqReport } from "@/lib/railway-client";
+import ResultV2 from "@/components/ResultV2";
+import type { V2AnalysisResult } from "@/lib/v2-types";
 
 type ResultPageShellProps = {
   expectStoredResult?: boolean;
@@ -20,6 +22,23 @@ type ResultPageShellProps = {
   initialReport?: AttentiqReport | null;
   initialReportJobId?: string | null;
 };
+
+function isV2AnalysisResult(value: unknown): value is V2AnalysisResult {
+  if (!value || typeof value !== "object") {
+    return false;
+  }
+
+  const candidate = value as Partial<V2AnalysisResult>;
+  return (
+    typeof candidate.id === "string" &&
+    typeof candidate.analysedAt === "string" &&
+    typeof candidate.status === "string" &&
+    typeof candidate.pipelineVersion === "string" &&
+    Boolean(candidate.diagnostic && typeof candidate.diagnostic === "object") &&
+    Array.isArray(candidate.dashboard) &&
+    Array.isArray(candidate.actions)
+  );
+}
 
 function matchesExpectedStoredResult({
   storedJobId,
@@ -210,6 +229,9 @@ export default function ResultPageShell({
   const [storedReport, setStoredReport] = useState<AttentiqReport | null>(
     initialReport
   );
+  const [storedV2Report, setStoredV2Report] = useState<V2AnalysisResult | null>(
+    null
+  );
   const [storedReportJobId, setStoredReportJobId] = useState<string | null>(
     initialReportJobId
   );
@@ -236,6 +258,11 @@ export default function ResultPageShell({
       });
 
       setStoredReport(matchesStoredResult ? stored?.report ?? null : null);
+      setStoredV2Report(
+        matchesStoredResult && isV2AnalysisResult(stored?.report)
+          ? stored.report
+          : null
+      );
       setStoredReportJobId(matchesStoredResult ? stored?.jobId ?? null : null);
       setHasResolvedStoredResult(true);
     }, 0);
@@ -275,7 +302,7 @@ export default function ResultPageShell({
           const data = (await response.json().catch(() => null)) as
             | {
                 status?: string;
-                result?: AttentiqReport;
+                result?: unknown;
                 userMessage?: string;
               }
             | null;
@@ -294,13 +321,19 @@ export default function ResultPageShell({
 
           if (data?.status === "success" && data.result) {
             if (!cancelled) {
-              setStoredReport(data.result);
+              if (isV2AnalysisResult(data.result)) {
+                setStoredV2Report(data.result);
+              } else {
+                setStoredReport(data.result as AttentiqReport);
+              }
               setStoredReportJobId(expectedReportJobId);
-              persistAnalyzeResult({
-                report: data.result,
-                url: expectedVideoUrl ?? "",
-                jobId: expectedReportJobId,
-              });
+              if (!isV2AnalysisResult(data.result)) {
+                persistAnalyzeResult({
+                  report: data.result as AttentiqReport,
+                  url: expectedVideoUrl ?? "",
+                  jobId: expectedReportJobId,
+                });
+              }
             }
             return;
           }
@@ -352,7 +385,12 @@ export default function ResultPageShell({
     hasResolvedStoredResult &&
     Boolean(expectedReportJobId) &&
     !storedReport &&
+    !storedV2Report &&
     !runtimeMessage;
+
+  if (storedV2Report) {
+    return <ResultV2 result={storedV2Report} />;
+  }
 
   if (storedReport) {
     return (
