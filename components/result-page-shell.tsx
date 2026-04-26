@@ -4,7 +4,7 @@ import Link from "next/link";
 import { useEffect, useState } from "react";
 import AnalysisLoadingState from "@/components/analysis-loading-state";
 import ResultReport from "@/components/result-report";
-import { readAnalyzeResult } from "@/lib/analyze-session";
+import { persistAnalyzeResult, readAnalyzeResult } from "@/lib/analyze-session";
 import type { PremiumEntitlement } from "@/lib/premium";
 import type { AttentiqReport } from "@/lib/railway-client";
 
@@ -216,6 +216,10 @@ export default function ResultPageShell({
   const [hasResolvedStoredResult, setHasResolvedStoredResult] = useState(
     !expectStoredResult || Boolean(initialReport) || Boolean(initialMessage)
   );
+  const [runtimeMessage, setRuntimeMessage] = useState<{
+    title: string;
+    message: string;
+  } | null>(null);
 
   useEffect(() => {
     if (!expectStoredResult || initialReport || initialMessage) {
@@ -247,6 +251,102 @@ export default function ResultPageShell({
     initialReport,
   ]);
 
+  useEffect(() => {
+    if (!expectStoredResult || storedReport || !hasResolvedStoredResult) {
+      return;
+    }
+
+    if (!expectedReportJobId) {
+      return;
+    }
+
+    let cancelled = false;
+    let attempts = 0;
+    const maxAttempts = 30;
+
+    async function pollJobResult() {
+      while (!cancelled && attempts < maxAttempts) {
+        attempts += 1;
+        try {
+          const response = await fetch(
+            `/api/analyze/${encodeURIComponent(expectedReportJobId)}`,
+            { cache: "no-store" }
+          );
+          const data = (await response.json().catch(() => null)) as
+            | {
+                status?: string;
+                result?: AttentiqReport;
+                userMessage?: string;
+              }
+            | null;
+
+          if (!response.ok) {
+            if (!cancelled) {
+              setRuntimeMessage({
+                title: "Diagnostic indisponible",
+                message:
+                  data?.userMessage ??
+                  "Le diagnostic n'est pas disponible pour le moment. Relancez une analyse.",
+              });
+            }
+            return;
+          }
+
+          if (data?.status === "success" && data.result) {
+            if (!cancelled) {
+              setStoredReport(data.result);
+              setStoredReportJobId(expectedReportJobId);
+              persistAnalyzeResult({
+                report: data.result,
+                url: expectedVideoUrl ?? "",
+                jobId: expectedReportJobId,
+              });
+            }
+            return;
+          }
+
+          if (data?.status === "error") {
+            if (!cancelled) {
+              setRuntimeMessage({
+                title: "Analyse interrompue",
+                message:
+                  data?.userMessage ??
+                  "Cette analyse a echoue. Reessayez avec une autre URL ou via upload.",
+              });
+            }
+            return;
+          }
+        } catch {
+          // Continue retry loop to absorb transient network errors.
+        }
+
+        await new Promise((resolve) => {
+          window.setTimeout(resolve, 2000);
+        });
+      }
+
+      if (!cancelled) {
+        setRuntimeMessage({
+          title: "Temps d'attente depasse",
+          message:
+            "Le diagnostic prend plus de temps que prevu. Reessayez dans quelques secondes.",
+        });
+      }
+    }
+
+    void pollJobResult();
+
+    return () => {
+      cancelled = true;
+    };
+  }, [
+    expectStoredResult,
+    storedReport,
+    hasResolvedStoredResult,
+    expectedReportJobId,
+    expectedVideoUrl,
+  ]);
+
   if (storedReport) {
     return (
       <ResultReport
@@ -259,6 +359,15 @@ export default function ResultPageShell({
 
   if (!hasResolvedStoredResult) {
     return <ResultLoadingState />;
+  }
+
+  if (runtimeMessage) {
+    return (
+      <ResultState
+        title={runtimeMessage.title}
+        message={runtimeMessage.message}
+      />
+    );
   }
 
   if (initialMessage) {
