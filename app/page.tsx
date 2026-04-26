@@ -5,7 +5,7 @@ import { ATTENTIQ_OFFERS } from "@/lib/offer-config";
 export const metadata: Metadata = {
   title: "Attentiq — Analyse d'attention multi-formats",
   description:
-    "Attentiq analyse videos, images et textes pour identifier ce qui fait decrocher l'attention et quoi corriger concretement.",
+    "Attentiq lit vos vidéos, images et textes comme un spectateur pour repérer ce qui fait décrocher l'attention et quoi améliorer.",
 };
 
 export default function HomePage() {
@@ -172,7 +172,7 @@ export default function HomePage() {
                 color: "var(--accent)",
               }}
             >
-              Analyse d&apos;attention IA
+              Analyse d&apos;attention au regard humain
             </span>
           </div>
 
@@ -276,12 +276,12 @@ export default function HomePage() {
               {
                 href: "/images",
                 title: "Images",
-                text: "Photos et creatives multi-plateformes.",
+                text: "Photos, carrousels et visuels pour le social.",
               },
               {
                 href: "/text",
                 title: "Textes",
-                text: "Posts, scripts et pages de vente.",
+                text: "Publications, bios, sondages, scripts…",
               },
             ].map((item) => (
               <Link
