@@ -94,7 +94,7 @@ export default function Checkout5RapportsPage() {
           </ul>
 
           {/* CTA */}
-          <CheckoutButton planName={plan.name} price={launchPrice} currency={plan.currency} />
+          <CheckoutButton planName={plan.name} price={plan.price} currency={plan.currency} />
         </div>
 
         {/* Trust signals */}

@@ -96,7 +96,7 @@ export default function CheckoutPack15Page() {
             ))}
           </ul>
 
-          <CheckoutButton planName={plan.name} price={launchPrice} currency={plan.currency} />
+          <CheckoutButton planName={plan.name} price={plan.price} currency={plan.currency} />
         </div>
 
         <div className="grid grid-cols-3 gap-4 mb-8 text-center">
