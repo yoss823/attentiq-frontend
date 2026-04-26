@@ -2,38 +2,69 @@ import type { Metadata } from "next";
 import Link from "next/link";
 
 export const metadata: Metadata = {
-  title: "Analyse vidéo — YouTube Shorts, Reels, TikTok | Attentiq",
+  title: "Analysez vos vidéos — Attentiq",
   description:
-    "Analysez la rétention de vos vidéos courtes : YouTube Shorts, Instagram Reels, TikTok. 1 test gratuit, puis abonnement.",
+    "Diagnostic IA de rétention pour YouTube Shorts, Instagram Reels et TikTok. 1 analyse gratuite, puis abonnement.",
 };
 
 const platforms = [
-  {
-    number: "01",
-    title: "YouTube Shorts",
-    description:
-      "Collez l'URL d'un Short public. L'IA analyse chaque seconde pour identifier les moments de décrochage et vous donner des actions concrètes.",
-  },
-  {
-    number: "02",
-    title: "Instagram Reels",
-    description:
-      "Analysez vos Reels ou ceux de vos concurrents. Comprenez pourquoi certains formats retiennent mieux l'attention que d'autres.",
-  },
-  {
-    number: "03",
-    title: "TikTok",
-    description:
-      "Diagnostic complet de vos TikToks : score de rétention, timestamps de chute, causes identifiées et recommandations actionnables.",
-  },
+  { label: "YouTube Shorts", icon: "▶" },
+  { label: "Instagram Reels", icon: "◈" },
+  { label: "TikTok", icon: "♪" },
 ];
 
-const included = [
+const features = [
   "Score de rétention global (1 à 10)",
-  "Timestamps exacts des chutes d'attention",
-  "Cause de chaque décrochage (visuel ou verbal)",
-  "Perception des spectateurs sur votre contenu",
+  "Secondes exactes où l'attention chute",
+  "Cause de chaque chute (visuelle ou verbale)",
   "3 à 5 actions concrètes pour vos prochaines vidéos",
+  "Analyse audio + visuelle frame par frame",
+  "Rapport téléchargeable",
+];
+
+const plans = [
+  {
+    kicker: "Essai gratuit",
+    priceLabel: "0€",
+    cadenceLabel: undefined,
+    summary: "1 analyse complète offerte pour découvrir Attentiq.",
+    featureList: [
+      "1 rapport complet",
+      "Toutes les chutes d'attention",
+      "Plan d'actions détaillé",
+    ],
+    ctaLabel: "Analyser gratuitement",
+    ctaHref: "/analyze",
+    featured: false,
+  },
+  {
+    kicker: "Pour publier chaque semaine",
+    priceLabel: "49€",
+    cadenceLabel: "/mois",
+    summary: "5 analyses par mois pour garder un rythme d'audit régulier.",
+    featureList: [
+      "5 rapports complets / mois",
+      "Même profondeur d'analyse",
+      "Le meilleur point de départ pour une routine",
+    ],
+    ctaLabel: "Choisir 49€/mois",
+    ctaHref: "/checkout/monthly-5",
+    featured: true,
+  },
+  {
+    kicker: "Pour une équipe ou un volume élevé",
+    priceLabel: "99€",
+    cadenceLabel: "/mois",
+    summary: "Analyses illimitées pour les équipes et créateurs intensifs.",
+    featureList: [
+      "Rapports complets illimités",
+      "Aucune limite de volume",
+      "Pensé pour une cadence de publication soutenue",
+    ],
+    ctaLabel: "Choisir 99€/mois",
+    ctaHref: "/checkout/unlimited",
+    featured: false,
+  },
 ];
 
 export default function VideosPage() {
@@ -63,19 +94,20 @@ export default function VideosPage() {
         style={{
           position: "relative",
           zIndex: 1,
-          maxWidth: "760px",
+          maxWidth: "980px",
           margin: "0 auto",
-          padding: "28px 16px 72px",
+          padding: "28px 16px 80px",
         }}
       >
         {/* Nav */}
         <nav
+          className="rise d1"
           style={{
             display: "flex",
             alignItems: "center",
             justifyContent: "space-between",
             gap: "12px",
-            marginBottom: "32px",
+            marginBottom: "28px",
             flexWrap: "wrap",
           }}
         >
@@ -118,30 +150,56 @@ export default function VideosPage() {
             </span>
           </Link>
 
-          <Link
-            href="/analyze"
-            style={{
-              display: "inline-flex",
-              alignItems: "center",
-              justifyContent: "center",
-              padding: "10px 18px",
-              borderRadius: "999px",
-              textDecoration: "none",
-              background: "linear-gradient(135deg, var(--accent), #79e7ff)",
-              color: "#041017",
-              fontSize: "13px",
-              fontWeight: 900,
-              boxShadow: "0 12px 36px rgba(0, 212, 255, 0.18)",
-            }}
-          >
-            Analyser
-          </Link>
+          <div style={{ display: "flex", alignItems: "center", gap: "8px" }}>
+            <Link
+              href="/guide"
+              style={{
+                fontSize: "13px",
+                fontWeight: 600,
+                color: "var(--text-secondary)",
+                textDecoration: "none",
+              }}
+            >
+              Comment ca marche
+            </Link>
+            <Link
+              href="/transparence"
+              style={{
+                fontSize: "13px",
+                fontWeight: 600,
+                color: "var(--text-secondary)",
+                textDecoration: "none",
+                marginLeft: "8px",
+              }}
+            >
+              Transparence
+            </Link>
+            <Link
+              href="/analyze"
+              style={{
+                display: "inline-flex",
+                alignItems: "center",
+                justifyContent: "center",
+                padding: "10px 18px",
+                borderRadius: "999px",
+                textDecoration: "none",
+                background: "linear-gradient(135deg, var(--accent), #79e7ff)",
+                color: "#041017",
+                fontSize: "13px",
+                fontWeight: 900,
+                marginLeft: "8px",
+                boxShadow: "0 12px 36px rgba(0, 212, 255, 0.18)",
+              }}
+            >
+              Analyser
+            </Link>
+          </div>
         </nav>
 
         {/* Hero */}
         <section
-          className="rise d1"
-          style={{ paddingBottom: "40px", paddingTop: "32px" }}
+          className="rise d2"
+          style={{ paddingBottom: "56px", paddingTop: "48px" }}
         >
           <div
             style={{
@@ -152,9 +210,18 @@ export default function VideosPage() {
               borderRadius: "999px",
               background: "rgba(0, 212, 255, 0.08)",
               border: "1px solid rgba(0, 212, 255, 0.18)",
-              marginBottom: "18px",
+              marginBottom: "20px",
             }}
           >
+            <span
+              style={{
+                width: "6px",
+                height: "6px",
+                borderRadius: "999px",
+                background: "var(--accent)",
+                boxShadow: "0 0 10px var(--accent-glow)",
+              }}
+            />
             <span
               style={{
                 fontSize: "11px",
@@ -164,131 +231,158 @@ export default function VideosPage() {
                 color: "var(--accent)",
               }}
             >
-              Analyse vidéo
+              Analyse vidéo IA
             </span>
           </div>
 
           <h1
             style={{
-              margin: "0 0 14px",
-              fontSize: "clamp(2rem, 7vw, 3.6rem)",
-              lineHeight: 0.96,
+              margin: "0 0 18px",
+              fontSize: "clamp(2.4rem, 8vw, 4.8rem)",
+              lineHeight: 0.94,
               letterSpacing: "-0.07em",
               color: "var(--text-primary)",
+              maxWidth: "16ch",
             }}
           >
-            Comprenez pourquoi vos vidéos perdent l&apos;attention
+            Analysez vos vidéos.
           </h1>
+
           <p
             style={{
-              margin: 0,
-              fontSize: "16px",
+              margin: "0 0 20px",
+              fontSize: "17px",
               lineHeight: 1.8,
               color: "rgba(237, 242, 247, 0.8)",
               maxWidth: "44rem",
             }}
           >
-            YouTube Shorts, Instagram Reels, TikTok — l&apos;IA analyse chaque
-            seconde de votre vidéo et vous donne un diagnostic actionnable en
-            90 secondes.
+            Attentiq identifie les secondes exactes où votre audience décroche
+            — avec les causes et un plan d&apos;actions concret. 1 analyse
+            gratuite, puis abonnement.
           </p>
-        </section>
 
-        {/* Platforms */}
-        <section className="rise d2" style={{ marginBottom: "40px" }}>
-          <div style={{ display: "grid", gap: "12px" }}>
-            {platforms.map((platform) => (
+          {/* Platform badges */}
+          <div
+            style={{
+              display: "flex",
+              gap: "10px",
+              flexWrap: "wrap",
+              marginBottom: "28px",
+            }}
+          >
+            {platforms.map((p) => (
               <div
-                key={platform.number}
+                key={p.label}
                 style={{
-                  borderRadius: "22px",
+                  display: "inline-flex",
+                  alignItems: "center",
+                  gap: "7px",
+                  padding: "7px 13px",
+                  borderRadius: "999px",
                   border: "1px solid var(--border)",
                   background: "rgba(255,255,255,0.03)",
-                  padding: "22px 18px",
-                  display: "grid",
-                  gridTemplateColumns: "48px minmax(0, 1fr)",
-                  gap: "16px",
-                  alignItems: "start",
+                  fontSize: "13px",
+                  fontWeight: 700,
+                  color: "var(--text-secondary)",
                 }}
               >
-                <div
-                  style={{
-                    width: "48px",
-                    height: "48px",
-                    borderRadius: "14px",
-                    background: "rgba(0, 212, 255, 0.08)",
-                    border: "1px solid rgba(0, 212, 255, 0.18)",
-                    display: "flex",
-                    alignItems: "center",
-                    justifyContent: "center",
-                    fontFamily: "monospace",
-                    fontSize: "13px",
-                    fontWeight: 800,
-                    color: "var(--accent)",
-                    letterSpacing: "0.1em",
-                  }}
-                >
-                  {platform.number}
-                </div>
-                <div>
-                  <h3
-                    style={{
-                      margin: "0 0 8px",
-                      fontSize: "16px",
-                      fontWeight: 800,
-                      letterSpacing: "-0.03em",
-                      color: "var(--text-primary)",
-                    }}
-                  >
-                    {platform.title}
-                  </h3>
-                  <p
-                    style={{
-                      margin: 0,
-                      fontSize: "14px",
-                      lineHeight: 1.75,
-                      color: "var(--text-secondary)",
-                    }}
-                  >
-                    {platform.description}
-                  </p>
-                </div>
+                <span style={{ color: "var(--accent)", fontSize: "12px" }}>
+                  {p.icon}
+                </span>
+                {p.label}
               </div>
             ))}
           </div>
+
+          <div style={{ display: "flex", gap: "12px", flexWrap: "wrap" }}>
+            <Link
+              href="/analyze"
+              style={{
+                display: "inline-flex",
+                alignItems: "center",
+                justifyContent: "center",
+                padding: "14px 26px",
+                borderRadius: "999px",
+                textDecoration: "none",
+                background: "linear-gradient(135deg, var(--accent), #79e7ff)",
+                color: "#041017",
+                fontSize: "15px",
+                fontWeight: 900,
+                boxShadow: "0 18px 52px rgba(0, 212, 255, 0.2)",
+              }}
+            >
+              Analyser gratuitement →
+            </Link>
+            <Link
+              href="/guide"
+              style={{
+                display: "inline-flex",
+                alignItems: "center",
+                justifyContent: "center",
+                padding: "14px 22px",
+                borderRadius: "999px",
+                textDecoration: "none",
+                border: "1px solid var(--border)",
+                color: "var(--text-secondary)",
+                fontSize: "14px",
+                fontWeight: 700,
+              }}
+            >
+              Comment ca marche
+            </Link>
+          </div>
         </section>
 
-        {/* Ce que le rapport contient */}
-        <section className="rise d3" style={{ marginBottom: "40px" }}>
+        {/* Features */}
+        <section className="rise d3" style={{ marginBottom: "56px" }}>
           <div
             style={{
-              borderRadius: "22px",
+              borderRadius: "28px",
               border: "1px solid var(--border)",
-              background: "rgba(255,255,255,0.03)",
-              padding: "22px 18px",
+              background:
+                "linear-gradient(180deg, rgba(12, 17, 23, 0.95) 0%, rgba(7, 11, 16, 0.96) 100%)",
+              padding: "28px 22px",
             }}
           >
+            <p
+              style={{
+                margin: "0 0 10px",
+                fontSize: "11px",
+                textTransform: "uppercase",
+                letterSpacing: "0.2em",
+                fontWeight: 800,
+                color: "var(--accent)",
+              }}
+            >
+              Ce que vous obtenez
+            </p>
             <h2
               style={{
-                margin: "0 0 16px",
-                fontSize: "17px",
-                fontWeight: 800,
-                letterSpacing: "-0.03em",
+                margin: "0 0 20px",
+                fontSize: "clamp(1.4rem, 4vw, 2rem)",
+                lineHeight: 1,
+                letterSpacing: "-0.05em",
                 color: "var(--text-primary)",
               }}
             >
-              Ce que le rapport contient
+              Un diagnostic complet en 90 secondes
             </h2>
-            <div style={{ display: "grid", gap: "10px" }}>
-              {included.map((item) => (
+            <div
+              style={{
+                display: "grid",
+                gap: "10px",
+                gridTemplateColumns: "repeat(auto-fit, minmax(260px, 1fr))",
+              }}
+            >
+              {features.map((f) => (
                 <div
-                  key={item}
+                  key={f}
                   style={{
                     display: "flex",
-                    alignItems: "flex-start",
+                    alignItems: "center",
                     gap: "10px",
                     fontSize: "14px",
-                    lineHeight: 1.65,
                     color: "rgba(237, 242, 247, 0.84)",
                   }}
                 >
@@ -306,12 +400,11 @@ export default function VideosPage() {
                       fontWeight: 800,
                       fontSize: "10px",
                       flexShrink: 0,
-                      marginTop: "2px",
                     }}
                   >
                     ✓
                   </span>
-                  {item}
+                  {f}
                 </div>
               ))}
             </div>
@@ -319,61 +412,232 @@ export default function VideosPage() {
         </section>
 
         {/* Pricing */}
-        <section className="rise d4" style={{ marginBottom: "40px" }}>
+        <section className="rise d4" style={{ marginBottom: "56px" }}>
+          <p
+            style={{
+              margin: "0 0 8px",
+              fontSize: "11px",
+              textTransform: "uppercase",
+              letterSpacing: "0.2em",
+              fontWeight: 800,
+              color: "var(--text-secondary)",
+            }}
+          >
+            Tarifs
+          </p>
+          <h2
+            style={{
+              margin: "0 0 24px",
+              fontSize: "clamp(1.4rem, 4vw, 2rem)",
+              lineHeight: 1,
+              letterSpacing: "-0.05em",
+              color: "var(--text-primary)",
+            }}
+          >
+            Choisissez votre formule
+          </h2>
+
+          <div
+            style={{
+              display: "grid",
+              gap: "14px",
+              gridTemplateColumns: "repeat(auto-fit, minmax(260px, 1fr))",
+            }}
+          >
+            {plans.map((plan) => (
+              <article
+                key={plan.ctaHref}
+                style={{
+                  borderRadius: "24px",
+                  border: plan.featured
+                    ? "1px solid rgba(0, 212, 255, 0.24)"
+                    : "1px solid var(--border)",
+                  background: plan.featured
+                    ? "linear-gradient(180deg, rgba(0, 212, 255, 0.1) 0%, rgba(10, 14, 20, 0.96) 100%)"
+                    : "rgba(255,255,255,0.03)",
+                  padding: "22px 18px",
+                  position: "relative",
+                }}
+              >
+                {plan.featured && (
+                  <div
+                    style={{
+                      position: "absolute",
+                      top: "-12px",
+                      left: "50%",
+                      transform: "translateX(-50%)",
+                      padding: "5px 12px",
+                      borderRadius: "999px",
+                      background:
+                        "linear-gradient(135deg, var(--accent), #79e7ff)",
+                      color: "#041017",
+                      fontSize: "10px",
+                      fontWeight: 900,
+                      textTransform: "uppercase",
+                      letterSpacing: "0.12em",
+                      whiteSpace: "nowrap",
+                    }}
+                  >
+                    Recommande
+                  </div>
+                )}
+
+                <p
+                  style={{
+                    margin: "0 0 6px",
+                    fontSize: "11px",
+                    textTransform: "uppercase",
+                    letterSpacing: "0.16em",
+                    fontWeight: 800,
+                    color: plan.featured
+                      ? "var(--accent)"
+                      : "var(--text-secondary)",
+                  }}
+                >
+                  {plan.kicker}
+                </p>
+
+                <div
+                  style={{
+                    display: "flex",
+                    alignItems: "baseline",
+                    gap: "5px",
+                    marginBottom: "10px",
+                  }}
+                >
+                  <span
+                    style={{
+                      fontSize: "38px",
+                      lineHeight: 0.95,
+                      letterSpacing: "-0.08em",
+                      fontWeight: 900,
+                      color: "var(--text-primary)",
+                    }}
+                  >
+                    {plan.priceLabel}
+                  </span>
+                  {plan.cadenceLabel && (
+                    <span
+                      style={{
+                        fontSize: "14px",
+                        fontWeight: 700,
+                        color: "var(--text-secondary)",
+                      }}
+                    >
+                      {plan.cadenceLabel}
+                    </span>
+                  )}
+                </div>
+
+                <p
+                  style={{
+                    margin: "0 0 16px",
+                    fontSize: "14px",
+                    lineHeight: 1.7,
+                    color: "var(--text-secondary)",
+                  }}
+                >
+                  {plan.summary}
+                </p>
+
+                <div
+                  style={{ marginBottom: "16px", display: "grid", gap: "8px" }}
+                >
+                  {plan.featureList.map((f) => (
+                    <div
+                      key={f}
+                      style={{
+                        display: "flex",
+                        alignItems: "center",
+                        gap: "10px",
+                        fontSize: "13px",
+                        color: "var(--text-primary)",
+                      }}
+                    >
+                      <span
+                        style={{
+                          width: "18px",
+                          height: "18px",
+                          borderRadius: "50%",
+                          background: "rgba(0, 212, 255, 0.12)",
+                          border: "1px solid rgba(0, 212, 255, 0.22)",
+                          color: "var(--accent)",
+                          display: "inline-flex",
+                          alignItems: "center",
+                          justifyContent: "center",
+                          fontWeight: 800,
+                          fontSize: "10px",
+                          flexShrink: 0,
+                        }}
+                      >
+                        ✓
+                      </span>
+                      {f}
+                    </div>
+                  ))}
+                </div>
+
+                <Link
+                  href={plan.ctaHref}
+                  style={{
+                    display: "block",
+                    textAlign: "center",
+                    padding: "13px 18px",
+                    borderRadius: "999px",
+                    textDecoration: "none",
+                    background: plan.featured
+                      ? "linear-gradient(135deg, var(--accent), #79e7ff)"
+                      : "rgba(255,255,255,0.06)",
+                    border: plan.featured
+                      ? "none"
+                      : "1px solid rgba(255,255,255,0.1)",
+                    color: plan.featured ? "#041017" : "var(--text-primary)",
+                    fontSize: "14px",
+                    fontWeight: 900,
+                    boxShadow: plan.featured
+                      ? "0 18px 52px rgba(0, 212, 255, 0.18)"
+                      : "none",
+                  }}
+                >
+                  {plan.ctaLabel}
+                </Link>
+              </article>
+            ))}
+          </div>
+        </section>
+
+        {/* CTA */}
+        <section className="rise d5" style={{ marginBottom: "56px" }}>
           <div
             style={{
               borderRadius: "28px",
               border: "1px solid rgba(0, 212, 255, 0.2)",
               background:
                 "linear-gradient(160deg, rgba(0, 212, 255, 0.08) 0%, rgba(12, 17, 23, 0.98) 60%)",
-              padding: "36px 24px",
+              padding: "40px 28px",
               textAlign: "center",
             }}
           >
-            <p
-              style={{
-                margin: "0 0 8px",
-                fontSize: "11px",
-                textTransform: "uppercase",
-                letterSpacing: "0.2em",
-                fontWeight: 800,
-                color: "var(--accent)",
-              }}
-            >
-              Tarif
-            </p>
             <h2
               style={{
                 margin: "0 0 12px",
-                fontSize: "clamp(1.5rem, 5vw, 2.4rem)",
+                fontSize: "clamp(1.6rem, 5vw, 2.6rem)",
                 lineHeight: 0.98,
                 letterSpacing: "-0.06em",
                 color: "var(--text-primary)",
               }}
             >
-              1 test gratuit, puis abonnement
+              Pret a voir ce que cache votre video ?
             </h2>
             <p
               style={{
-                margin: "0 0 8px",
+                margin: "0 0 24px",
                 fontSize: "15px",
                 lineHeight: 1.8,
                 color: "rgba(237, 242, 247, 0.8)",
               }}
             >
-              Essayez gratuitement sur une vidéo de votre choix. Si le
-              diagnostic vous aide, continuez avec un abonnement pour analyser
-              autant de vidéos que vous le souhaitez.
-            </p>
-            <p
-              style={{
-                margin: "0 0 24px",
-                fontSize: "13px",
-                lineHeight: 1.7,
-                color: "var(--text-secondary)",
-              }}
-            >
-              1 test gratuit, puis abonnement obligatoire
+              Collez une URL. L&apos;analyse prend 90 secondes.
             </p>
             <Link
               href="/analyze"
@@ -381,7 +645,7 @@ export default function VideosPage() {
                 display: "inline-flex",
                 alignItems: "center",
                 justifyContent: "center",
-                padding: "14px 26px",
+                padding: "14px 28px",
                 borderRadius: "999px",
                 textDecoration: "none",
                 background: "linear-gradient(135deg, var(--accent), #79e7ff)",
@@ -391,7 +655,7 @@ export default function VideosPage() {
                 boxShadow: "0 18px 52px rgba(0, 212, 255, 0.2)",
               }}
             >
-              Analyser une vidéo
+              Analyser gratuitement
             </Link>
             <p
               style={{
@@ -400,7 +664,7 @@ export default function VideosPage() {
                 color: "var(--text-secondary)",
               }}
             >
-              Aucune carte requise pour le premier test.
+              Aucune creation de compte requise.
             </p>
           </div>
         </section>
@@ -410,7 +674,6 @@ export default function VideosPage() {
           style={{
             borderTop: "1px solid var(--border)",
             paddingTop: "24px",
-            marginTop: "40px",
             display: "flex",
             flexWrap: "wrap",
             alignItems: "center",
@@ -425,12 +688,15 @@ export default function VideosPage() {
               color: "var(--text-secondary)",
             }}
           >
-            Attentiq — Diagnostic IA de rétention vidéo
+            Attentiq — Diagnostic IA de retention video
           </p>
           <nav style={{ display: "flex", gap: "16px", flexWrap: "wrap" }}>
             {[
               { href: "/guide", label: "Comment ca marche" },
               { href: "/transparence", label: "Transparence" },
+              { href: "/videos", label: "Vidéos" },
+              { href: "/text", label: "Textes" },
+              { href: "/images", label: "Photos" },
               { href: "/analyze", label: "Analyser" },
             ].map((link) => (
               <Link
