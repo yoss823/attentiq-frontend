@@ -1,5 +1,7 @@
 import type { Metadata } from "next";
 import Link from "next/link";
+import { Suspense } from "react";
+import AnalyzeTextImageExperience from "@/components/analyze-text-image-experience";
 
 export const metadata: Metadata = {
   title: "Analysez vos photos — Attentiq",
@@ -293,6 +295,10 @@ export default function ImagesPage() {
               Comment ca marche
             </Link>
           </div>
+
+          <Suspense fallback={null}>
+            <AnalyzeTextImageExperience mode="image" />
+          </Suspense>
         </section>
 
         {/* Features */}

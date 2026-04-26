@@ -64,6 +64,15 @@ export default function AnalyzeExperience({
       const res = await fetch(`/api/analyze/${encodeURIComponent(jId)}`);
       const data = await res.json();
 
+      if (!res.ok) {
+        setError(
+          (typeof data.userMessage === "string" && data.userMessage) ||
+            "Impossible de recuperer le diagnostic."
+        );
+        setNeedsUpload(Boolean(data.needsUpload));
+        return;
+      }
+
       if (data.status === "success" && data.result) {
         const report = data.result;
         persistAnalyzeResult({ report, url: videoUrl || "", jobId: jId });
