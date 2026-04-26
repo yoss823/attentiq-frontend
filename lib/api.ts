@@ -51,15 +51,20 @@ async function apiFetch<T>(
     cache: "no-store",
   });
 
-  let data: any = null;
+  let data: unknown = null;
   try {
     data = await res.json();
   } catch {}
 
   if (!res.ok) {
-    throw new Error(
-      data?.error || `Request failed with status ${res.status}`
-    );
+    const errorMessage =
+      typeof data === "object" &&
+      data !== null &&
+      "error" in data &&
+      typeof data.error === "string"
+        ? data.error
+        : `Request failed with status ${res.status}`;
+    throw new Error(errorMessage);
   }
 
   return data as T;
