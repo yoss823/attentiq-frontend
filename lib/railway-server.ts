@@ -44,6 +44,7 @@ const PUBLIC_FETCH_HEADERS = {
 } as const;
 
 const RAPID_API_VIDEO_FIELDS = [
+  "url",
   "play",
   "video_link_nwm",
   "nwm_video_url_HQ",
@@ -203,12 +204,18 @@ export async function preflightRailwayUrl(videoUrl: string) {
     Boolean(payload.has_video_link_nwm) ||
     RAPID_API_VIDEO_FIELDS.some((field) => videoFields.includes(field));
 
-  if (!payload.has_data || !hasVideoCandidate) {
+  if (!payload.has_data) {
     throw new UrlIntakeError(
       "DOWNLOAD_FAILED",
       422,
       "Cette URL ne permet pas de recuperer un media exploitable pour l'audit. Importez la video directement."
     );
+  }
+
+  // Some providers only expose a generic media URL field.
+  // If we can confirm data exists, let backend `/analyze` decide.
+  if (!hasVideoCandidate) {
+    return;
   }
 }
 
