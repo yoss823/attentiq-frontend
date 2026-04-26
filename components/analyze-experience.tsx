@@ -1,218 +1,455 @@
 "use client";
 
-import { useState, useRef } from "react";
-import { useRouter } from "next/navigation";
+import Link from "next/link";
+import { useState, useRef, useEffect } from "react";
+import { useRouter, useSearchParams } from "next/navigation";
+import AnalysisLoadingState from "@/components/analysis-loading-state";
+import { persistAnalyzeResult } from "@/lib/analyze-session";
 
-type Format = "video" | "image" | "text";
+const ANALYZE_ROUTE = "/api/analyze";
 
-const BACKEND_URL =
-  process.env.NEXT_PUBLIC_BACKEND_URL ||
-  "https://attentiqbackend-production.up.railway.app";
+type AnalyzeExperienceProps = {
+  initialJobId?: string | null;
+  initialVideoUrl?: string | null;
+  initialPaid?: boolean;
+};
 
-export default function AnalyzeExperience() {
+export default function AnalyzeExperience({
+  initialJobId = null,
+  initialVideoUrl = null,
+  initialPaid = false,
+}: AnalyzeExperienceProps) {
   const router = useRouter();
-  const [format, setFormat] = useState<Format>("video");
-  const [videoUrl, setVideoUrl] = useState("");
-  const [text, setText] = useState("");
-  const [imageFile, setImageFile] = useState<File | null>(null);
-  const [loading, setLoading] = useState(false);
-  const [loadingMsg, setLoadingMsg] = useState("");
+  const searchParams = useSearchParams();
+  const [videoUrl, setVideoUrl] = useState(
+    initialVideoUrl ?? searchParams.get("videoUrl") ?? searchParams.get("url") ?? ""
+  );
+  const [isAnalyzing, setIsAnalyzing] = useState(false);
+  const [elapsedMs, setElapsedMs] = useState(0);
   const [error, setError] = useState<string | null>(null);
-  const fileRef = useRef<HTMLInputElement>(null);
+  const [needsUpload, setNeedsUpload] = useState(false);
+  const startedAtRef = useRef<number | null>(null);
+  const timerRef = useRef<ReturnType<typeof setInterval> | null>(null);
 
-  const LOADING_MESSAGES = [
-    "Téléchargement de la vidéo…",
-    "Transcription de l'audio…",
-    "Analyse image par image…",
-    "Génération du diagnostic…",
-  ];
+  const jobId = initialJobId ?? searchParams.get("jobId");
+  const paid = initialPaid || searchParams.get("paid") === "1";
 
-  const startLoadingMessages = () => {
-    let i = 0;
-    setLoadingMsg(LOADING_MESSAGES[0]);
-    const interval = setInterval(() => {
-      i++;
-      if (i < LOADING_MESSAGES.length) {
-        setLoadingMsg(LOADING_MESSAGES[i]);
-      } else {
-        clearInterval(interval);
-      }
-    }, 20000);
-    return interval;
-  };
-
-  const pollJob = async (jobId: string): Promise<void> => {
-    const res = await fetch(`${BACKEND_URL}/analyze/${jobId}`);
-    const data = await res.json();
-    if (data.status === "success") {
-      router.push(`/analyze/result?jobId=${jobId}`);
-    } else if (data.status === "error") {
-      throw new Error(data.error_message ?? "Erreur d'analyse.");
-    } else {
-      await new Promise((r) => setTimeout(r, 5000));
-      return pollJob(jobId);
+  useEffect(() => {
+    if (jobId) {
+      void handleJobId(jobId);
     }
-  };
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [jobId]);
 
-  const handleSubmit = async () => {
+  function startTimer() {
+    startedAtRef.current = Date.now();
+    timerRef.current = setInterval(() => {
+      setElapsedMs(Date.now() - (startedAtRef.current ?? Date.now()));
+    }, 300);
+  }
+
+  function stopTimer() {
+    if (timerRef.current) {
+      clearInterval(timerRef.current);
+      timerRef.current = null;
+    }
+  }
+
+  async function handleJobId(jId: string) {
+    setIsAnalyzing(true);
     setError(null);
-    setLoading(true);
-    const interval = startLoadingMessages();
+    startTimer();
 
     try {
-      let jobId: string;
+      const res = await fetch(`/api/analyze/${encodeURIComponent(jId)}`);
+      const data = await res.json();
 
-      if (format === "video") {
-        if (!videoUrl.includes("tiktok.com")) {
-          throw new Error("Seules les URLs TikTok sont supportées pour l'instant.");
-        }
-        const res = await fetch(`${BACKEND_URL}/analyze`, {
-          method: "POST",
-          headers: { "Content-Type": "application/json" },
-          body: JSON.stringify({
-            request_id: crypto.randomUUID(),
-            url: videoUrl,
-            platform: "tiktok",
-            max_duration_seconds: 60,
-            requested_at: new Date().toISOString(),
-          }),
-        });
-        const data = await res.json();
-        jobId = data.job_id;
-      } else if (format === "text") {
-        if (!text.trim()) throw new Error("Collez un texte à analyser.");
-        const res = await fetch(`${BACKEND_URL}/analyze/text`, {
-          method: "POST",
-          headers: { "Content-Type": "application/json" },
-          body: JSON.stringify({ text: text.trim() }),
-        });
-        const data = await res.json();
-        jobId = data.job_id;
-      } else {
-        if (!imageFile) throw new Error("Sélectionnez une image à analyser.");
-        const formData = new FormData();
-        formData.append("file", imageFile);
-        const res = await fetch(`${BACKEND_URL}/analyze/image`, {
-          method: "POST",
-          body: formData,
-        });
-        const data = await res.json();
-        jobId = data.job_id;
+      if (data.status === "success" && data.result) {
+        const report = data.result;
+        persistAnalyzeResult({ report, url: videoUrl || "", jobId: jId });
+        router.push(`/analyze/result?jobId=${jId}`);
+        return;
       }
 
-      await pollJob(jobId);
-    } catch (err: unknown) {
-      setError(err instanceof Error ? err.message : "Erreur inattendue.");
+      if (data.status === "error") {
+        setError(data.userMessage ?? "Analyse echouee.");
+        setNeedsUpload(data.needsUpload ?? false);
+        return;
+      }
+
+      // Still processing — poll
+      await new Promise((r) => setTimeout(r, 4000));
+      void handleJobId(jId);
+    } catch {
+      setError("Impossible de recuperer le diagnostic. Reessayez.");
     } finally {
-      clearInterval(interval);
-      setLoading(false);
+      stopTimer();
+      setIsAnalyzing(false);
     }
-  };
+  }
+
+  async function handleSubmit(e: React.FormEvent) {
+    e.preventDefault();
+    const trimmedUrl = videoUrl.trim();
+    if (!trimmedUrl) return;
+
+    setIsAnalyzing(true);
+    setError(null);
+    setNeedsUpload(false);
+    startTimer();
+
+    try {
+      const res = await fetch(ANALYZE_ROUTE, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ url: trimmedUrl }),
+      });
+
+      const data = await res.json();
+
+      if (!res.ok) {
+        setError(data.userMessage ?? "Erreur lors du lancement de l'analyse.");
+        setNeedsUpload(data.needsUpload ?? false);
+        return;
+      }
+
+      const newJobId = typeof data.job_id === "string" ? data.job_id : null;
+
+      if (newJobId) {
+        stopTimer();
+        setIsAnalyzing(false);
+        router.push(`/analyze/result?jobId=${newJobId}&videoUrl=${encodeURIComponent(trimmedUrl)}`);
+        return;
+      }
+
+      // Fallback: direct report in response
+      if (data.report) {
+        persistAnalyzeResult({ report: data.report, url: trimmedUrl });
+        router.push(`/analyze/result?videoUrl=${encodeURIComponent(trimmedUrl)}`);
+        return;
+      }
+
+      setError("Reponse inattendue du service. Reessayez.");
+    } catch {
+      setError("Impossible de joindre le service d'analyse. Verifiez votre connexion.");
+    } finally {
+      stopTimer();
+      setIsAnalyzing(false);
+    }
+  }
+
+  if (isAnalyzing) {
+    return (
+      <main
+        style={{
+          minHeight: "100vh",
+          display: "flex",
+          alignItems: "center",
+          justifyContent: "center",
+          padding: "24px 16px",
+          background:
+            "radial-gradient(circle at top, rgba(0, 212, 255, 0.16), transparent 24%), var(--bg-base)",
+        }}
+      >
+        <section
+          style={{
+            width: "100%",
+            maxWidth: "560px",
+          }}
+        >
+          <AnalysisLoadingState
+            elapsedMs={elapsedMs}
+            headline="Analyse en cours."
+            detail="Attentiq telecharge la video, transcrit l'audio et genere votre diagnostic de retention. Cela prend generalement 60 a 90 secondes."
+          />
+        </section>
+      </main>
+    );
+  }
 
   return (
-    <div className="min-h-screen bg-zinc-950 text-zinc-100 flex items-center justify-center px-4">
-      <div className="w-full max-w-xl space-y-8">
-        <div className="text-center space-y-2">
-          <h1 className="text-3xl font-bold">Analysez votre contenu</h1>
-          <p className="text-zinc-400 text-sm">
-            Le diagnostic arrive en 60 à 90 secondes.
-          </p>
-        </div>
+    <main
+      style={{
+        minHeight: "100vh",
+        background:
+          "radial-gradient(circle at top, rgba(0, 212, 255, 0.14), transparent 28%), radial-gradient(circle at 82% 16%, rgba(251, 146, 60, 0.08), transparent 18%), var(--bg-base)",
+      }}
+    >
+      <div
+        aria-hidden="true"
+        style={{
+          position: "fixed",
+          inset: 0,
+          pointerEvents: "none",
+          backgroundImage:
+            "linear-gradient(rgba(255,255,255,0.025) 1px, transparent 1px), linear-gradient(90deg, rgba(255,255,255,0.025) 1px, transparent 1px)",
+          backgroundSize: "44px 44px",
+          maskImage:
+            "linear-gradient(180deg, rgba(0,0,0,0.6) 0%, rgba(0,0,0,0.18) 68%, transparent 100%)",
+        }}
+      />
 
-        {/* Format tabs */}
-        <div className="flex border border-zinc-800 rounded-lg overflow-hidden">
-          {(["video", "image", "text"] as Format[]).map((f) => (
-            <button
-              key={f}
-              onClick={() => setFormat(f)}
-              className={`flex-1 py-2.5 text-sm font-medium transition-colors ${
-                format === f
-                  ? "bg-zinc-800 text-zinc-100"
-                  : "text-zinc-500 hover:text-zinc-300"
-              }`}
-            >
-              {f === "video" ? "Vidéo" : f === "image" ? "Image" : "Texte"}
-            </button>
-          ))}
-        </div>
-
-        {/* Input */}
-        <div className="space-y-3">
-          {format === "video" && (
-            <input
-              type="url"
-              value={videoUrl}
-              onChange={(e) => setVideoUrl(e.target.value)}
-              placeholder="https://www.tiktok.com/@..."
-              className="w-full bg-zinc-900 border border-zinc-800 rounded-lg px-4 py-3 text-sm text-zinc-100 placeholder:text-zinc-600 focus:outline-none focus:border-zinc-600"
-            />
-          )}
-
-          {format === "image" && (
+      <div
+        style={{
+          position: "relative",
+          zIndex: 1,
+          maxWidth: "760px",
+          margin: "0 auto",
+          padding: "28px 16px 64px",
+        }}
+      >
+        <nav
+          style={{
+            display: "flex",
+            alignItems: "center",
+            justifyContent: "space-between",
+            gap: "12px",
+            marginBottom: "32px",
+            flexWrap: "wrap",
+          }}
+        >
+          <Link
+            href="/"
+            style={{
+              display: "inline-flex",
+              alignItems: "center",
+              gap: "10px",
+              textDecoration: "none",
+            }}
+          >
             <div
-              onClick={() => fileRef.current?.click()}
-              className="border-2 border-dashed border-zinc-700 rounded-lg p-8 text-center cursor-pointer hover:border-zinc-500 transition-colors"
+              style={{
+                width: "36px",
+                height: "36px",
+                borderRadius: "10px",
+                background: "rgba(0, 212, 255, 0.1)",
+                border: "1px solid rgba(0, 212, 255, 0.22)",
+                display: "flex",
+                alignItems: "center",
+                justifyContent: "center",
+                fontSize: "11px",
+                fontWeight: 900,
+                letterSpacing: "0.1em",
+                color: "var(--accent)",
+              }}
             >
-              {imageFile ? (
-                <p className="text-sm text-zinc-300">{imageFile.name}</p>
-              ) : (
-                <p className="text-sm text-zinc-500">
-                  Glissez une image ou{" "}
-                  <span className="underline">choisissez un fichier</span>
-                </p>
-              )}
-              <input
-                ref={fileRef}
-                type="file"
-                accept="image/jpeg,image/png,image/webp"
-                className="hidden"
-                onChange={(e) => setImageFile(e.target.files?.[0] ?? null)}
-              />
+              AT
             </div>
-          )}
+            <span
+              style={{
+                fontSize: "15px",
+                fontWeight: 700,
+                color: "var(--text-primary)",
+                letterSpacing: "-0.02em",
+              }}
+            >
+              Attentiq
+            </span>
+          </Link>
 
-          {format === "text" && (
-            <textarea
-              value={text}
-              onChange={(e) => setText(e.target.value)}
-              placeholder="Collez votre texte, caption, script…"
-              rows={6}
-              className="w-full bg-zinc-900 border border-zinc-800 rounded-lg px-4 py-3 text-sm text-zinc-100 placeholder:text-zinc-600 focus:outline-none focus:border-zinc-600 resize-none"
-            />
-          )}
-        </div>
+          <Link
+            href="/guide"
+            style={{
+              fontSize: "13px",
+              fontWeight: 600,
+              color: "var(--text-secondary)",
+              textDecoration: "none",
+            }}
+          >
+            Comment ca marche
+          </Link>
+        </nav>
 
-        {/* Error */}
-        {error && <p className="text-sm text-red-400">{error}</p>}
-
-        {/* Loading state */}
-        {loading && (
-          <div className="text-center space-y-2">
-            <div className="w-6 h-6 border-2 border-zinc-600 border-t-zinc-300 rounded-full animate-spin mx-auto" />
-            <p className="text-sm text-zinc-400">{loadingMsg}</p>
-            <p className="text-xs text-zinc-600">
-              L'analyse prend généralement 60 à 90 secondes.
-            </p>
+        {paid && (
+          <div
+            style={{
+              marginBottom: "18px",
+              padding: "14px 16px",
+              borderRadius: "18px",
+              border: "1px solid rgba(52, 211, 153, 0.24)",
+              background: "rgba(52, 211, 153, 0.08)",
+              color: "#86efac",
+              fontSize: "14px",
+              lineHeight: 1.7,
+            }}
+          >
+            Paiement confirme — le rapport complet est maintenant debloque sur
+            cette analyse.
           </div>
         )}
 
-        {/* Submit */}
-        {!loading && (
-          <button
-            onClick={handleSubmit}
-            className="w-full bg-zinc-100 text-zinc-900 font-semibold py-3 rounded-lg hover:bg-white transition-colors"
+        <section
+          style={{
+            borderRadius: "30px",
+            border: "1px solid rgba(0, 212, 255, 0.2)",
+            background:
+              "linear-gradient(180deg, rgba(11, 16, 22, 0.98) 0%, rgba(7, 11, 16, 0.96) 100%)",
+            padding: "28px 22px",
+            boxShadow: "0 32px 120px rgba(0, 0, 0, 0.34)",
+          }}
+        >
+          <div
+            style={{
+              display: "inline-flex",
+              alignItems: "center",
+              gap: "8px",
+              padding: "8px 12px",
+              borderRadius: "999px",
+              background: "rgba(0, 212, 255, 0.08)",
+              border: "1px solid rgba(0, 212, 255, 0.18)",
+              marginBottom: "18px",
+            }}
           >
-            Analyser →
-          </button>
-        )}
+            <span
+              style={{
+                width: "7px",
+                height: "7px",
+                borderRadius: "999px",
+                background: "var(--accent)",
+                boxShadow: "0 0 12px var(--accent-glow)",
+              }}
+            />
+            <span
+              style={{
+                fontSize: "11px",
+                fontWeight: 800,
+                textTransform: "uppercase",
+                letterSpacing: "0.18em",
+                color: "var(--accent)",
+              }}
+            >
+              Diagnostic gratuit
+            </span>
+          </div>
 
-        <p className="text-center text-xs text-zinc-600">
-          Vos données ne sont pas stockées.{" "}
-          <a href="/transparence" className="underline">
-            En savoir plus
-          </a>
-        </p>
+          <h1
+            style={{
+              margin: "0 0 10px",
+              fontSize: "clamp(1.9rem, 7vw, 3.2rem)",
+              lineHeight: 0.96,
+              letterSpacing: "-0.07em",
+              color: "var(--text-primary)",
+            }}
+          >
+            Analysez votre video TikTok.
+          </h1>
+          <p
+            style={{
+              margin: "0 0 24px",
+              fontSize: "15px",
+              lineHeight: 1.8,
+              color: "rgba(237, 242, 247, 0.8)",
+              maxWidth: "38rem",
+            }}
+          >
+            Collez une URL TikTok publique. Le diagnostic de retention arrive en
+            60 a 90 secondes — gratuitement.
+          </p>
+
+          <form onSubmit={handleSubmit}>
+            <div
+              style={{
+                display: "grid",
+                gap: "12px",
+                gridTemplateColumns: "minmax(0, 1fr) auto",
+              }}
+            >
+              <input
+                type="url"
+                value={videoUrl}
+                onChange={(e) => setVideoUrl(e.target.value)}
+                placeholder="https://www.tiktok.com/@..."
+                required
+                style={{
+                  minHeight: "54px",
+                  borderRadius: "18px",
+                  border: "1px solid var(--border)",
+                  background: "rgba(5, 9, 14, 0.78)",
+                  color: "var(--text-primary)",
+                  fontSize: "15px",
+                  padding: "0 16px",
+                  outline: "none",
+                }}
+              />
+              <button
+                type="submit"
+                disabled={isAnalyzing || !videoUrl.trim()}
+                style={{
+                  minHeight: "54px",
+                  borderRadius: "999px",
+                  border: "none",
+                  padding: "0 22px",
+                  background:
+                    isAnalyzing || !videoUrl.trim()
+                      ? "rgba(255,255,255,0.08)"
+                      : "linear-gradient(135deg, var(--accent), #79e7ff)",
+                  color:
+                    isAnalyzing || !videoUrl.trim()
+                      ? "var(--text-secondary)"
+                      : "#041017",
+                  fontSize: "15px",
+                  fontWeight: 900,
+                  cursor:
+                    isAnalyzing || !videoUrl.trim() ? "not-allowed" : "pointer",
+                  whiteSpace: "nowrap",
+                  boxShadow:
+                    isAnalyzing || !videoUrl.trim()
+                      ? "none"
+                      : "0 18px 52px rgba(0, 212, 255, 0.18)",
+                }}
+              >
+                Analyser →
+              </button>
+            </div>
+          </form>
+
+          {error && (
+            <div
+              style={{
+                marginTop: "16px",
+                padding: "14px 16px",
+                borderRadius: "18px",
+                border: "1px solid rgba(251, 146, 60, 0.28)",
+                background: "rgba(251, 146, 60, 0.08)",
+                color: "#fdba74",
+                fontSize: "14px",
+                lineHeight: 1.7,
+              }}
+            >
+              {error}
+              {needsUpload && (
+                <p
+                  style={{
+                    margin: "8px 0 0",
+                    fontSize: "13px",
+                    color: "var(--text-secondary)",
+                  }}
+                >
+                  Seules les URLs TikTok publiques sont supportees pour
+                  l&apos;instant.
+                </p>
+              )}
+            </div>
+          )}
+
+          <p
+            style={{
+              marginTop: "16px",
+              fontSize: "12px",
+              lineHeight: 1.6,
+              color: "var(--text-muted)",
+            }}
+          >
+            Vos donnees ne sont pas stockees.{" "}
+            <Link
+              href="/transparence"
+              style={{ color: "var(--text-secondary)", textDecoration: "none" }}
+            >
+              En savoir plus
+            </Link>
+          </p>
+        </section>
       </div>
-    </div>
+    </main>
   );
 }

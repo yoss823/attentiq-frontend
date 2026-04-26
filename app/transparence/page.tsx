@@ -8,23 +8,23 @@ export const metadata: Metadata = {
 };
 
 const strengths = [
-  "Identifier des signaux structurels dans la vidéo (rythme, accroche, ruptures narratives)",
-  "Donner des timestamps précis sur les zones à risque de décrochage",
-  "Traduire ces signaux en langage actionnable pour vos prochaines vidéos",
-  "Fonctionner sans accès à votre compte (pas besoin de connexion)",
+  "Identifier des signaux structurels dans la video (rythme, accroche, ruptures narratives)",
+  "Donner des timestamps precis sur les zones a risque de decrochage",
+  "Traduire ces signaux en langage actionnable pour vos prochaines videos",
+  "Fonctionner sans acces a votre compte (pas besoin de connexion)",
 ];
 
 const limits = [
   "Il n'analyse pas l'algorithme des plateformes ni les tendances du moment",
-  "Il ne peut pas prédire les vues, la viralité ou la croissance",
-  "Il n'a pas accès aux données réelles de rétention de votre compte",
+  "Il ne peut pas predire les vues, la viralite ou la croissance",
+  "Il n'a pas acces aux donnees reelles de retention de votre compte",
   "Les recommandations sont des pistes diagnostiques — pas des certitudes",
 ];
 
 const edgeCases = [
   {
-    title: "Vidéos très courtes (< 10 s)",
-    detail: "Peu de signal à analyser. Le diagnostic devient moins stable.",
+    title: "Videos tres courtes (< 10 s)",
+    detail: "Peu de signal a analyser. Le diagnostic devient moins stable.",
   },
   {
     title: "Audio indisponible",
@@ -32,243 +32,680 @@ const edgeCases = [
       "L'analyse reste possible, mais elle est partielle — la transcription manque.",
   },
   {
-    title: "Comptes privés ou vidéos supprimées",
-    detail: "Inaccessibles. L'outil ne peut pas analyser ce qu'il ne peut pas télécharger.",
+    title: "Comptes prives ou videos supprimees",
+    detail:
+      "Inaccessibles. L'outil ne peut pas analyser ce qu'il ne peut pas telecharger.",
   },
 ];
 
 const privacyPoints = [
-  "La vidéo est téléchargée temporairement pour l'analyse puis supprimée",
-  "Aucun stockage des URLs ou rapports après traitement",
-  "Aucune donnée vendue ou partagée avec des tiers",
+  "La video est telechargee temporairement pour l'analyse puis supprimee",
+  "Aucun stockage des URLs ou rapports apres traitement",
+  "Aucune donnee vendue ou partagee avec des tiers",
 ];
-
-function SectionBlock({
-  index,
-  title,
-  children,
-}: {
-  index: string;
-  title: string;
-  children: React.ReactNode;
-}) {
-  return (
-    <section className="rounded-2xl p-6 sm:p-8 bg-white/[0.03] border border-white/[0.06]">
-      <div className="mb-6 flex items-center gap-4">
-        <span className="flex h-9 w-9 shrink-0 items-center justify-center rounded-xl font-mono text-sm font-bold bg-brand-600/10 text-brand-300 border border-brand-600/30">
-          {index}
-        </span>
-        <h2 className="text-xl font-semibold tracking-[-0.03em] sm:text-2xl text-white">
-          {title}
-        </h2>
-      </div>
-      {children}
-    </section>
-  );
-}
-
-function CheckList({ items }: { items: string[] }) {
-  return (
-    <ul className="space-y-3">
-      {items.map((item) => (
-        <li key={item} className="flex items-start gap-3">
-          <span className="mt-0.5 flex h-5 w-5 shrink-0 items-center justify-center rounded-full text-xs bg-brand-600/10 text-brand-300">
-            ✓
-          </span>
-          <span className="text-sm leading-7 text-slate-400">{item}</span>
-        </li>
-      ))}
-    </ul>
-  );
-}
-
-function CrossList({ items }: { items: string[] }) {
-  return (
-    <ul className="space-y-3">
-      {items.map((item) => (
-        <li key={item} className="flex items-start gap-3">
-          <span
-            className="mt-0.5 flex h-5 w-5 shrink-0 items-center justify-center rounded-full text-xs font-bold"
-            style={{
-              background: "rgba(239,68,68,0.12)",
-              color: "#f87171",
-              border: "1px solid rgba(239,68,68,0.2)",
-            }}
-          >
-            ×
-          </span>
-          <span className="text-sm leading-7 text-slate-400">{item}</span>
-        </li>
-      ))}
-    </ul>
-  );
-}
 
 export default function TransparencePage() {
   return (
-    <main className="min-h-screen bg-slate-950 text-white">
-      {/* Subtle grid */}
+    <main
+      style={{
+        minHeight: "100vh",
+        background:
+          "radial-gradient(circle at top, rgba(0, 212, 255, 0.14), transparent 28%), var(--bg-base)",
+      }}
+    >
       <div
         aria-hidden="true"
-        className="pointer-events-none fixed inset-0"
         style={{
+          position: "fixed",
+          inset: 0,
+          pointerEvents: "none",
           backgroundImage:
-            "linear-gradient(rgba(51,64,245,0.025) 1px, transparent 1px), linear-gradient(90deg, rgba(51,64,245,0.025) 1px, transparent 1px)",
-          backgroundSize: "60px 60px",
+            "linear-gradient(rgba(255,255,255,0.025) 1px, transparent 1px), linear-gradient(90deg, rgba(255,255,255,0.025) 1px, transparent 1px)",
+          backgroundSize: "44px 44px",
           maskImage:
-            "linear-gradient(180deg, rgba(0,0,0,0.6) 0%, rgba(0,0,0,0.1) 60%, rgba(0,0,0,0) 100%)",
+            "linear-gradient(180deg, rgba(0,0,0,0.6) 0%, rgba(0,0,0,0.18) 68%, transparent 100%)",
         }}
       />
 
-      <div className="relative mx-auto max-w-4xl px-5 pb-24 pt-6 sm:px-8">
+      <div
+        style={{
+          position: "relative",
+          zIndex: 1,
+          maxWidth: "760px",
+          margin: "0 auto",
+          padding: "28px 16px 72px",
+        }}
+      >
         {/* Nav */}
-        <nav className="rise flex items-center justify-between py-2">
-          <Link href="/" className="flex items-center gap-3">
-            <div className="flex h-10 w-10 items-center justify-center rounded-xl text-sm font-bold tracking-widest bg-brand-600/10 border border-brand-600/30 text-brand-300">
+        <nav
+          style={{
+            display: "flex",
+            alignItems: "center",
+            justifyContent: "space-between",
+            gap: "12px",
+            marginBottom: "32px",
+            flexWrap: "wrap",
+          }}
+        >
+          <Link
+            href="/"
+            style={{
+              display: "inline-flex",
+              alignItems: "center",
+              gap: "10px",
+              textDecoration: "none",
+            }}
+          >
+            <div
+              style={{
+                width: "36px",
+                height: "36px",
+                borderRadius: "10px",
+                background: "rgba(0, 212, 255, 0.1)",
+                border: "1px solid rgba(0, 212, 255, 0.22)",
+                display: "flex",
+                alignItems: "center",
+                justifyContent: "center",
+                fontSize: "11px",
+                fontWeight: 900,
+                letterSpacing: "0.1em",
+                color: "var(--accent)",
+              }}
+            >
               AT
             </div>
-            <span className="text-base font-semibold tracking-[-0.02em] text-white">
+            <span
+              style={{
+                fontSize: "15px",
+                fontWeight: 700,
+                color: "var(--text-primary)",
+                letterSpacing: "-0.02em",
+              }}
+            >
               Attentiq
             </span>
           </Link>
 
-          <div className="flex items-center gap-1 sm:gap-2">
-            <Link
-              href="/guide"
-              className="hidden rounded-full px-4 py-2 text-sm font-medium transition sm:block text-slate-400 border border-white/[0.08]"
-            >
-              Comment ça marche
-            </Link>
-            <Link
-              href="/transparence"
-              className="hidden rounded-full px-4 py-2 text-sm font-medium sm:block bg-brand-600/10 text-brand-300 border border-brand-600/30"
-            >
-              Transparence
-            </Link>
-            <Link
-              href="/analyze"
-              className="rounded-full px-4 py-2 text-sm font-semibold transition bg-brand-600 text-white hover:opacity-90"
-            >
-              Analyser
-            </Link>
-          </div>
+          <Link
+            href="/analyze"
+            style={{
+              display: "inline-flex",
+              alignItems: "center",
+              justifyContent: "center",
+              padding: "10px 18px",
+              borderRadius: "999px",
+              textDecoration: "none",
+              background: "linear-gradient(135deg, var(--accent), #79e7ff)",
+              color: "#041017",
+              fontSize: "13px",
+              fontWeight: 900,
+              boxShadow: "0 12px 36px rgba(0, 212, 255, 0.18)",
+            }}
+          >
+            Analyser
+          </Link>
         </nav>
 
         {/* Hero */}
-        <section className="pb-14 pt-16 sm:pt-24">
-          <div className="rise" style={{ animationDelay: "0.05s" }}>
-            <p className="mb-5 inline-flex items-center gap-2 rounded-full px-4 py-1.5 text-[11px] font-semibold uppercase tracking-[0.22em] bg-brand-600/10 text-brand-300 border border-brand-600/30">
-              Transparence
-            </p>
-            <h1
-              className="max-w-3xl text-3xl font-semibold tracking-[-0.05em] sm:text-4xl lg:text-5xl text-white"
-              style={{ lineHeight: 1.1 }}
+        <section
+          className="rise d1"
+          style={{ paddingBottom: "36px", paddingTop: "32px" }}
+        >
+          <div
+            style={{
+              display: "inline-flex",
+              alignItems: "center",
+              gap: "8px",
+              padding: "7px 12px",
+              borderRadius: "999px",
+              background: "rgba(0, 212, 255, 0.08)",
+              border: "1px solid rgba(0, 212, 255, 0.18)",
+              marginBottom: "18px",
+            }}
+          >
+            <span
+              style={{
+                fontSize: "11px",
+                fontWeight: 800,
+                textTransform: "uppercase",
+                letterSpacing: "0.2em",
+                color: "var(--accent)",
+              }}
             >
-              Ce qu&apos;Attentiq fait — et ce qu&apos;il ne fait pas
-            </h1>
-            <p className="mt-6 max-w-2xl text-base leading-8 sm:text-lg text-slate-400">
-              Nous préférons être clairs sur les limites de cet outil plutôt
-              que de vous promettre des résultats que nous ne pouvons pas
-              garantir.
-            </p>
+              Transparence
+            </span>
           </div>
+
+          <h1
+            style={{
+              margin: "0 0 14px",
+              fontSize: "clamp(1.8rem, 6vw, 3.2rem)",
+              lineHeight: 0.98,
+              letterSpacing: "-0.06em",
+              color: "var(--text-primary)",
+            }}
+          >
+            Ce qu&apos;Attentiq fait — et ce qu&apos;il ne fait pas
+          </h1>
+          <p
+            style={{
+              margin: 0,
+              fontSize: "16px",
+              lineHeight: 1.8,
+              color: "rgba(237, 242, 247, 0.8)",
+              maxWidth: "44rem",
+            }}
+          >
+            Nous preferons etre clairs sur les limites de cet outil plutot que
+            de vous promettre des resultats que nous ne pouvons pas garantir.
+          </p>
         </section>
 
         {/* Content blocks */}
-        <div className="space-y-5">
-          <SectionBlock index="01" title="Ce que l'outil fait bien">
-            <p className="mb-5 text-sm leading-7 text-slate-400">
-              Attentiq est utile quand vous cherchez à comprendre comment une
-              vidéo perd l&apos;attention sur le plan structurel. Il lit la
-              vidéo comme un assemblage de signaux — pas comme une promesse de
-              résultats.
-            </p>
-            <CheckList items={strengths} />
-          </SectionBlock>
-
-          <SectionBlock index="02" title="Ce que l'outil ne peut pas garantir">
-            <p className="mb-5 text-sm leading-7 text-slate-400">
-              Cet outil n&apos;est pas branché sur une vérité cachée des plateformes.
-              Il donne une lecture sérieuse, mais bornée.
-            </p>
-            <CrossList items={limits} />
-          </SectionBlock>
-
-          <SectionBlock
-            index="03"
-            title="Cas où le diagnostic est moins pertinent"
+        <div style={{ display: "grid", gap: "12px" }}>
+          {/* Ce que l'outil fait bien */}
+          <section
+            className="rise d2"
+            style={{
+              borderRadius: "22px",
+              border: "1px solid var(--border)",
+              background: "rgba(255,255,255,0.03)",
+              padding: "22px 18px",
+            }}
           >
-            <p className="mb-5 text-sm leading-7 text-slate-400">
-              Il existe des contextes où la lecture reste possible mais perd en
-              finesse. Mieux vaut le savoir à l&apos;avance.
+            <div
+              style={{
+                display: "flex",
+                alignItems: "center",
+                gap: "12px",
+                marginBottom: "16px",
+              }}
+            >
+              <div
+                style={{
+                  width: "36px",
+                  height: "36px",
+                  borderRadius: "10px",
+                  background: "rgba(0, 212, 255, 0.08)",
+                  border: "1px solid rgba(0, 212, 255, 0.18)",
+                  display: "flex",
+                  alignItems: "center",
+                  justifyContent: "center",
+                  fontFamily: "monospace",
+                  fontSize: "12px",
+                  fontWeight: 800,
+                  color: "var(--accent)",
+                }}
+              >
+                01
+              </div>
+              <h2
+                style={{
+                  margin: 0,
+                  fontSize: "17px",
+                  fontWeight: 800,
+                  letterSpacing: "-0.03em",
+                  color: "var(--text-primary)",
+                }}
+              >
+                Ce que l&apos;outil fait bien
+              </h2>
+            </div>
+            <p
+              style={{
+                margin: "0 0 14px",
+                fontSize: "14px",
+                lineHeight: 1.75,
+                color: "var(--text-secondary)",
+              }}
+            >
+              Attentiq est utile quand vous cherchez a comprendre comment une
+              video perd l&apos;attention sur le plan structurel. Il lit la
+              video comme un assemblage de signaux — pas comme une promesse de
+              resultats.
             </p>
-            <div className="grid gap-3 sm:grid-cols-3">
-              {edgeCases.map((ec) => (
+            <div style={{ display: "grid", gap: "10px" }}>
+              {strengths.map((item) => (
                 <div
-                  key={ec.title}
-                  className="rounded-xl p-4 bg-white/[0.04] border border-white/[0.06]"
+                  key={item}
+                  style={{
+                    display: "flex",
+                    alignItems: "flex-start",
+                    gap: "10px",
+                    fontSize: "14px",
+                    lineHeight: 1.65,
+                    color: "rgba(237, 242, 247, 0.84)",
+                  }}
                 >
-                  <p className="mb-2 text-sm font-semibold leading-5 text-white">
-                    {ec.title}
-                  </p>
-                  <p className="text-sm leading-6 text-slate-400">{ec.detail}</p>
+                  <span
+                    style={{
+                      width: "18px",
+                      height: "18px",
+                      borderRadius: "50%",
+                      background: "rgba(0, 212, 255, 0.12)",
+                      border: "1px solid rgba(0, 212, 255, 0.22)",
+                      color: "var(--accent)",
+                      display: "inline-flex",
+                      alignItems: "center",
+                      justifyContent: "center",
+                      fontWeight: 800,
+                      fontSize: "10px",
+                      flexShrink: 0,
+                      marginTop: "2px",
+                    }}
+                  >
+                    ✓
+                  </span>
+                  {item}
                 </div>
               ))}
             </div>
-          </SectionBlock>
+          </section>
 
-          <SectionBlock index="04" title="Confidentialité des données">
-            <p className="mb-5 text-sm leading-7 text-slate-400">
-              La confiance ne repose pas seulement sur le ton. Elle repose sur
-              ce que nous faisons — et ne faisons pas — avec vos données.
+          {/* Ce que l'outil ne peut pas garantir */}
+          <section
+            className="rise d3"
+            style={{
+              borderRadius: "22px",
+              border: "1px solid var(--border)",
+              background: "rgba(255,255,255,0.03)",
+              padding: "22px 18px",
+            }}
+          >
+            <div
+              style={{
+                display: "flex",
+                alignItems: "center",
+                gap: "12px",
+                marginBottom: "16px",
+              }}
+            >
+              <div
+                style={{
+                  width: "36px",
+                  height: "36px",
+                  borderRadius: "10px",
+                  background: "rgba(0, 212, 255, 0.08)",
+                  border: "1px solid rgba(0, 212, 255, 0.18)",
+                  display: "flex",
+                  alignItems: "center",
+                  justifyContent: "center",
+                  fontFamily: "monospace",
+                  fontSize: "12px",
+                  fontWeight: 800,
+                  color: "var(--accent)",
+                }}
+              >
+                02
+              </div>
+              <h2
+                style={{
+                  margin: 0,
+                  fontSize: "17px",
+                  fontWeight: 800,
+                  letterSpacing: "-0.03em",
+                  color: "var(--text-primary)",
+                }}
+              >
+                Ce que l&apos;outil ne peut pas garantir
+              </h2>
+            </div>
+            <p
+              style={{
+                margin: "0 0 14px",
+                fontSize: "14px",
+                lineHeight: 1.75,
+                color: "var(--text-secondary)",
+              }}
+            >
+              Cet outil n&apos;est pas branche sur une verite cachee des
+              plateformes. Il donne une lecture serieuse, mais bornee.
             </p>
-            <CheckList items={privacyPoints} />
-          </SectionBlock>
+            <div style={{ display: "grid", gap: "10px" }}>
+              {limits.map((item) => (
+                <div
+                  key={item}
+                  style={{
+                    display: "flex",
+                    alignItems: "flex-start",
+                    gap: "10px",
+                    fontSize: "14px",
+                    lineHeight: 1.65,
+                    color: "rgba(237, 242, 247, 0.84)",
+                  }}
+                >
+                  <span
+                    style={{
+                      width: "18px",
+                      height: "18px",
+                      borderRadius: "50%",
+                      background: "rgba(248, 113, 113, 0.12)",
+                      border: "1px solid rgba(248, 113, 113, 0.2)",
+                      color: "#f87171",
+                      display: "inline-flex",
+                      alignItems: "center",
+                      justifyContent: "center",
+                      fontWeight: 800,
+                      fontSize: "10px",
+                      flexShrink: 0,
+                      marginTop: "2px",
+                    }}
+                  >
+                    ×
+                  </span>
+                  {item}
+                </div>
+              ))}
+            </div>
+          </section>
+
+          {/* Cas limites */}
+          <section
+            className="rise d4"
+            style={{
+              borderRadius: "22px",
+              border: "1px solid var(--border)",
+              background: "rgba(255,255,255,0.03)",
+              padding: "22px 18px",
+            }}
+          >
+            <div
+              style={{
+                display: "flex",
+                alignItems: "center",
+                gap: "12px",
+                marginBottom: "16px",
+              }}
+            >
+              <div
+                style={{
+                  width: "36px",
+                  height: "36px",
+                  borderRadius: "10px",
+                  background: "rgba(0, 212, 255, 0.08)",
+                  border: "1px solid rgba(0, 212, 255, 0.18)",
+                  display: "flex",
+                  alignItems: "center",
+                  justifyContent: "center",
+                  fontFamily: "monospace",
+                  fontSize: "12px",
+                  fontWeight: 800,
+                  color: "var(--accent)",
+                }}
+              >
+                03
+              </div>
+              <h2
+                style={{
+                  margin: 0,
+                  fontSize: "17px",
+                  fontWeight: 800,
+                  letterSpacing: "-0.03em",
+                  color: "var(--text-primary)",
+                }}
+              >
+                Cas ou le diagnostic est moins pertinent
+              </h2>
+            </div>
+            <p
+              style={{
+                margin: "0 0 14px",
+                fontSize: "14px",
+                lineHeight: 1.75,
+                color: "var(--text-secondary)",
+              }}
+            >
+              Il existe des contextes ou la lecture reste possible mais perd en
+              finesse. Mieux vaut le savoir a l&apos;avance.
+            </p>
+            <div
+              style={{
+                display: "grid",
+                gap: "10px",
+                gridTemplateColumns: "repeat(auto-fit, minmax(200px, 1fr))",
+              }}
+            >
+              {edgeCases.map((ec) => (
+                <div
+                  key={ec.title}
+                  style={{
+                    borderRadius: "18px",
+                    border: "1px solid var(--border)",
+                    background: "rgba(255,255,255,0.03)",
+                    padding: "16px",
+                  }}
+                >
+                  <p
+                    style={{
+                      margin: "0 0 8px",
+                      fontSize: "14px",
+                      fontWeight: 800,
+                      color: "var(--text-primary)",
+                    }}
+                  >
+                    {ec.title}
+                  </p>
+                  <p
+                    style={{
+                      margin: 0,
+                      fontSize: "13px",
+                      lineHeight: 1.7,
+                      color: "var(--text-secondary)",
+                    }}
+                  >
+                    {ec.detail}
+                  </p>
+                </div>
+              ))}
+            </div>
+          </section>
+
+          {/* Confidentialite */}
+          <section
+            className="rise d5"
+            style={{
+              borderRadius: "22px",
+              border: "1px solid var(--border)",
+              background: "rgba(255,255,255,0.03)",
+              padding: "22px 18px",
+            }}
+          >
+            <div
+              style={{
+                display: "flex",
+                alignItems: "center",
+                gap: "12px",
+                marginBottom: "16px",
+              }}
+            >
+              <div
+                style={{
+                  width: "36px",
+                  height: "36px",
+                  borderRadius: "10px",
+                  background: "rgba(0, 212, 255, 0.08)",
+                  border: "1px solid rgba(0, 212, 255, 0.18)",
+                  display: "flex",
+                  alignItems: "center",
+                  justifyContent: "center",
+                  fontFamily: "monospace",
+                  fontSize: "12px",
+                  fontWeight: 800,
+                  color: "var(--accent)",
+                }}
+              >
+                04
+              </div>
+              <h2
+                style={{
+                  margin: 0,
+                  fontSize: "17px",
+                  fontWeight: 800,
+                  letterSpacing: "-0.03em",
+                  color: "var(--text-primary)",
+                }}
+              >
+                Confidentialite des donnees
+              </h2>
+            </div>
+            <p
+              style={{
+                margin: "0 0 14px",
+                fontSize: "14px",
+                lineHeight: 1.75,
+                color: "var(--text-secondary)",
+              }}
+            >
+              La confiance ne repose pas seulement sur le ton. Elle repose sur
+              ce que nous faisons — et ne faisons pas — avec vos donnees.
+            </p>
+            <div style={{ display: "grid", gap: "10px" }}>
+              {privacyPoints.map((item) => (
+                <div
+                  key={item}
+                  style={{
+                    display: "flex",
+                    alignItems: "flex-start",
+                    gap: "10px",
+                    fontSize: "14px",
+                    lineHeight: 1.65,
+                    color: "rgba(237, 242, 247, 0.84)",
+                  }}
+                >
+                  <span
+                    style={{
+                      width: "18px",
+                      height: "18px",
+                      borderRadius: "50%",
+                      background: "rgba(0, 212, 255, 0.12)",
+                      border: "1px solid rgba(0, 212, 255, 0.22)",
+                      color: "var(--accent)",
+                      display: "inline-flex",
+                      alignItems: "center",
+                      justifyContent: "center",
+                      fontWeight: 800,
+                      fontSize: "10px",
+                      flexShrink: 0,
+                      marginTop: "2px",
+                    }}
+                  >
+                    ✓
+                  </span>
+                  {item}
+                </div>
+              ))}
+            </div>
+          </section>
 
           {/* CTA */}
-          <div className="rounded-2xl px-6 py-10 text-center sm:py-12 bg-white/[0.03] border border-brand-600/30">
-            <p className="mb-3 text-[11px] font-semibold uppercase tracking-[0.22em] text-brand-300">
-              Prêt ?
+          <div
+            className="rise d6"
+            style={{
+              borderRadius: "28px",
+              border: "1px solid rgba(0, 212, 255, 0.2)",
+              background:
+                "linear-gradient(160deg, rgba(0, 212, 255, 0.08) 0%, rgba(12, 17, 23, 0.98) 60%)",
+              padding: "36px 24px",
+              textAlign: "center",
+            }}
+          >
+            <p
+              style={{
+                margin: "0 0 8px",
+                fontSize: "11px",
+                textTransform: "uppercase",
+                letterSpacing: "0.2em",
+                fontWeight: 800,
+                color: "var(--accent)",
+              }}
+            >
+              Pret ?
             </p>
-            <h2 className="mb-3 text-xl font-semibold tracking-[-0.03em] sm:text-2xl text-white">
+            <h2
+              style={{
+                margin: "0 0 12px",
+                fontSize: "clamp(1.3rem, 4vw, 2rem)",
+                lineHeight: 1,
+                letterSpacing: "-0.05em",
+                color: "var(--text-primary)",
+              }}
+            >
               Si le diagnostic vous aide, il doit aussi pouvoir dire ce
               qu&apos;il ne sait pas faire.
             </h2>
-            <p className="mb-7 text-sm leading-7 text-slate-400">
+            <p
+              style={{
+                margin: "0 0 22px",
+                fontSize: "14px",
+                lineHeight: 1.8,
+                color: "rgba(237, 242, 247, 0.8)",
+              }}
+            >
               Vous savez maintenant exactement ce que vous obtenez — et ce que
               vous n&apos;obtenez pas.
             </p>
             <Link
               href="/analyze"
-              className="inline-flex items-center justify-center rounded-full px-7 py-3.5 text-sm font-semibold transition hover:opacity-90 bg-brand-600 text-white"
+              style={{
+                display: "inline-flex",
+                alignItems: "center",
+                justifyContent: "center",
+                padding: "13px 24px",
+                borderRadius: "999px",
+                textDecoration: "none",
+                background: "linear-gradient(135deg, var(--accent), #79e7ff)",
+                color: "#041017",
+                fontSize: "14px",
+                fontWeight: 900,
+                boxShadow: "0 18px 52px rgba(0, 212, 255, 0.18)",
+              }}
             >
-              Analyser une vidéo
+              Analyser une video
             </Link>
           </div>
         </div>
 
         {/* Footer */}
-        <footer className="border-t border-white/[0.06] py-8 mt-10">
-          <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
-            <p className="text-sm font-medium text-slate-400">
-              Attentiq — Diagnostic IA de rétention vidéo
-            </p>
-            <nav className="flex flex-wrap gap-4">
-              {[
-                { href: "/guide", label: "Comment ça marche" },
-                { href: "/transparence", label: "Transparence" },
-                { href: "/analyze", label: "Analyser" },
-              ].map((link) => (
-                <Link
-                  key={link.href}
-                  href={link.href}
-                  className="text-sm transition hover:opacity-80 text-slate-400"
-                >
-                  {link.label}
-                </Link>
-              ))}
-            </nav>
-          </div>
+        <footer
+          style={{
+            borderTop: "1px solid var(--border)",
+            paddingTop: "24px",
+            marginTop: "40px",
+            display: "flex",
+            flexWrap: "wrap",
+            alignItems: "center",
+            justifyContent: "space-between",
+            gap: "12px",
+          }}
+        >
+          <p
+            style={{
+              margin: 0,
+              fontSize: "13px",
+              color: "var(--text-secondary)",
+            }}
+          >
+            Attentiq — Diagnostic IA de retention video
+          </p>
+          <nav style={{ display: "flex", gap: "16px", flexWrap: "wrap" }}>
+            {[
+              { href: "/guide", label: "Comment ca marche" },
+              { href: "/transparence", label: "Transparence" },
+              { href: "/analyze", label: "Analyser" },
+            ].map((link) => (
+              <Link
+                key={link.href}
+                href={link.href}
+                style={{
+                  fontSize: "13px",
+                  color: "var(--text-secondary)",
+                  textDecoration: "none",
+                }}
+              >
+                {link.label}
+              </Link>
+            ))}
+          </nav>
         </footer>
       </div>
     </main>
