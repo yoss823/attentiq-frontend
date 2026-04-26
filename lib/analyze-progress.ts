@@ -12,7 +12,8 @@ export const ANALYZE_PROGRESS_STEPS = [
   },
   {
     label: "Synthese du diagnostic d'attention",
-    helper: "Le teaser gratuit est prepare avec les chutes visibles et l'aperçu d'actions.",
+    helper:
+      "Le teaser gratuit liste quelques chutes precises ; le complet expose toute la timeline et les analyses liees.",
     startMs: 42_000,
   },
   {

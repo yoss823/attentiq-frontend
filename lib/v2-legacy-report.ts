@@ -1,5 +1,35 @@
-import type { AttentiqReport, RailwayResponse } from "@/lib/railway-client";
+import type {
+  AttentionDrop,
+  AttentiqReport,
+  RailwayResponse,
+} from "@/lib/railway-client";
 import type { V2AnalysisResult } from "@/lib/v2-types";
+
+const DROP_SEVERITIES = new Set<AttentionDrop["severity"]>([
+  "low",
+  "medium",
+  "high",
+  "critical",
+]);
+
+function mapV2AttentionDropsToLegacy(result: V2AnalysisResult): AttentionDrop[] {
+  const list = result.attentionDrops;
+  if (!Array.isArray(list) || list.length === 0) return [];
+  const out: AttentionDrop[] = [];
+  for (const d of list) {
+    const ts = Number(d.timestampSeconds);
+    const rawSev = (d.severity || "medium").toLowerCase() as AttentionDrop["severity"];
+    const sev = DROP_SEVERITIES.has(rawSev) ? rawSev : "medium";
+    const cause = (d.cause || "").trim();
+    if (!Number.isFinite(ts) || cause.length < 4) continue;
+    out.push({
+      timestamp_seconds: ts,
+      severity: sev,
+      cause,
+    });
+  }
+  return out;
+}
 
 /** Libellés FR pour les labels machine du moteur V2 (affichage « humain »). */
 const PRIMARY_RISK_FR: Record<string, string> = {
@@ -133,6 +163,8 @@ export function buildLegacyReportFromV2(result: V2AnalysisResult): AttentiqRepor
     .map((action) => action.label?.trim())
     .filter((l): l is string => Boolean(l));
 
+  const attentionDrops = mapV2AttentionDropsToLegacy(result);
+
   const metadata: RailwayResponse["metadata"] = {
     url: result.sourceUrl ?? "",
     platform: result.sourcePlatform ?? "unknown",
@@ -153,7 +185,7 @@ export function buildLegacyReportFromV2(result: V2AnalysisResult): AttentiqRepor
       creator_perception: buildCreatorPerception(result.dashboard),
       audience_loss_estimate: buildAudienceLossEstimate(retentionScore),
       corrective_actions: actions.slice(0, 3),
-      attention_drops: [],
+      attention_drops: attentionDrops,
     },
   };
 

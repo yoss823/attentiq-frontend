@@ -18,6 +18,12 @@ export interface V2Action {
   rationale: string;
 }
 
+export interface V2AttentionDrop {
+  timestampSeconds: number;
+  severity: string;
+  cause: string;
+}
+
 export interface V2AssistantIntent {
   type: string;
   available: boolean;
@@ -39,6 +45,8 @@ export interface V2AnalysisResult {
   dashboard: V2DashboardMetric[];
   actions: V2Action[];
   assistant: V2Assistant;
+  /** Timeline complète ; le teaser n’affiche que les premières entrées. */
+  attentionDrops?: V2AttentionDrop[];
   sourceUrl?: string | null;
   sourcePlatform?: string | null;
   durationSeconds?: number | null;

@@ -1361,6 +1361,29 @@ export default function ResultReport({
                 title="Ce que le gratuit montre deja"
               />
 
+              {allDrops.length > FREE_TEASER_LIMITS.drops && (
+                <div
+                  style={{
+                    marginBottom: "14px",
+                    padding: "12px 14px",
+                    borderRadius: "16px",
+                    border: "1px solid rgba(0, 212, 255, 0.22)",
+                    background: "rgba(0, 212, 255, 0.07)",
+                    color: "rgba(237, 242, 247, 0.88)",
+                    fontSize: "13px",
+                    lineHeight: 1.65,
+                  }}
+                >
+                  Aperçu gratuit : vous voyez les{" "}
+                  <strong>{FREE_TEASER_LIMITS.drops}</strong> premières chutes avec
+                  cause et sévérité. Le rapport complet ajoute les{" "}
+                  <strong>{allDrops.length - FREE_TEASER_LIMITS.drops}+</strong>{" "}
+                  suivantes, la timeline entière, les liens entre chutes, le détail
+                  par axe (verbal / rythme / visuel quand le signal existe) et un plan
+                  d&apos;action priorisé étendu.
+                </div>
+              )}
+
               {previewDrops.length > 0 ? (
                 <div style={{ display: "grid", gap: "12px" }}>
                   {previewDrops.map((drop, index) => {
