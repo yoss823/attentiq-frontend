@@ -7,6 +7,7 @@ import {
 import {
   freeTrialExhaustedUserMessage,
   hasUsedFreeTrialForFormat,
+  isDevVideoTrialBypassEnabled,
   paywallPathForFormat,
   setFreeTrialCookieOnResponse,
 } from "@/lib/free-trial";
@@ -21,7 +22,7 @@ export async function POST(req: NextRequest) {
   const hasUsedVideoTrial = hasUsedFreeTrialForFormat(req, "video");
   const hasPremium = Boolean(entitlement?.isPremium);
 
-  if (hasUsedVideoTrial && !hasPremium) {
+  if (!isDevVideoTrialBypassEnabled() && hasUsedVideoTrial && !hasPremium) {
     return NextResponse.json(
       {
         error: "FREE_TRIAL_EXHAUSTED",
@@ -139,7 +140,9 @@ export async function POST(req: NextRequest) {
       { headers: buildPipelineHeaders() }
     );
 
-    setFreeTrialCookieOnResponse(response, "video", hasPremium);
+    if (!isDevVideoTrialBypassEnabled()) {
+      setFreeTrialCookieOnResponse(response, "video", hasPremium);
+    }
 
     return response;
   } catch (error) {

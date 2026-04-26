@@ -13,6 +13,18 @@ export const FREE_TRIAL_COOKIE_BY_FORMAT: Record<FreeTrialFormat, string> = {
 
 export const FREE_TRIAL_COOKIE_MAX_AGE_SECONDS = 60 * 60 * 24 * 365;
 
+/**
+ * Local dev only: add `ATTENTIQ_DEV_VIDEO_TRIAL_BYPASS=1` to `.env.local` while
+ * `next dev` runs so URL/upload video tests are not blocked after the first run.
+ * Never set this in production.
+ */
+export function isDevVideoTrialBypassEnabled(): boolean {
+  return (
+    process.env.NODE_ENV === "development" &&
+    process.env.ATTENTIQ_DEV_VIDEO_TRIAL_BYPASS === "1"
+  );
+}
+
 export function hasUsedFreeTrialForFormat(
   req: NextRequest,
   format: FreeTrialFormat
