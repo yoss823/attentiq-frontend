@@ -40,7 +40,9 @@ async function retrieveCheckoutSession(
     return null;
   }
   try {
-    return await stripe.checkout.sessions.retrieve(sessionId);
+    return await stripe.checkout.sessions.retrieve(sessionId, {
+      expand: ["customer"],
+    });
   } catch {
     return null;
   }

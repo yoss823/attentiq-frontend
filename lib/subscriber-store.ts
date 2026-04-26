@@ -3,6 +3,10 @@ import "server-only";
 import { Pool } from "pg";
 import type Stripe from "stripe";
 import {
+  checkoutSessionCustomerEmail,
+  resolveOfferSlugFromPaidStripeSession,
+} from "@/lib/paid-stripe-session";
+import {
   getOfferByPriceCents,
   getOfferBySlug,
   type AttentiqOffer,
@@ -259,13 +263,24 @@ export async function recordStripeCheckoutCompletionIfAbsent(
   const paymentSessionId = session.id;
   const amountCents = session.amount_total ?? 0;
   const currency = (session.currency || "eur").toLowerCase();
-  const offer = getOfferByPriceCents(amountCents);
-  const rawEmail =
-    session.customer_details?.email ??
-    (typeof session.customer_email === "string"
-      ? session.customer_email
-      : null);
+  const resolvedSlug = resolveOfferSlugFromPaidStripeSession(session);
+  const offer =
+    getOfferBySlug(resolvedSlug) ?? getOfferByPriceCents(amountCents);
+  const rawEmail = checkoutSessionCustomerEmail(session);
   const email = rawEmail?.trim() ? normalizeEmail(rawEmail) : null;
+
+  if (!rawEmail?.trim()) {
+    console.warn(
+      "[subscriber-store] recordStripeCheckoutCompletionIfAbsent: no customer email on session",
+      { sessionId: paymentSessionId }
+    );
+  }
+  if (!offer) {
+    console.warn(
+      "[subscriber-store] recordStripeCheckoutCompletionIfAbsent: offer unresolved",
+      { sessionId: paymentSessionId, amountCents, resolvedSlug }
+    );
+  }
 
   const db = getPool();
   await db.query(
@@ -280,7 +295,12 @@ export async function recordStripeCheckoutCompletionIfAbsent(
         raw_payload
       )
       values ($1, $2, $3, $4, $5, $6, $7::jsonb)
-      on conflict (stripe_session_id) do nothing
+      on conflict (stripe_session_id) do update set
+        email = coalesce(excluded.email, subscriber_payment_events.email),
+        offer_slug = coalesce(excluded.offer_slug, subscriber_payment_events.offer_slug),
+        amount_cents = excluded.amount_cents,
+        currency = excluded.currency,
+        raw_payload = excluded.raw_payload
     `,
     [
       paymentSessionId,

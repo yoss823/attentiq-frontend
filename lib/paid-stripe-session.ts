@@ -1,6 +1,36 @@
 import type Stripe from "stripe";
 import { getOfferByPriceCents, normalizeOfferSlug } from "@/lib/offer-config";
 
+/** E-mail acheteur : détails checkout, champ session, ou client Stripe (session avec `expand: ['customer']`). */
+export function checkoutSessionCustomerEmail(
+  session: Stripe.Checkout.Session
+): string | null {
+  const fromDetails = session.customer_details?.email;
+  if (typeof fromDetails === "string" && fromDetails.trim()) {
+    return fromDetails.trim();
+  }
+  if (
+    typeof session.customer_email === "string" &&
+    session.customer_email.trim()
+  ) {
+    return session.customer_email.trim();
+  }
+  const cust = session.customer;
+  if (cust && typeof cust === "object") {
+    if ("deleted" in cust && cust.deleted === true) {
+      return null;
+    }
+    if (
+      "email" in cust &&
+      typeof cust.email === "string" &&
+      cust.email.trim()
+    ) {
+      return cust.email.trim();
+    }
+  }
+  return null;
+}
+
 /** Même logique que set-premium : metadata puis montant payé. */
 export function resolveOfferSlugFromPaidStripeSession(
   session: Stripe.Checkout.Session

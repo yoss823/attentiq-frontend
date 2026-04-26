@@ -3,6 +3,7 @@ import Stripe from "stripe";
 import { sendCheckoutThankYouEmail } from "@/lib/checkout-email";
 import { getPlanFromOfferSlug } from "@/lib/premium";
 import {
+  checkoutSessionCustomerEmail,
   isPaidStripeCheckoutSession,
   jobAndVideoFromStripeSession,
   resolveOfferSlugFromPaidStripeSession,
@@ -24,30 +25,6 @@ type SetPremiumBody = {
 
 function normalizeString(value: unknown) {
   return typeof value === "string" && value.trim() ? value.trim() : null;
-}
-
-function checkoutCustomerEmail(session: Stripe.Checkout.Session) {
-  const fromDetails = session.customer_details?.email;
-  if (typeof fromDetails === "string" && fromDetails.trim()) {
-    return fromDetails.trim();
-  }
-  if (typeof session.customer_email === "string" && session.customer_email.trim()) {
-    return session.customer_email.trim();
-  }
-  const cust = session.customer;
-  if (cust && typeof cust === "object") {
-    if ("deleted" in cust && cust.deleted === true) {
-      return null;
-    }
-    if (
-      "email" in cust &&
-      typeof cust.email === "string" &&
-      cust.email.trim()
-    ) {
-      return cust.email.trim();
-    }
-  }
-  return null;
 }
 
 export async function POST(req: NextRequest) {
@@ -90,7 +67,7 @@ export async function POST(req: NextRequest) {
     const resolvedVideoUrl =
       videoUrl ?? normalizeString(fromMeta.videoUrl) ?? null;
 
-    const customerEmail = checkoutCustomerEmail(session);
+    const customerEmail = checkoutSessionCustomerEmail(session);
 
     let thankYouEmail:
       | {
