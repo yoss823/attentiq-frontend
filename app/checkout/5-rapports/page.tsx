@@ -11,7 +11,7 @@ export const metadata: Metadata = {
 
 const plan = PRICING_PLANS.find((p) => p.id === '5-rapports')!;
 const LAUNCH_DISCOUNT_PERCENT = 20;
-const launchPrice = Number((plan.price * (1 - LAUNCH_DISCOUNT_PERCENT / 100)).toFixed(2));
+const listPrice = Number((plan.price / (1 - LAUNCH_DISCOUNT_PERCENT / 100)).toFixed(2));
 
 export default function Checkout5RapportsPage() {
   return (
@@ -53,19 +53,19 @@ export default function Checkout5RapportsPage() {
             </div>
             <div className="flex items-end justify-center gap-1 mb-3">
               <span className="text-xl font-bold text-slate-500 line-through mr-2">
-                {plan.price}
+                {listPrice}
                 {plan.currency}
               </span>
               <span className="text-6xl font-extrabold text-white">
-                {launchPrice}
+                {plan.price}
               </span>
               <span className="text-2xl text-slate-300 mb-2">{plan.currency}</span>
             </div>
             <p className="text-slate-400 text-sm">{plan.description}</p>
             <p className="text-brand-400 text-xs mt-2 font-medium">
-              Soit {(launchPrice / 5).toFixed(2)}
+              Soit {(plan.price / 5).toFixed(2)}
               {plan.currency} par rapport — économisez jusqu&apos;à{" "}
-              {Math.round((1 - launchPrice / (5 * 9)) * 100)}% vs 5 × 9€
+              {Math.round((1 - plan.price / (5 * 9)) * 100)}% vs 5 × 9€
             </p>
           </div>
 

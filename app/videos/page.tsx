@@ -2,7 +2,7 @@ import type { Metadata } from "next";
 import Link from "next/link";
 import {
   formatLandingEuroCents,
-  getLandingLaunchPriceCents,
+  getLandingListPriceCents,
   LANDING_LAUNCH_DISCOUNT_PERCENT,
   LANDING_PAID_PLANS,
 } from "@/lib/landing-pricing-plans";
@@ -539,7 +539,7 @@ export default function VideosPage() {
                       textDecoration: "line-through",
                     }}
                   >
-                    {plan.priceLabel}
+                    {formatLandingEuroCents(getLandingListPriceCents(plan.priceCents))}
                   </span>
                   <span
                     style={{
@@ -550,7 +550,7 @@ export default function VideosPage() {
                       color: "var(--text-primary)",
                     }}
                   >
-                    {formatLandingEuroCents(getLandingLaunchPriceCents(plan.priceCents))}
+                    {formatLandingEuroCents(plan.priceCents)}
                   </span>
                   {plan.cadenceLabel && (
                     <span

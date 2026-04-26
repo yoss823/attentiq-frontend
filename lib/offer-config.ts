@@ -159,9 +159,12 @@ export function getOfferByPriceCents(priceCents: number) {
   return ATTENTIQ_OFFERS.find((offer) => offer.priceCents === priceCents) ?? null;
 }
 
-export function getLaunchPriceCents(basePriceCents: number) {
-  const discounted = Math.round(basePriceCents * (1 - LAUNCH_DISCOUNT_PERCENT / 100));
-  return Math.max(100, discounted);
+/**
+ * Prix « avant remise » affiché barré : `salePriceCents` est déjà le tarif
+ * lancement (-20 %) facturé sur Stripe.
+ */
+export function getLaunchListPriceCents(salePriceCents: number) {
+  return Math.round(salePriceCents / (1 - LAUNCH_DISCOUNT_PERCENT / 100));
 }
 
 export function formatEuroCents(valueCents: number) {

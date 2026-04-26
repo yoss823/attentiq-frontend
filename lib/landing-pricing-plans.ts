@@ -17,9 +17,9 @@ export type LandingPlanCard = {
 
 export const LANDING_LAUNCH_DISCOUNT_PERCENT = 20;
 
-export function getLandingLaunchPriceCents(priceCents: number) {
-  const discounted = Math.round(priceCents * (1 - LANDING_LAUNCH_DISCOUNT_PERCENT / 100));
-  return Math.max(100, discounted);
+/** Prix barré : `salePriceCents` est déjà le tarif remisé (-20 %). */
+export function getLandingListPriceCents(salePriceCents: number) {
+  return Math.round(salePriceCents / (1 - LANDING_LAUNCH_DISCOUNT_PERCENT / 100));
 }
 
 export function formatLandingEuroCents(valueCents: number) {

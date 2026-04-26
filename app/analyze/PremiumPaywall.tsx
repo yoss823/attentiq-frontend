@@ -1,7 +1,7 @@
 import {
   ATTENTIQ_OFFERS,
   formatEuroCents,
-  getLaunchPriceCents,
+  getLaunchListPriceCents,
   LAUNCH_DISCOUNT_PERCENT,
 } from "@/lib/offer-config";
 import CheckoutLaunchButton from "@/components/checkout-launch-button";
@@ -371,7 +371,7 @@ export default function PremiumPaywall({
                     textDecoration: "line-through",
                   }}
                 >
-                  {offer.priceLabel}
+                  {formatEuroCents(getLaunchListPriceCents(offer.priceCents))}
                 </span>
                 <span
                   style={{
@@ -382,7 +382,7 @@ export default function PremiumPaywall({
                     color: "var(--text-primary)",
                   }}
                 >
-                  {formatEuroCents(getLaunchPriceCents(offer.priceCents))}
+                  {formatEuroCents(offer.priceCents)}
                 </span>
                 {offer.cadenceLabel && (
                   <span

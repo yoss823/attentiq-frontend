@@ -11,11 +11,11 @@ export const metadata: Metadata = {
 
 const plan = PRICING_PLANS.find((p) => p.id === "pack-15")!;
 const LAUNCH_DISCOUNT_PERCENT = 20;
-const launchPrice = Number((plan.price * (1 - LAUNCH_DISCOUNT_PERCENT / 100)).toFixed(2));
+const listPrice = Number((plan.price / (1 - LAUNCH_DISCOUNT_PERCENT / 100)).toFixed(2));
 
 export default function CheckoutPack15Page() {
-  const perReport = (launchPrice / 15).toFixed(2);
-  const savingsPct = Math.round((1 - launchPrice / (15 * 9)) * 100);
+  const perReport = (plan.price / 15).toFixed(2);
+  const savingsPct = Math.round((1 - plan.price / (15 * 9)) * 100);
 
   return (
     <main className="min-h-screen bg-gradient-to-br from-slate-950 via-brand-950 to-slate-900 text-white">
@@ -53,11 +53,11 @@ export default function CheckoutPack15Page() {
             </div>
             <div className="flex items-end justify-center gap-1 mb-3 flex-wrap">
               <span className="text-xl font-bold text-slate-500 line-through mr-2">
-                {plan.price}
+                {listPrice}
                 {plan.currency}
               </span>
               <span className="text-6xl font-extrabold text-white">
-                {launchPrice}
+                {plan.price}
               </span>
               <span className="text-2xl text-slate-300 mb-2">{plan.currency}</span>
               {plan.period ? (

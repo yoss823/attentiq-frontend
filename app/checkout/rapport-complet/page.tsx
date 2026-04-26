@@ -11,7 +11,7 @@ export const metadata: Metadata = {
 
 const plan = PRICING_PLANS.find((p) => p.id === 'rapport-complet')!;
 const LAUNCH_DISCOUNT_PERCENT = 20;
-const launchPrice = Number((plan.price * (1 - LAUNCH_DISCOUNT_PERCENT / 100)).toFixed(2));
+const listPrice = Number((plan.price / (1 - LAUNCH_DISCOUNT_PERCENT / 100)).toFixed(2));
 
 export default function CheckoutRapportCompletPage() {
   return (
@@ -46,11 +46,11 @@ export default function CheckoutRapportCompletPage() {
             </div>
             <div className="flex items-end justify-center gap-1 mb-3">
               <span className="text-xl font-bold text-slate-500 line-through mr-2">
-                {plan.price}
+                {listPrice}
                 {plan.currency}
               </span>
               <span className="text-6xl font-extrabold text-white">
-                {launchPrice}
+                {plan.price}
               </span>
               <span className="text-2xl text-slate-300 mb-2">{plan.currency}</span>
             </div>

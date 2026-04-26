@@ -3,7 +3,7 @@ import Link from "next/link";
 import {
   ATTENTIQ_OFFERS,
   formatEuroCents,
-  getLaunchPriceCents,
+  getLaunchListPriceCents,
   LAUNCH_DISCOUNT_PERCENT,
 } from "@/lib/offer-config";
 
@@ -498,7 +498,7 @@ export default function HomePage() {
                       textDecoration: "line-through",
                     }}
                   >
-                    {offer.priceLabel}
+                    {formatEuroCents(getLaunchListPriceCents(offer.priceCents))}
                   </span>
                   <span
                     style={{
@@ -509,7 +509,7 @@ export default function HomePage() {
                       color: "var(--text-primary)",
                     }}
                   >
-                    {formatEuroCents(getLaunchPriceCents(offer.priceCents))}
+                    {formatEuroCents(offer.priceCents)}
                   </span>
                   {offer.cadenceLabel && (
                     <span

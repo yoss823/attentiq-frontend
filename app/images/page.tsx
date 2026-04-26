@@ -4,7 +4,7 @@ import { Suspense } from "react";
 import AnalyzeTextImageExperience from "@/components/analyze-text-image-experience";
 import {
   formatLandingEuroCents,
-  getLandingLaunchPriceCents,
+  getLandingListPriceCents,
   LANDING_LAUNCH_DISCOUNT_PERCENT,
   LANDING_PAID_PLANS,
 } from "@/lib/landing-pricing-plans";
@@ -506,7 +506,7 @@ export default function ImagesPage() {
                       textDecoration: "line-through",
                     }}
                   >
-                    {plan.priceLabel}
+                    {formatLandingEuroCents(getLandingListPriceCents(plan.priceCents))}
                   </span>
                   <span
                     style={{
@@ -517,7 +517,7 @@ export default function ImagesPage() {
                       color: "var(--text-primary)",
                     }}
                   >
-                    {formatLandingEuroCents(getLandingLaunchPriceCents(plan.priceCents))}
+                    {formatLandingEuroCents(plan.priceCents)}
                   </span>
                   {plan.cadenceLabel && (
                     <span

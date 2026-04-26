@@ -9,7 +9,7 @@ import {
 } from "@/lib/checkout-context";
 import {
   formatEuroCents,
-  getLaunchPriceCents,
+  getLaunchListPriceCents,
   getOfferBySlug,
   getOfferRouteSlugs,
   LAUNCH_DISCOUNT_PERCENT,
@@ -388,7 +388,7 @@ export default async function CheckoutOfferPage({
                     textDecoration: "line-through",
                   }}
                 >
-                  {offer.priceLabel}
+                  {formatEuroCents(getLaunchListPriceCents(offer.priceCents))}
                 </span>
                 <span
                   style={{
@@ -399,7 +399,7 @@ export default async function CheckoutOfferPage({
                     color: "var(--text-primary)",
                   }}
                 >
-                  {formatEuroCents(getLaunchPriceCents(offer.priceCents))}
+                  {formatEuroCents(offer.priceCents)}
                 </span>
                 {offer.cadenceLabel && (
                   <span
