@@ -5,6 +5,7 @@
  */
 export type LandingPlanCard = {
   kicker: string;
+  priceCents: number;
   priceLabel: string;
   cadenceLabel?: string;
   summary: string;
@@ -14,9 +15,26 @@ export type LandingPlanCard = {
   featured: boolean;
 };
 
+export const LANDING_LAUNCH_DISCOUNT_PERCENT = 20;
+
+export function getLandingLaunchPriceCents(priceCents: number) {
+  const discounted = Math.round(priceCents * (1 - LANDING_LAUNCH_DISCOUNT_PERCENT / 100));
+  return Math.max(100, discounted);
+}
+
+export function formatLandingEuroCents(valueCents: number) {
+  const euros = valueCents / 100;
+  const hasDecimals = valueCents % 100 !== 0;
+  if (!hasDecimals) {
+    return `${Math.round(euros)}€`;
+  }
+  return `${euros.toFixed(2).replace(".", ",")}€`;
+}
+
 export const LANDING_PAID_PLANS: LandingPlanCard[] = [
   {
     kicker: "Pour débloquer un diagnostic",
+    priceCents: 900,
     priceLabel: "9€",
     summary:
       "Un rapport complet — même profondeur pour vidéo, texte ou image.",
@@ -31,6 +49,7 @@ export const LANDING_PAID_PLANS: LandingPlanCard[] = [
   },
   {
     kicker: "Pour publier chaque semaine",
+    priceCents: 2900,
     priceLabel: "29€",
     cadenceLabel: "/mois",
     summary:
@@ -46,6 +65,7 @@ export const LANDING_PAID_PLANS: LandingPlanCard[] = [
   },
   {
     kicker: "Pour une série de contenus",
+    priceCents: 8900,
     priceLabel: "89€",
     cadenceLabel: "/mois",
     summary: "15 diagnostics complets par mois — abonnement mensuel.",

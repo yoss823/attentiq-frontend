@@ -19,6 +19,8 @@ export type AttentiqOffer = {
   featured?: boolean;
 };
 
+export const LAUNCH_DISCOUNT_PERCENT = 20;
+
 /** Stripe Price IDs — canonical names + Railway aliases (sans renommer les vars). */
 const STRIPE_PRICE_SINGLE_RESOLVED =
   process.env.STRIPE_PRICE_SINGLE_REPORT ||
@@ -155,6 +157,20 @@ export function getOfferBySlug(slug: string) {
 
 export function getOfferByPriceCents(priceCents: number) {
   return ATTENTIQ_OFFERS.find((offer) => offer.priceCents === priceCents) ?? null;
+}
+
+export function getLaunchPriceCents(basePriceCents: number) {
+  const discounted = Math.round(basePriceCents * (1 - LAUNCH_DISCOUNT_PERCENT / 100));
+  return Math.max(100, discounted);
+}
+
+export function formatEuroCents(valueCents: number) {
+  const euros = valueCents / 100;
+  const hasDecimals = valueCents % 100 !== 0;
+  if (!hasDecimals) {
+    return `${Math.round(euros)}€`;
+  }
+  return `${euros.toFixed(2).replace(".", ",")}€`;
 }
 
 export function getTeaserDrops<T>(items: T[] | null | undefined) {

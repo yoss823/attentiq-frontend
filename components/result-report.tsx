@@ -665,6 +665,8 @@ export default function ResultReport({
   const isVideoContent = contentKind === "video";
   const analyzeHref =
     contentKind === "text" ? "/text" : contentKind === "image" ? "/images" : "/analyze";
+  const nextFreeFormatHref =
+    contentKind === "video" ? "/text" : contentKind === "text" ? "/images" : "/videos";
   const guideHref = `/guide?format=${contentKind}`;
   const contentLabel =
     contentKind === "text" ? "texte" : contentKind === "image" ? "visuel" : "video";
@@ -1675,7 +1677,7 @@ export default function ResultReport({
           >
             {isPremiumUnlocked
               ? `Le rapport complet sert maintenant a executer. Corrigez d'abord la priorite numero un, puis relancez un autre ${contentLabel} pour comparer une nouvelle version.`
-              : `Le gratuit sert a qualifier rapidement la valeur du diagnostic. Soit vous debloquez le rapport complet, soit vous relancez un autre ${contentLabel} pour comparer.`}
+              : "Le gratuit sert a qualifier rapidement la valeur du diagnostic. Soit vous debloquez le rapport complet, soit vous essayez un autre format gratuit (video, texte ou image)."}
           </p>
 
           <div
@@ -1687,7 +1689,7 @@ export default function ResultReport({
             }}
           >
             <Link
-              href={analyzeHref}
+              href={nextFreeFormatHref}
               style={{
                 display: "inline-flex",
                 alignItems: "center",
@@ -1702,7 +1704,7 @@ export default function ResultReport({
                 fontWeight: 900,
               }}
             >
-              Analyser un autre contenu
+              Essayer un autre format gratuit
             </Link>
             <Link
               href={guideHref}

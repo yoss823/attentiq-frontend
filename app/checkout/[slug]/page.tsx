@@ -8,8 +8,11 @@ import {
   getCheckoutContextFromSearchParams,
 } from "@/lib/checkout-context";
 import {
+  formatEuroCents,
+  getLaunchPriceCents,
   getOfferBySlug,
   getOfferRouteSlugs,
+  LAUNCH_DISCOUNT_PERCENT,
 } from "@/lib/offer-config";
 
 type CheckoutOfferPageProps = {
@@ -352,6 +355,23 @@ export default async function CheckoutOfferPage({
               >
                 Offre selectionnee
               </p>
+              <span
+                style={{
+                  display: "inline-flex",
+                  marginTop: "8px",
+                  padding: "4px 9px",
+                  borderRadius: "999px",
+                  border: "1px solid rgba(16, 185, 129, 0.28)",
+                  background: "rgba(16, 185, 129, 0.12)",
+                  color: "#6ee7b7",
+                  fontSize: "10px",
+                  fontWeight: 900,
+                  textTransform: "uppercase",
+                  letterSpacing: "0.12em",
+                }}
+              >
+                Offre de lancement -{LAUNCH_DISCOUNT_PERCENT}%
+              </span>
               <div
                 style={{
                   marginTop: "12px",
@@ -362,6 +382,16 @@ export default async function CheckoutOfferPage({
               >
                 <span
                   style={{
+                    fontSize: "17px",
+                    fontWeight: 700,
+                    color: "var(--text-secondary)",
+                    textDecoration: "line-through",
+                  }}
+                >
+                  {offer.priceLabel}
+                </span>
+                <span
+                  style={{
                     fontSize: "44px",
                     lineHeight: 0.95,
                     letterSpacing: "-0.08em",
@@ -369,7 +399,7 @@ export default async function CheckoutOfferPage({
                     color: "var(--text-primary)",
                   }}
                 >
-                  {offer.priceLabel}
+                  {formatEuroCents(getLaunchPriceCents(offer.priceCents))}
                 </span>
                 {offer.cadenceLabel && (
                   <span

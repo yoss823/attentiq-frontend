@@ -1,6 +1,11 @@
 import type { Metadata } from "next";
 import Link from "next/link";
-import { ATTENTIQ_OFFERS } from "@/lib/offer-config";
+import {
+  ATTENTIQ_OFFERS,
+  formatEuroCents,
+  getLaunchPriceCents,
+  LAUNCH_DISCOUNT_PERCENT,
+} from "@/lib/offer-config";
 
 export const metadata: Metadata = {
   title: "Attentiq — Analyse d'attention multi-formats",
@@ -460,6 +465,23 @@ export default function HomePage() {
                 >
                   {offer.kicker}
                 </p>
+                <span
+                  style={{
+                    display: "inline-flex",
+                    marginBottom: "8px",
+                    padding: "4px 9px",
+                    borderRadius: "999px",
+                    border: "1px solid rgba(16, 185, 129, 0.28)",
+                    background: "rgba(16, 185, 129, 0.12)",
+                    color: "#6ee7b7",
+                    fontSize: "10px",
+                    fontWeight: 900,
+                    textTransform: "uppercase",
+                    letterSpacing: "0.12em",
+                  }}
+                >
+                  Offre de lancement -{LAUNCH_DISCOUNT_PERCENT}%
+                </span>
 
                 <div
                   style={{
@@ -471,6 +493,16 @@ export default function HomePage() {
                 >
                   <span
                     style={{
+                      fontSize: "16px",
+                      fontWeight: 700,
+                      color: "var(--text-secondary)",
+                      textDecoration: "line-through",
+                    }}
+                  >
+                    {offer.priceLabel}
+                  </span>
+                  <span
+                    style={{
                       fontSize: "38px",
                       lineHeight: 0.95,
                       letterSpacing: "-0.08em",
@@ -478,7 +510,7 @@ export default function HomePage() {
                       color: "var(--text-primary)",
                     }}
                   >
-                    {offer.priceLabel}
+                    {formatEuroCents(getLaunchPriceCents(offer.priceCents))}
                   </span>
                   {offer.cadenceLabel && (
                     <span

@@ -2,7 +2,12 @@ import type { Metadata } from "next";
 import Link from "next/link";
 import { Suspense } from "react";
 import AnalyzeTextImageExperience from "@/components/analyze-text-image-experience";
-import { LANDING_PAID_PLANS } from "@/lib/landing-pricing-plans";
+import {
+  formatLandingEuroCents,
+  getLandingLaunchPriceCents,
+  LANDING_LAUNCH_DISCOUNT_PERCENT,
+  LANDING_PAID_PLANS,
+} from "@/lib/landing-pricing-plans";
 
 export const metadata: Metadata = {
   title: "Analysez vos textes — Attentiq",
@@ -467,6 +472,23 @@ export default function TextPage() {
                 >
                   {plan.kicker}
                 </p>
+                <span
+                  style={{
+                    display: "inline-flex",
+                    marginBottom: "8px",
+                    padding: "4px 9px",
+                    borderRadius: "999px",
+                    border: "1px solid rgba(16, 185, 129, 0.28)",
+                    background: "rgba(16, 185, 129, 0.12)",
+                    color: "#6ee7b7",
+                    fontSize: "10px",
+                    fontWeight: 900,
+                    textTransform: "uppercase",
+                    letterSpacing: "0.12em",
+                  }}
+                >
+                  Offre de lancement -{LANDING_LAUNCH_DISCOUNT_PERCENT}%
+                </span>
 
                 <div
                   style={{
@@ -478,6 +500,16 @@ export default function TextPage() {
                 >
                   <span
                     style={{
+                      fontSize: "16px",
+                      fontWeight: 700,
+                      color: "var(--text-secondary)",
+                      textDecoration: "line-through",
+                    }}
+                  >
+                    {plan.priceLabel}
+                  </span>
+                  <span
+                    style={{
                       fontSize: "38px",
                       lineHeight: 0.95,
                       letterSpacing: "-0.08em",
@@ -485,7 +517,7 @@ export default function TextPage() {
                       color: "var(--text-primary)",
                     }}
                   >
-                    {plan.priceLabel}
+                    {formatLandingEuroCents(getLandingLaunchPriceCents(plan.priceCents))}
                   </span>
                   {plan.cadenceLabel && (
                     <span

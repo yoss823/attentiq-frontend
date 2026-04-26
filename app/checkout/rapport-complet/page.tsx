@@ -10,6 +10,8 @@ export const metadata: Metadata = {
 };
 
 const plan = PRICING_PLANS.find((p) => p.id === 'rapport-complet')!;
+const LAUNCH_DISCOUNT_PERCENT = 20;
+const launchPrice = Number((plan.price * (1 - LAUNCH_DISCOUNT_PERCENT / 100)).toFixed(2));
 
 export default function CheckoutRapportCompletPage() {
   return (
@@ -37,9 +39,18 @@ export default function CheckoutRapportCompletPage() {
             <p className="text-sm text-slate-400 uppercase tracking-widest mb-2">
               {plan.name}
             </p>
+            <div className="mb-2">
+              <span className="inline-flex items-center gap-1.5 bg-emerald-500/15 border border-emerald-400/35 text-emerald-300 text-[11px] font-bold px-3 py-1 rounded-full uppercase tracking-widest">
+                Offre de lancement -20%
+              </span>
+            </div>
             <div className="flex items-end justify-center gap-1 mb-3">
-              <span className="text-6xl font-extrabold text-white">
+              <span className="text-xl font-bold text-slate-500 line-through mr-2">
                 {plan.price}
+                {plan.currency}
+              </span>
+              <span className="text-6xl font-extrabold text-white">
+                {launchPrice}
               </span>
               <span className="text-2xl text-slate-300 mb-2">{plan.currency}</span>
             </div>
@@ -71,7 +82,7 @@ export default function CheckoutRapportCompletPage() {
           </ul>
 
           {/* CTA */}
-          <CheckoutButton planName={plan.name} price={plan.price} currency={plan.currency} />
+          <CheckoutButton planName={plan.name} price={launchPrice} currency={plan.currency} />
         </div>
 
         {/* Trust signals */}

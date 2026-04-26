@@ -10,10 +10,12 @@ export const metadata: Metadata = {
 };
 
 const plan = PRICING_PLANS.find((p) => p.id === "pack-15")!;
+const LAUNCH_DISCOUNT_PERCENT = 20;
+const launchPrice = Number((plan.price * (1 - LAUNCH_DISCOUNT_PERCENT / 100)).toFixed(2));
 
 export default function CheckoutPack15Page() {
-  const perReport = (plan.price / 15).toFixed(2);
-  const savingsPct = Math.round((1 - plan.price / (15 * 9)) * 100);
+  const perReport = (launchPrice / 15).toFixed(2);
+  const savingsPct = Math.round((1 - launchPrice / (15 * 9)) * 100);
 
   return (
     <main className="min-h-screen bg-gradient-to-br from-slate-950 via-brand-950 to-slate-900 text-white">
@@ -44,9 +46,18 @@ export default function CheckoutPack15Page() {
             <p className="text-sm text-brand-300 uppercase tracking-widest mb-2">
               {plan.name}
             </p>
+            <div className="mb-2">
+              <span className="inline-flex items-center gap-1.5 bg-emerald-500/15 border border-emerald-400/35 text-emerald-300 text-[11px] font-bold px-3 py-1 rounded-full uppercase tracking-widest">
+                Offre de lancement -20%
+              </span>
+            </div>
             <div className="flex items-end justify-center gap-1 mb-3 flex-wrap">
-              <span className="text-6xl font-extrabold text-white">
+              <span className="text-xl font-bold text-slate-500 line-through mr-2">
                 {plan.price}
+                {plan.currency}
+              </span>
+              <span className="text-6xl font-extrabold text-white">
+                {launchPrice}
               </span>
               <span className="text-2xl text-slate-300 mb-2">{plan.currency}</span>
               {plan.period ? (
@@ -85,7 +96,7 @@ export default function CheckoutPack15Page() {
             ))}
           </ul>
 
-          <CheckoutButton planName={plan.name} price={plan.price} currency={plan.currency} />
+          <CheckoutButton planName={plan.name} price={launchPrice} currency={plan.currency} />
         </div>
 
         <div className="grid grid-cols-3 gap-4 mb-8 text-center">
