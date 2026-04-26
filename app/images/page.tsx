@@ -106,7 +106,7 @@ export default function ImagesPage() {
 
           <div style={{ display: "flex", alignItems: "center", gap: "8px" }}>
             <Link
-              href="/guide"
+              href="/guide?format=image"
               style={{
                 fontSize: "13px",
                 fontWeight: 600,
@@ -258,7 +258,7 @@ export default function ImagesPage() {
               Voir les offres image →
             </Link>
             <Link
-              href="/guide"
+              href="/guide?format=image"
               style={{
                 display: "inline-flex",
                 alignItems: "center",
@@ -674,7 +674,7 @@ export default function ImagesPage() {
           </p>
           <nav style={{ display: "flex", gap: "16px", flexWrap: "wrap" }}>
             {[
-              { href: "/guide", label: "Comment ca marche" },
+              { href: "/guide?format=image", label: "Comment ca marche" },
               { href: "/transparence", label: "Transparence" },
               { href: "/videos", label: "Vidéos" },
               { href: "/text", label: "Textes" },

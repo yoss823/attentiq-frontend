@@ -322,7 +322,7 @@ export default function AnalyzeExperience({
           </Link>
 
           <Link
-            href="/guide"
+            href="/guide?format=video"
             style={{
               fontSize: "13px",
               fontWeight: 600,

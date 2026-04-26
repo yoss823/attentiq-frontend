@@ -6,7 +6,8 @@ import AnalysisLoadingState from "@/components/analysis-loading-state";
 import ResultReport from "@/components/result-report";
 import { persistAnalyzeResult, readAnalyzeResult } from "@/lib/analyze-session";
 import type { PremiumEntitlement } from "@/lib/premium";
-import type { AttentiqReport, RailwayResponse } from "@/lib/railway-client";
+import type { AttentiqReport } from "@/lib/railway-client";
+import { buildLegacyReportFromV2 } from "@/lib/v2-legacy-report";
 import type { V2AnalysisResult } from "@/lib/v2-types";
 
 type ResultPageShellProps = {
@@ -37,49 +38,6 @@ function isV2AnalysisResult(value: unknown): value is V2AnalysisResult {
     Array.isArray(candidate.dashboard) &&
     Array.isArray(candidate.actions)
   );
-}
-
-function buildLegacyReportFromV2(result: V2AnalysisResult): AttentiqReport {
-  const retentionScore = Math.max(
-    0,
-    Math.min(10, Number((result.diagnostic.score * 10).toFixed(1)))
-  );
-  const actions = result.actions
-    .map((action) => action.label?.trim())
-    .filter((label): label is string => Boolean(label));
-  const metadata: RailwayResponse["metadata"] = {
-    url: result.sourceUrl ?? "",
-    platform: result.sourcePlatform ?? "unknown",
-    author: "attentiq",
-    title: "Diagnostic d'attention",
-    duration_seconds: result.durationSeconds ?? 0,
-    hashtags: [],
-  };
-
-  const response: RailwayResponse = {
-    request_id: result.id,
-    status: "success",
-    metadata,
-    diagnostic: {
-      retention_score: retentionScore,
-      global_summary: result.diagnostic.explanation,
-      drop_off_rule: `Diagnostic dominant: ${result.diagnostic.label.replace(
-        /_/g,
-        " "
-      )}`,
-      creator_perception:
-        "Ce diagnostic est genere automatiquement a partir du format envoye.",
-      audience_loss_estimate: "Estimation fournie par le moteur V2.",
-      corrective_actions: actions.slice(0, 3),
-      attention_drops: [],
-    },
-  };
-
-  return {
-    text: result.diagnostic.explanation,
-    data: response,
-    partial: false,
-  };
 }
 
 function matchesExpectedStoredResult({
@@ -197,7 +155,7 @@ function ResultState({
             Analyser une video
           </Link>
           <Link
-            href="/guide"
+            href="/guide?format=video"
             style={{
               display: "inline-flex",
               alignItems: "center",

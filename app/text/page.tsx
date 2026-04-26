@@ -106,7 +106,7 @@ export default function TextPage() {
 
           <div style={{ display: "flex", alignItems: "center", gap: "8px" }}>
             <Link
-              href="/guide"
+              href="/guide?format=text"
               style={{
                 fontSize: "13px",
                 fontWeight: 600,
@@ -258,7 +258,7 @@ export default function TextPage() {
               Voir les offres texte →
             </Link>
             <Link
-              href="/guide"
+              href="/guide?format=text"
               style={{
                 display: "inline-flex",
                 alignItems: "center",
@@ -674,7 +674,7 @@ export default function TextPage() {
           </p>
           <nav style={{ display: "flex", gap: "16px", flexWrap: "wrap" }}>
             {[
-              { href: "/guide", label: "Comment ca marche" },
+              { href: "/guide?format=text", label: "Comment ca marche" },
               { href: "/transparence", label: "Transparence" },
               { href: "/videos", label: "Vidéos" },
               { href: "/text", label: "Textes" },

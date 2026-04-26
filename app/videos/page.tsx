@@ -110,7 +110,7 @@ export default function VideosPage() {
 
           <div style={{ display: "flex", alignItems: "center", gap: "8px" }}>
             <Link
-              href="/guide"
+              href="/guide?format=video"
               style={{
                 fontSize: "13px",
                 fontWeight: 600,
@@ -295,7 +295,7 @@ export default function VideosPage() {
               Analyser gratuitement →
             </Link>
             <Link
-              href="/guide"
+              href="/guide?format=video"
               style={{
                 display: "inline-flex",
                 alignItems: "center",
@@ -696,7 +696,7 @@ export default function VideosPage() {
           </p>
           <nav style={{ display: "flex", gap: "16px", flexWrap: "wrap" }}>
             {[
-              { href: "/guide", label: "Comment ca marche" },
+              { href: "/guide?format=video", label: "Comment ca marche" },
               { href: "/transparence", label: "Transparence" },
               { href: "/videos", label: "Vidéos" },
               { href: "/text", label: "Textes" },

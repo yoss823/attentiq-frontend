@@ -1645,7 +1645,7 @@ export default function ResultReport({
               Analyser une autre video
             </Link>
             <Link
-              href="/guide"
+              href="/guide?format=video"
               style={{
                 display: "inline-flex",
                 alignItems: "center",

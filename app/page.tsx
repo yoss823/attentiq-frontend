@@ -93,7 +93,7 @@ export default function HomePage() {
 
           <div style={{ display: "flex", alignItems: "center", gap: "8px" }}>
             <Link
-              href="/guide"
+              href="/guide?format=video"
               style={{
                 fontSize: "13px",
                 fontWeight: 600,
@@ -652,7 +652,7 @@ export default function HomePage() {
           </p>
           <nav style={{ display: "flex", gap: "16px", flexWrap: "wrap" }}>
             {[
-              { href: "/guide", label: "Comment ca marche" },
+              { href: "/guide?format=video", label: "Comment ca marche" },
               { href: "/transparence", label: "Transparence" },
               { href: "/videos", label: "Videos" },
               { href: "/images", label: "Images" },

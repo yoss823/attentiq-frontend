@@ -1,7 +1,8 @@
 export const ANALYZE_PROGRESS_STEPS = [
   {
     label: "Verification de l'URL et recuperation de la video",
-    helper: "Attentiq verifie le format TikTok public puis lance la collecte.",
+    helper:
+      "Attentiq verifie l'URL (TikTok, YouTube, Instagram, Snapchat) ou le fichier, puis lance la collecte.",
     startMs: 0,
   },
   {
