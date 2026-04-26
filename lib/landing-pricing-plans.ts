@@ -44,7 +44,7 @@ export const LANDING_PAID_PLANS: LandingPlanCard[] = [
       "Plan d'actions détaillé",
     ],
     ctaLabel: "Choisir 9€",
-    ctaHref: "/checkout/rapport-complet",
+    ctaHref: "/checkout/single",
     featured: false,
   },
   {

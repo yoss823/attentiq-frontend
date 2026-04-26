@@ -72,7 +72,7 @@ export const ATTENTIQ_OFFERS: AttentiqOffer[] = [
   },
   {
     slug: "monthly-5",
-    legacySlugs: ["5-rapports-mois"],
+    legacySlugs: ["5-rapports-mois", "5-rapports"],
     name: "5 rapports / mois",
     shortLabel: "Creator",
     kicker: "Pour publier chaque semaine",
