@@ -23,6 +23,8 @@ import { normalizeOfferSlug } from "@/lib/offer-config";
 export const runtime = "nodejs";
 
 const stripe = new Stripe(process.env.STRIPE_SECRET_KEY as string, {
+  // Typings ship `LatestApiVersion`; dashboard uses a newer pinned version.
+  // @ts-expect-error Stripe API version string newer than package union
   apiVersion: "2025-02-24.acacia",
 });
 

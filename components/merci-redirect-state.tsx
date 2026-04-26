@@ -25,6 +25,7 @@ type SetPremiumSuccess = {
   plan: "single" | "5" | "pack15" | null;
   jobId: string | null;
   videoUrl: string | null;
+  customerEmail: string | null;
 };
 
 type SetPremiumFailure = {
@@ -129,6 +130,7 @@ export default function MerciRedirectState({
           offerSlug: setPremiumPayload.offerSlug,
           jobId: setPremiumPayload.jobId,
           videoUrl: setPremiumPayload.videoUrl,
+          subscriberEmail: setPremiumPayload.customerEmail,
         });
 
         router.replace(

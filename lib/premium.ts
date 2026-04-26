@@ -37,6 +37,8 @@ export type PremiumEntitlement = StorageValue & {
   requestId: string | null;
   plan: PremiumPlan | null;
   offerSlug: string | null;
+  /** E-mail abonné (côté serveur pour quota mensuel), renvoyé après set-premium. */
+  subscriberEmail: string | null;
   expiresAt: string | null;
 };
 
@@ -157,6 +159,8 @@ function isPremiumEntitlement(value: unknown): value is PremiumEntitlement {
       candidate.plan === "5" ||
       candidate.plan === "pack15") &&
     (candidate.offerSlug == null || typeof candidate.offerSlug === "string") &&
+    (candidate.subscriberEmail == null ||
+      typeof candidate.subscriberEmail === "string") &&
     (candidate.expiresAt == null || typeof candidate.expiresAt === "string")
   );
 }
@@ -201,6 +205,7 @@ function sanitizeEntitlement(
     jobId: coerceString(entitlement.jobId),
     requestId: coerceString(entitlement.requestId),
     offerSlug: coerceString(entitlement.offerSlug),
+    subscriberEmail: coerceString(entitlement.subscriberEmail),
     expiresAt: normalizeIsoDate(entitlement.expiresAt),
   };
 }
@@ -209,11 +214,13 @@ function buildPremiumEntitlement({
   offerSlug,
   jobId,
   requestId,
+  subscriberEmail,
   savedAt = new Date(),
 }: {
   offerSlug: string;
   jobId?: string | null;
   requestId?: string | null;
+  subscriberEmail?: string | null;
   savedAt?: Date;
 }): PremiumEntitlement {
   const normalizedOfferSlug = normalizeOfferSlug(offerSlug) ?? offerSlug;
@@ -229,6 +236,7 @@ function buildPremiumEntitlement({
     requestId: coerceString(requestId),
     plan,
     offerSlug: normalizedOfferSlug,
+    subscriberEmail: coerceString(subscriberEmail),
     expiresAt,
     savedAt: savedAtIso,
   };
@@ -346,6 +354,7 @@ export function buildLegacyPremiumEntitlement({
       requestId: premiumUnlockRequestId,
       plan: "single" as const,
       offerSlug: null,
+      subscriberEmail: null,
       expiresAt: new Date(Date.now() + SINGLE_PLAN_TTL_SECONDS * 1000).toISOString(),
       savedAt: new Date().toISOString(),
     };
@@ -457,10 +466,12 @@ export function activatePremiumEntitlementFromSuccessfulCheckout(
     offerSlug,
     jobId = null,
     videoUrl = null,
+    subscriberEmail = null,
   }: {
     offerSlug: string;
     jobId?: string | null;
     videoUrl?: string | null;
+    subscriberEmail?: string | null;
   }
 ) {
   const storedResult = readAnalyzeResult();
@@ -475,6 +486,7 @@ export function activatePremiumEntitlementFromSuccessfulCheckout(
     offerSlug,
     jobId: matchingStoredResult?.jobId ?? jobId,
     requestId: matchingStoredResult?.report.data.request_id ?? null,
+    subscriberEmail,
   });
 
   persistPremiumEntitlement(entitlement);

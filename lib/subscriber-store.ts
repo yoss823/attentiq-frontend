@@ -129,6 +129,19 @@ async function ensureSchema() {
         updated_at timestamptz not null default now()
       );
     `);
+
+    await db.query(`
+      create table if not exists subscriber_quota_charges (
+        job_id text primary key,
+        email text not null,
+        charged_at timestamptz not null default now()
+      );
+    `);
+
+    await db.query(`
+      create index if not exists subscriber_quota_charges_email_idx
+      on subscriber_quota_charges (email, charged_at desc);
+    `);
   })();
 
   return schemaReadyPromise;
@@ -522,4 +535,133 @@ export async function upsertVerifiedCheckoutContext({
     `,
     [stripeSessionId, offerSlug, jobId, videoUrl]
   );
+}
+
+export type SubscriptionPlanForQuota = "5" | "pack15";
+
+/**
+ * Une analyse terminée avec succès consomme 1 unité du quota mensuel
+ * (abonnements 5 ou 15 rapports), une seule fois par job_id.
+ */
+export async function chargeSubscriptionReportQuotaIfNeeded(params: {
+  email: string;
+  jobId: string;
+  plan: SubscriptionPlanForQuota;
+}): Promise<{ charged: boolean; reason?: string }> {
+  if (!process.env.DATABASE_URL) {
+    return { charged: false, reason: "no_database" };
+  }
+
+  await ensureSchema();
+
+  const email = normalizeEmail(params.email);
+  const pool = getPool();
+  const client = await pool.connect();
+
+  try {
+    await client.query("BEGIN");
+
+    const accountResult = await client.query<{
+      monthly_quota: number | null;
+      monthly_used: number;
+      quota_period_started_at: Date;
+    }>(
+      `
+        select monthly_quota, monthly_used, quota_period_started_at
+        from subscriber_accounts
+        where email = $1
+        for update
+      `,
+      [email]
+    );
+
+    const row = accountResult.rows[0];
+    if (
+      !row ||
+      row.monthly_quota == null ||
+      row.monthly_quota < 1
+    ) {
+      await client.query("ROLLBACK");
+      return { charged: false, reason: "no_subscriber_account" };
+    }
+
+    await client.query(
+      `
+        update subscriber_accounts
+        set
+          monthly_used = 0,
+          quota_period_started_at = date_trunc('month', now()),
+          updated_at = now()
+        where email = $1
+          and date_trunc('month', quota_period_started_at)
+            < date_trunc('month', now())
+      `,
+      [email]
+    );
+
+    const fresh = await client.query<{
+      monthly_quota: number;
+      monthly_used: number;
+    }>(
+      `
+        select monthly_quota, monthly_used
+        from subscriber_accounts
+        where email = $1
+        for update
+      `,
+      [email]
+    );
+
+    const u = fresh.rows[0];
+    if (!u || u.monthly_used >= u.monthly_quota) {
+      await client.query("ROLLBACK");
+      return { charged: false, reason: "quota_exhausted" };
+    }
+
+    const ins = await client.query(
+      `
+        insert into subscriber_quota_charges (job_id, email)
+        values ($1, $2)
+        on conflict (job_id) do nothing
+        returning job_id
+      `,
+      [params.jobId, email]
+    );
+
+    if (ins.rowCount === 0) {
+      await client.query("COMMIT");
+      return { charged: false, reason: "already_charged_for_job" };
+    }
+
+    const upd = await client.query(
+      `
+        update subscriber_accounts
+        set
+          monthly_used = monthly_used + 1,
+          updated_at = now()
+        where email = $1
+          and monthly_used < monthly_quota
+        returning monthly_used
+      `,
+      [email]
+    );
+
+    if (upd.rowCount === 0) {
+      await client.query(
+        `delete from subscriber_quota_charges where job_id = $1`,
+        [params.jobId]
+      );
+      await client.query("ROLLBACK");
+      return { charged: false, reason: "quota_exhausted" };
+    }
+
+    await client.query("COMMIT");
+    return { charged: true };
+  } catch (e) {
+    await client.query("ROLLBACK");
+    console.error("[subscriber-store] chargeSubscriptionReportQuotaIfNeeded", e);
+    return { charged: false, reason: "transaction_failed" };
+  } finally {
+    client.release();
+  }
 }

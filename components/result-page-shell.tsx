@@ -279,6 +279,7 @@ export default function ResultPageShell({
       return;
     }
 
+    const reportJobId = expectedReportJobId;
     let cancelled = false;
     let attempts = 0;
     const maxAttempts = 30;
@@ -288,7 +289,7 @@ export default function ResultPageShell({
         attempts += 1;
         try {
           const response = await fetch(
-            `/api/analyze/${encodeURIComponent(expectedReportJobId)}`,
+            `/api/analyze/${encodeURIComponent(reportJobId)}`,
             { cache: "no-store" }
           );
           const data = (await response.json().catch(() => null)) as
@@ -318,13 +319,13 @@ export default function ResultPageShell({
               } else {
                 setStoredReport(data.result as AttentiqReport);
               }
-              setStoredReportJobId(expectedReportJobId);
+              setStoredReportJobId(reportJobId);
               persistAnalyzeResult({
                 report: isV2AnalysisResult(data.result)
                   ? buildLegacyReportFromV2(data.result)
                   : (data.result as AttentiqReport),
                 url: expectedVideoUrl ?? "",
-                jobId: expectedReportJobId,
+                jobId: reportJobId,
               });
             }
             return;
