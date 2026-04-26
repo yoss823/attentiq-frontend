@@ -1,10 +1,11 @@
 import type { Metadata } from "next";
 import Link from "next/link";
+import { landingPlansWithFreeTrial } from "@/lib/landing-pricing-plans";
 
 export const metadata: Metadata = {
   title: "Analysez vos vidéos — Attentiq",
   description:
-    "Diagnostic IA de rétention pour YouTube Shorts, Instagram Reels et TikTok. 1 analyse gratuite, puis abonnement.",
+    "Diagnostic IA de rétention pour YouTube Shorts, Instagram Reels et TikTok. Essai gratuit, puis 9€, 29€/mois (5 rapports) ou 89€/mois (15 rapports).",
 };
 
 const platforms = [
@@ -22,50 +23,7 @@ const features = [
   "Rapport téléchargeable",
 ];
 
-const plans = [
-  {
-    kicker: "Essai gratuit",
-    priceLabel: "0€",
-    cadenceLabel: undefined,
-    summary: "1 analyse complète offerte pour découvrir Attentiq.",
-    featureList: [
-      "1 rapport complet",
-      "Toutes les chutes d'attention",
-      "Plan d'actions détaillé",
-    ],
-    ctaLabel: "Analyser gratuitement",
-    ctaHref: "/analyze",
-    featured: false,
-  },
-  {
-    kicker: "Pour publier chaque semaine",
-    priceLabel: "49€",
-    cadenceLabel: "/mois",
-    summary: "5 analyses par mois pour garder un rythme d'audit régulier.",
-    featureList: [
-      "5 rapports complets / mois",
-      "Même profondeur d'analyse",
-      "Le meilleur point de départ pour une routine",
-    ],
-    ctaLabel: "Choisir 49€/mois",
-    ctaHref: "/checkout/monthly-5",
-    featured: true,
-  },
-  {
-    kicker: "Pour une équipe ou un volume élevé",
-    priceLabel: "99€",
-    cadenceLabel: "/mois",
-    summary: "Analyses illimitées pour les équipes et créateurs intensifs.",
-    featureList: [
-      "Rapports complets illimités",
-      "Aucune limite de volume",
-      "Pensé pour une cadence de publication soutenue",
-    ],
-    ctaLabel: "Choisir 99€/mois",
-    ctaHref: "/checkout/unlimited",
-    featured: false,
-  },
-];
+const plans = landingPlansWithFreeTrial("/analyze");
 
 export default function VideosPage() {
   return (

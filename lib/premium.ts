@@ -29,7 +29,7 @@ type LegacySubscriptionAccessState = StorageValue & {
   offerSlug: string;
 };
 
-export type PremiumPlan = "single" | "5" | "unlimited";
+export type PremiumPlan = "single" | "5" | "pack15";
 
 export type PremiumEntitlement = StorageValue & {
   isPremium: boolean;
@@ -117,8 +117,8 @@ export function getPlanFromOfferSlug(
     return "5";
   }
 
-  if (normalizedOfferSlug === "unlimited") {
-    return "unlimited";
+  if (normalizedOfferSlug === "pack-15") {
+    return "pack15";
   }
 
   return null;
@@ -129,7 +129,12 @@ function getPlanTtlSeconds(plan: PremiumPlan | null) {
     return SINGLE_PLAN_TTL_SECONDS;
   }
 
-  if (plan === "5" || plan === "unlimited") {
+  if (plan === "5") {
+    return SUBSCRIPTION_PLAN_TTL_SECONDS;
+  }
+
+  if (plan === "pack15") {
+    /** 15 rapports / mois : même logique de fenêtre d'accès que l'abonnement 5 rapports. */
     return SUBSCRIPTION_PLAN_TTL_SECONDS;
   }
 
@@ -150,7 +155,7 @@ function isPremiumEntitlement(value: unknown): value is PremiumEntitlement {
     (candidate.plan == null ||
       candidate.plan === "single" ||
       candidate.plan === "5" ||
-      candidate.plan === "unlimited") &&
+      candidate.plan === "pack15") &&
     (candidate.offerSlug == null || typeof candidate.offerSlug === "string") &&
     (candidate.expiresAt == null || typeof candidate.expiresAt === "string")
   );
@@ -404,7 +409,7 @@ export function hasSubscriptionAccess(
   initialEntitlement: PremiumEntitlement | null = null
 ) {
   const entitlement = readPremiumEntitlement(initialEntitlement);
-  return entitlement?.plan === "5" || entitlement?.plan === "unlimited";
+  return entitlement?.plan === "5" || entitlement?.plan === "pack15";
 }
 
 export function resolvePremiumAccessState({
@@ -418,7 +423,7 @@ export function resolvePremiumAccessState({
 }) {
   const entitlement = readPremiumEntitlement(initialEntitlement);
   const isSubscriptionEntitlement =
-    entitlement?.plan === "5" || entitlement?.plan === "unlimited";
+    entitlement?.plan === "5" || entitlement?.plan === "pack15";
   const isMatchingOneShot =
     Boolean(entitlement) &&
     (entitlement?.requestId === reportRequestId ||
@@ -461,7 +466,7 @@ export function activatePremiumEntitlementFromSuccessfulCheckout(
   return {
     entitlement,
     unlockMode:
-      entitlement.plan === "5" || entitlement.plan === "unlimited"
+      entitlement.plan === "5" || entitlement.plan === "pack15"
         ? ("subscription" as const)
         : ("one_shot" as const),
   };

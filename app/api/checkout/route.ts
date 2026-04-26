@@ -27,9 +27,13 @@ export async function POST(req: NextRequest) {
       return NextResponse.json({ error: "videoUrl manquante" }, { status: 400 });
     }
 
-    const PRICE_ID = process.env.STRIPE_PRICE_SINGLE_REPORT;
+    const PRICE_ID =
+      process.env.STRIPE_PRICE_SINGLE_REPORT ||
+      process.env.STRIPE_PRICE_SINGLE_REPORT_9;
     if (!PRICE_ID) {
-      throw new Error("STRIPE_PRICE_SINGLE_REPORT non défini");
+      throw new Error(
+        "STRIPE_PRICE_SINGLE_REPORT ou STRIPE_PRICE_SINGLE_REPORT_9 non défini"
+      );
     }
 
     const baseUrl = getBaseUrl(req);

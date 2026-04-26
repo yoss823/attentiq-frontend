@@ -2,11 +2,12 @@ import type { Metadata } from "next";
 import Link from "next/link";
 import { Suspense } from "react";
 import AnalyzeTextImageExperience from "@/components/analyze-text-image-experience";
+import { landingPlansWithFreeTrial } from "@/lib/landing-pricing-plans";
 
 export const metadata: Metadata = {
   title: "Analysez vos textes — Attentiq",
   description:
-    "Diagnostic IA de rétention pour vos textes. 3 formules : 4€ (1 texte), 14€/mois (5 textes), 29€/mois (illimité).",
+    "Diagnostic IA de rétention pour vos textes. Essai gratuit, puis même grille que la vidéo : 9€, 29€/mois, 89€/mois.",
 };
 
 const features = [
@@ -18,50 +19,7 @@ const features = [
   "Plan d'actions concret et actionnable",
 ];
 
-const plans = [
-  {
-    kicker: "Pour tester une fois",
-    priceLabel: "4€",
-    cadenceLabel: undefined,
-    summary: "Analysez un texte en profondeur, sans engagement.",
-    featureList: [
-      "1 analyse complète",
-      "Score d'accroche détaillé",
-      "Plan d'actions personnalisé",
-    ],
-    ctaLabel: "Choisir 4€ (texte)",
-    ctaHref: "/text#tarifs",
-    featured: false,
-  },
-  {
-    kicker: "Pour publier chaque semaine",
-    priceLabel: "14€",
-    cadenceLabel: "/mois",
-    summary: "5 analyses par mois pour affiner votre écriture en continu.",
-    featureList: [
-      "5 analyses complètes / mois",
-      "Même profondeur d'analyse",
-      "Idéal pour une routine éditoriale",
-    ],
-    ctaLabel: "Choisir 14€/mois (texte)",
-    ctaHref: "/text#tarifs",
-    featured: true,
-  },
-  {
-    kicker: "Pour un volume élevé",
-    priceLabel: "29€",
-    cadenceLabel: "/mois",
-    summary: "Analyses illimitées pour les équipes et rédacteurs intensifs.",
-    featureList: [
-      "Analyses illimitées / mois",
-      "Aucune limite de volume",
-      "Pensé pour une production soutenue",
-    ],
-    ctaLabel: "Choisir 29€/mois (texte)",
-    ctaHref: "/text#tarifs",
-    featured: false,
-  },
-];
+const plans = landingPlansWithFreeTrial("/text");
 
 export default function TextPage() {
   return (

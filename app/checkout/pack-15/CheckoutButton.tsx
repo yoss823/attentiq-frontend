@@ -1,7 +1,7 @@
-'use client';
+"use client";
 
-import { useState } from 'react';
-import { STRIPE_LINKS } from '@/lib/stripe';
+import { useState } from "react";
+import { STRIPE_LINKS } from "@/lib/stripe";
 
 export default function CheckoutButton({
   planName,
@@ -20,7 +20,7 @@ export default function CheckoutButton({
     if (link) {
       window.location.href = link;
     } else {
-      alert('Lien de paiement non disponible');
+      alert("Lien de paiement non disponible");
       setLoading(false);
     }
   };
@@ -58,7 +58,10 @@ export default function CheckoutButton({
             Redirection vers le paiement…
           </span>
         ) : (
-          <>Payer {price}{currency} — {planName}</>
+          <>
+            Payer {price}
+            {currency} — {planName}
+          </>
         )}
       </button>
       <p className="text-center text-xs text-slate-500">

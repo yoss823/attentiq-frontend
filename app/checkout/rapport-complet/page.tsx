@@ -4,7 +4,7 @@ import { PRICING_PLANS } from '@/lib/constants';
 import CheckoutButton from './CheckoutButton';
 
 export const metadata: Metadata = {
-  title: 'Rapport Complet — 19€',
+  title: "Rapport complet — 9€",
   description:
     'Obtenez un rapport d\'analyse TikTok complet pour une vidéo. Recommandations personnalisées, carte d\'attention, PDF téléchargeable.',
 };

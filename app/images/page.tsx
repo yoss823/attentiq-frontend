@@ -2,11 +2,12 @@ import type { Metadata } from "next";
 import Link from "next/link";
 import { Suspense } from "react";
 import AnalyzeTextImageExperience from "@/components/analyze-text-image-experience";
+import { landingPlansWithFreeTrial } from "@/lib/landing-pricing-plans";
 
 export const metadata: Metadata = {
   title: "Analysez vos photos — Attentiq",
   description:
-    "Diagnostic IA de rétention pour vos visuels. 3 formules : 9€ (1 photo), 29€/mois (5 photos), 59€/mois (illimité).",
+    "Diagnostic IA de rétention pour vos visuels. Essai gratuit, puis 9€, 29€/mois (5 rapports), 89€/mois (15 rapports).",
 };
 
 const features = [
@@ -18,50 +19,7 @@ const features = [
   "Plan d'actions concret et actionnable",
 ];
 
-const plans = [
-  {
-    kicker: "Pour tester une fois",
-    priceLabel: "9€",
-    cadenceLabel: undefined,
-    summary: "Analysez une photo en profondeur, sans engagement.",
-    featureList: [
-      "1 analyse complète",
-      "Score d'impact visuel détaillé",
-      "Plan d'actions personnalisé",
-    ],
-    ctaLabel: "Choisir 9€ (image)",
-    ctaHref: "/images#tarifs",
-    featured: false,
-  },
-  {
-    kicker: "Pour publier chaque semaine",
-    priceLabel: "29€",
-    cadenceLabel: "/mois",
-    summary: "5 analyses par mois pour optimiser vos visuels en continu.",
-    featureList: [
-      "5 analyses complètes / mois",
-      "Même profondeur d'analyse",
-      "Idéal pour une routine créative",
-    ],
-    ctaLabel: "Choisir 29€/mois (image)",
-    ctaHref: "/images#tarifs",
-    featured: true,
-  },
-  {
-    kicker: "Pour un volume élevé",
-    priceLabel: "59€",
-    cadenceLabel: "/mois",
-    summary: "Analyses illimitées pour les équipes et créatifs intensifs.",
-    featureList: [
-      "Analyses illimitées / mois",
-      "Aucune limite de volume",
-      "Pensé pour une production soutenue",
-    ],
-    ctaLabel: "Choisir 59€/mois (image)",
-    ctaHref: "/images#tarifs",
-    featured: false,
-  },
-];
+const plans = landingPlansWithFreeTrial("/images");
 
 export default function ImagesPage() {
   return (

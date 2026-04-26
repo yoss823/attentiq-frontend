@@ -13,7 +13,7 @@ type MerciRedirectStateProps = {
 type VerifySessionSuccess = {
   ok: true;
   offerSlug: string;
-  plan: "single" | "5" | "unlimited" | null;
+  plan: "single" | "5" | "pack15" | null;
   jobId: string | null;
   videoUrl: string | null;
 };
@@ -22,7 +22,7 @@ type SetPremiumSuccess = {
   ok: true;
   paid: boolean;
   offerSlug: string;
-  plan: "single" | "5" | "unlimited" | null;
+  plan: "single" | "5" | "pack15" | null;
   jobId: string | null;
   videoUrl: string | null;
 };
@@ -36,7 +36,7 @@ type VerifySessionFailure = {
   ok: false;
   error: string;
   offerSlug?: string;
-  plan?: "single" | "5" | "unlimited" | null;
+  plan?: "single" | "5" | "pack15" | null;
 };
 
 function buildErrorCopy(error: string) {

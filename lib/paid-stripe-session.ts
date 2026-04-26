@@ -1,0 +1,35 @@
+import type Stripe from "stripe";
+import { getOfferByPriceCents, normalizeOfferSlug } from "@/lib/offer-config";
+
+/** Même logique que set-premium : metadata puis montant payé. */
+export function resolveOfferSlugFromPaidStripeSession(
+  session: Stripe.Checkout.Session
+): string {
+  const rawOfferSlug =
+    session.metadata?.offerSlug?.trim() ||
+    session.metadata?.plan?.trim() ||
+    null;
+  const amountTotal = session.amount_total ?? 0;
+  const offerFromAmount = getOfferByPriceCents(amountTotal);
+  return (
+    normalizeOfferSlug(rawOfferSlug) ??
+    offerFromAmount?.slug ??
+    "single"
+  );
+}
+
+export function isPaidStripeCheckoutSession(
+  session: Stripe.Checkout.Session
+): boolean {
+  return (
+    session.payment_status === "paid" || session.status === "complete"
+  );
+}
+
+export function jobAndVideoFromStripeSession(
+  session: Stripe.Checkout.Session
+): { jobId: string | null; videoUrl: string | null } {
+  const jobId = session.metadata?.jobId?.trim() || null;
+  const videoUrl = session.metadata?.videoUrl?.trim() || null;
+  return { jobId, videoUrl };
+}

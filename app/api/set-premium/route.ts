@@ -1,7 +1,11 @@
 import { NextRequest, NextResponse } from "next/server";
 import Stripe from "stripe";
 import { getPlanFromOfferSlug } from "@/lib/premium";
-import { normalizeOfferSlug, getOfferByPriceCents } from "@/lib/offer-config";
+import {
+  isPaidStripeCheckoutSession,
+  jobAndVideoFromStripeSession,
+  resolveOfferSlugFromPaidStripeSession,
+} from "@/lib/paid-stripe-session";
 
 export const runtime = "nodejs";
 
@@ -43,35 +47,21 @@ export async function POST(req: NextRequest) {
       );
     }
 
-    const paymentOk =
-      session.payment_status === "paid" || session.status === "complete";
-
-    if (!paymentOk) {
+    if (!isPaidStripeCheckoutSession(session)) {
       return NextResponse.json(
         { ok: false, error: "SESSION_NOT_PAID" },
         { status: 403 }
       );
     }
 
-    // Resolve offer slug from session metadata or amount
-    const rawOfferSlug =
-      session.metadata?.offerSlug?.trim() ||
-      session.metadata?.plan?.trim() ||
-      null;
-    const amountTotal = session.amount_total ?? 0;
-    const offerFromAmount = getOfferByPriceCents(amountTotal);
-    const resolvedOfferSlug =
-      normalizeOfferSlug(rawOfferSlug) ??
-      offerFromAmount?.slug ??
-      "single";
-
+    const resolvedOfferSlug = resolveOfferSlugFromPaidStripeSession(session);
     const plan = getPlanFromOfferSlug(resolvedOfferSlug);
 
-    // Resolve jobId from body or session metadata
+    const fromMeta = jobAndVideoFromStripeSession(session);
     const resolvedJobId =
-      jobId ?? normalizeString(session.metadata?.jobId) ?? null;
+      jobId ?? normalizeString(fromMeta.jobId) ?? null;
     const resolvedVideoUrl =
-      videoUrl ?? normalizeString(session.metadata?.videoUrl) ?? null;
+      videoUrl ?? normalizeString(fromMeta.videoUrl) ?? null;
 
     return NextResponse.json({
       ok: true,

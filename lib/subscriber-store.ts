@@ -1,6 +1,7 @@
 import "server-only";
 
 import { Pool } from "pg";
+import type Stripe from "stripe";
 import {
   getOfferByPriceCents,
   getOfferBySlug,
@@ -227,6 +228,71 @@ export async function recordNanoCorpPayment(
     offer,
     createdAccount: Boolean(offer?.createsAccount),
   };
+}
+
+/**
+ * Quand le webhook Nanocorp n'a pas encore écrit la ligne, on synchronise depuis
+ * une session Checkout Stripe déjà payée (ex. retour /merci sur Payment Link).
+ */
+export async function recordStripeCheckoutCompletionIfAbsent(
+  session: Stripe.Checkout.Session
+): Promise<{ offer: AttentiqOffer | null }> {
+  if (!process.env.DATABASE_URL) {
+    return { offer: null };
+  }
+
+  await ensureSchema();
+
+  const paymentSessionId = session.id;
+  const amountCents = session.amount_total ?? 0;
+  const currency = (session.currency || "eur").toLowerCase();
+  const offer = getOfferByPriceCents(amountCents);
+  const rawEmail =
+    session.customer_details?.email ??
+    (typeof session.customer_email === "string"
+      ? session.customer_email
+      : null);
+  const email = rawEmail?.trim() ? normalizeEmail(rawEmail) : null;
+
+  const db = getPool();
+  await db.query(
+    `
+      insert into subscriber_payment_events (
+        stripe_session_id,
+        event_type,
+        email,
+        offer_slug,
+        amount_cents,
+        currency,
+        raw_payload
+      )
+      values ($1, $2, $3, $4, $5, $6, $7::jsonb)
+      on conflict (stripe_session_id) do nothing
+    `,
+    [
+      paymentSessionId,
+      "stripe.checkout.session.completed",
+      email,
+      offer?.slug ?? null,
+      amountCents,
+      currency,
+      JSON.stringify({
+        source: "stripe_session_sync",
+        session_id: session.id,
+      }),
+    ]
+  );
+
+  if (offer?.createsAccount && rawEmail?.trim()) {
+    await upsertSubscriberAccount(offer, {
+      amount_cents: amountCents,
+      currency,
+      customer_email: rawEmail.trim(),
+      stripe_session_id: paymentSessionId,
+    });
+  }
+
+  return { offer };
 }
 
 export async function getSubscriberAccountByEmail(email: string): Promise<{

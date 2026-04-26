@@ -19,16 +19,24 @@ export type AttentiqOffer = {
   featured?: boolean;
 };
 
-// Stripe payment links — update these when new links are generated in the Stripe dashboard.
-// These are used as fallbacks when the /api/checkout/prepare session creation fails.
-// Primary checkout flow uses /api/checkout/prepare to create dynamic Stripe sessions.
+/** Stripe Price IDs — canonical names + Railway aliases (sans renommer les vars). */
+const STRIPE_PRICE_SINGLE_RESOLVED =
+  process.env.STRIPE_PRICE_SINGLE_REPORT ||
+  process.env.STRIPE_PRICE_SINGLE_REPORT_9;
+const STRIPE_PRICE_PACK_15_RESOLVED =
+  process.env.STRIPE_PRICE_PACK_15 ||
+  process.env.STRIPE_PRICE_MONTHLY_89;
+
+// Stripe payment links — set in env when you create products in Stripe Dashboard.
+// Fallback URLs are placeholders; replace with real Payment Links before launch.
 const STRIPE_SINGLE_URL =
   process.env.NEXT_PUBLIC_STRIPE_LINK_SINGLE ||
   "https://buy.stripe.com/00w28s5PmeXl22m3WreP11u";
 const STRIPE_MONTHLY5_URL =
   process.env.NEXT_PUBLIC_STRIPE_LINK_MONTHLY5 ||
   "https://buy.stripe.com/00w28s5PmeXl22m3WreP11u";
-const STRIPE_UNLIMITED_URL =
+const STRIPE_PACK_15_URL =
+  process.env.NEXT_PUBLIC_STRIPE_LINK_PACK_15 ||
   process.env.NEXT_PUBLIC_STRIPE_LINK_UNLIMITED ||
   "https://buy.stripe.com/00w28s5PmeXl22m3WreP11u";
 
@@ -44,17 +52,18 @@ export const ATTENTIQ_OFFERS: AttentiqOffer[] = [
     name: "Rapport complet",
     shortLabel: "One-shot",
     kicker: "Pour débloquer une vidéo",
-    priceCents: 1900,
-    priceLabel: "19€",
+    priceCents: 900,
+    priceLabel: "9€",
     summary: "Débloquez le diagnostic complet d'une seule vidéo.",
     audience: "Pour valider une vidéo précise avant de republier.",
-    ctaLabel: "Choisir 19€",
+    ctaLabel: "Choisir 9€",
     featureList: [
       "1 rapport complet",
       "Toutes les chutes d'attention",
       "Plan d'actions détaillé",
     ],
-    stripePriceId: "price_1TNxfxKXvWnroW3IZzYmMgtN",
+    stripePriceId:
+      STRIPE_PRICE_SINGLE_RESOLVED || "price_1TNxfxKXvWnroW3IZzYmMgtN",
     stripeUrl: STRIPE_SINGLE_URL,
     checkoutPath: "/checkout/single",
     monthlyQuota: 1,
@@ -65,18 +74,19 @@ export const ATTENTIQ_OFFERS: AttentiqOffer[] = [
     name: "5 rapports / mois",
     shortLabel: "Creator",
     kicker: "Pour publier chaque semaine",
-    priceCents: 4900,
-    priceLabel: "49€",
+    priceCents: 2900,
+    priceLabel: "29€",
     cadenceLabel: "/mois",
-    summary: "Gardez un rythme d'audit sans passer en illimité.",
+    summary: "5 rapports complets par mois — comme presque 2 analyses offertes vs l'unité.",
     audience: "Pour les créateurs qui testent plusieurs hooks par mois.",
-    ctaLabel: "Choisir 49€/mois",
+    ctaLabel: "Choisir 29€/mois",
     featureList: [
       "5 rapports complets / mois",
       "Même profondeur d'analyse",
-      "Le meilleur point de départ pour une routine",
+      "Idéal pour une routine de publication",
     ],
-    stripePriceId: "price_1TNxfxKXvWnroW3IUCapqAK5",
+    stripePriceId:
+      process.env.STRIPE_PRICE_MONTHLY_29 || "price_1TNxfxKXvWnroW3IUCapqAK5",
     stripeUrl: STRIPE_MONTHLY5_URL,
     checkoutPath: "/checkout/monthly-5",
     createsAccount: true,
@@ -84,30 +94,31 @@ export const ATTENTIQ_OFFERS: AttentiqOffer[] = [
     featured: true,
   },
   {
-    slug: "unlimited",
-    legacySlugs: ["illimite-mois"],
-    name: "Illimité / mois",
-    shortLabel: "Studio",
-    kicker: "Pour une équipe ou un volume élevé",
-    priceCents: 9900,
-    priceLabel: "99€",
+    slug: "pack-15",
+    legacySlugs: ["unlimited", "illimite-mois", "illimite"],
+    name: "15 rapports / mois",
+    shortLabel: "Volume",
+    kicker: "Pour une série de vidéos",
+    priceCents: 8900,
+    priceLabel: "89€",
     cadenceLabel: "/mois",
-    summary: "Passez toutes vos vidéos au diagnostic sans friction.",
-    audience: "Pour les équipes, studios et créateurs intensifs.",
-    ctaLabel: "Choisir 99€/mois",
+    summary:
+      "15 diagnostics complets par mois — pour les créateurs qui publient souvent.",
+    audience: "Pour auditer plusieurs sorties chaque mois avec le même niveau d'analyse.",
+    ctaLabel: "Choisir 89€/mois",
     featureList: [
-      "Rapports complets illimités",
-      "Aucune limite de volume",
-      "Pensé pour une cadence de publication soutenue",
+      "15 rapports complets / mois",
+      "Renouvelé chaque mois",
+      "Même qualité d'analyse qu'à l'unité",
     ],
-    stripePriceId: "price_1TNxfxKXvWnroW3IG6G9qmDF",
-    stripeUrl: STRIPE_UNLIMITED_URL,
-    checkoutPath: "/checkout/unlimited",
+    stripePriceId:
+      STRIPE_PRICE_PACK_15_RESOLVED || "price_1TNxfxKXvWnroW3IG6G9qmDF",
+    stripeUrl: STRIPE_PACK_15_URL,
+    checkoutPath: "/checkout/pack-15",
     createsAccount: true,
-    monthlyQuota: null,
+    monthlyQuota: 15,
   },
 ];
-
 
 export function normalizeOfferSlug(slug: string | null | undefined) {
   const trimmed = slug?.trim();
