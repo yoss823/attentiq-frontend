@@ -3,9 +3,9 @@ import Link from "next/link";
 import { ATTENTIQ_OFFERS } from "@/lib/offer-config";
 
 export const metadata: Metadata = {
-  title: "Attentiq — Diagnostic de rétention vidéo par IA",
+  title: "Attentiq — Analyse d'attention multi-formats",
   description:
-    "Attentiq analyse votre contenu et identifie les secondes exactes où l'attention chute — avec les causes et un plan d'actions concret.",
+    "Attentiq analyse videos, images et textes pour identifier ce qui fait decrocher l'attention et quoi corriger concretement.",
 };
 
 export default function HomePage() {
@@ -116,7 +116,7 @@ export default function HomePage() {
               Transparence
             </Link>
             <Link
-              href="/analyze"
+              href="/videos"
               style={{
                 display: "inline-flex",
                 alignItems: "center",
@@ -172,7 +172,7 @@ export default function HomePage() {
                 color: "var(--accent)",
               }}
             >
-              Diagnostic de retention IA
+              Analyse d&apos;attention IA
             </span>
           </div>
 
@@ -186,7 +186,7 @@ export default function HomePage() {
               maxWidth: "14ch",
             }}
           >
-            Sachez ou votre video fait decrocher.
+            Comprenez ou votre contenu fait decrocher.
           </h1>
 
           <p
@@ -198,14 +198,14 @@ export default function HomePage() {
               maxWidth: "44rem",
             }}
           >
-            Attentiq analyse votre contenu et identifie les secondes exactes ou
-            l&apos;attention chute — avec les causes et un plan d&apos;actions
-            concret.
+            Attentiq analyse vos videos, visuels et textes pour expliquer
+            precisement ce qui ne va pas et comment l&apos;ameliorer sur les
+            prochains contenus.
           </p>
 
           <div style={{ display: "flex", gap: "12px", flexWrap: "wrap" }}>
             <Link
-              href="/analyze"
+              href="/videos"
               style={{
                 display: "inline-flex",
                 alignItems: "center",
@@ -220,10 +220,10 @@ export default function HomePage() {
                 boxShadow: "0 18px 52px rgba(0, 212, 255, 0.2)",
               }}
             >
-              Analyser gratuitement →
+              Analyser une video →
             </Link>
             <Link
-              href="/guide"
+              href="/text"
               style={{
                 display: "inline-flex",
                 alignItems: "center",
@@ -237,8 +237,87 @@ export default function HomePage() {
                 fontWeight: 700,
               }}
             >
-              Comment ca marche
+              Analyser un texte
             </Link>
+            <Link
+              href="/images"
+              style={{
+                display: "inline-flex",
+                alignItems: "center",
+                justifyContent: "center",
+                padding: "14px 22px",
+                borderRadius: "999px",
+                textDecoration: "none",
+                border: "1px solid var(--border)",
+                color: "var(--text-secondary)",
+                fontSize: "14px",
+                fontWeight: 700,
+              }}
+            >
+              Analyser une image
+            </Link>
+          </div>
+        </section>
+
+        <section className="rise d2" style={{ marginBottom: "42px" }}>
+          <div
+            style={{
+              display: "grid",
+              gap: "14px",
+              gridTemplateColumns: "repeat(auto-fit, minmax(220px, 1fr))",
+            }}
+          >
+            {[
+              {
+                href: "/videos",
+                title: "Videos",
+                text: "TikTok, Reels et YouTube Shorts.",
+              },
+              {
+                href: "/images",
+                title: "Images",
+                text: "Photos et creatives multi-plateformes.",
+              },
+              {
+                href: "/text",
+                title: "Textes",
+                text: "Posts, scripts et pages de vente.",
+              },
+            ].map((item) => (
+              <Link
+                key={item.href}
+                href={item.href}
+                style={{
+                  textDecoration: "none",
+                  borderRadius: "22px",
+                  border: "1px solid var(--border)",
+                  background: "rgba(255,255,255,0.03)",
+                  padding: "18px",
+                }}
+              >
+                <p
+                  style={{
+                    margin: 0,
+                    color: "var(--text-primary)",
+                    fontSize: "18px",
+                    fontWeight: 800,
+                    letterSpacing: "-0.03em",
+                  }}
+                >
+                  {item.title}
+                </p>
+                <p
+                  style={{
+                    margin: "8px 0 0",
+                    color: "var(--text-secondary)",
+                    fontSize: "14px",
+                    lineHeight: 1.7,
+                  }}
+                >
+                  {item.text}
+                </p>
+              </Link>
+            ))}
           </div>
         </section>
 
@@ -505,7 +584,7 @@ export default function HomePage() {
                 color: "var(--text-primary)",
               }}
             >
-              Pret a voir ce que cache votre video ?
+              Pret a comprendre ce qui fait decrocher ?
             </h2>
             <p
               style={{
@@ -515,10 +594,10 @@ export default function HomePage() {
                 color: "rgba(237, 242, 247, 0.8)",
               }}
             >
-              Collez une URL. L&apos;analyse prend 90 secondes.
+              Choisissez votre format, puis lancez une analyse en quelques secondes.
             </p>
             <Link
-              href="/analyze"
+              href="/videos"
               style={{
                 display: "inline-flex",
                 alignItems: "center",
@@ -533,7 +612,7 @@ export default function HomePage() {
                 boxShadow: "0 18px 52px rgba(0, 212, 255, 0.2)",
               }}
             >
-              Analyser gratuitement
+              Commencer par les videos
             </Link>
             <p
               style={{
@@ -566,13 +645,15 @@ export default function HomePage() {
               color: "var(--text-secondary)",
             }}
           >
-            Attentiq — Diagnostic IA de retention video
+            Attentiq — Analyse d&apos;attention multi-formats
           </p>
           <nav style={{ display: "flex", gap: "16px", flexWrap: "wrap" }}>
             {[
               { href: "/guide", label: "Comment ca marche" },
               { href: "/transparence", label: "Transparence" },
-              { href: "/analyze", label: "Analyser" },
+              { href: "/videos", label: "Videos" },
+              { href: "/images", label: "Images" },
+              { href: "/text", label: "Textes" },
             ].map((link) => (
               <Link
                 key={link.href}
