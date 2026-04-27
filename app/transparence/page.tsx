@@ -118,7 +118,7 @@ const TRANSPARENCE_FAQ = [
   },
   {
     q: "L'aperçu gratuit montre quoi exactement ?",
-    a: "Un extrait utile pour décider : 1 analyse gratuite par format (video, texte, image), avec un aperçu court (souvent 1 a 2 signaux). Le complet détaille la timeline ou l'équivalent sur texte et image.",
+    a: "Un extrait utile pour décider : 1 analyse gratuite par format (vidéo, texte, image), avec un aperçu court (souvent 1 à 2 signaux). Le complet détaille la timeline ou l'équivalent sur texte et image.",
   },
   {
     q: "Mes données servent à entraîner des modèles ?",
@@ -959,7 +959,7 @@ export default function TransparencePage() {
                 color: "var(--text-primary)",
               }}
             >
-              Un cadre clair pour mieux decider, sur video, texte et image.
+              Un cadre clair pour mieux décider, sur vidéo, texte et image.
             </h2>
             <p
               style={{

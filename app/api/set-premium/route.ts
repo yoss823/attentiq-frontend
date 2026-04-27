@@ -148,7 +148,7 @@ export async function POST(req: NextRequest) {
               email: customerEmail,
               jobId: resolvedJobId,
               subject: "Votre diagnostic Attentiq (PDF)",
-              body: "Vous trouverez votre diagnostic en piece jointe.",
+              body: "Vous trouverez votre diagnostic en pièce jointe.",
             }),
           });
           if (!pdfResponse.ok) {

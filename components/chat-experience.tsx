@@ -508,7 +508,7 @@ export default function ChatExperience() {
               background: "rgba(0,212,255,0.08)",
             }}
           >
-            Post-diagnostic assistant
+            Assistant post-diagnostic
           </span>
         </nav>
 

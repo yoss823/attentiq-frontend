@@ -697,7 +697,7 @@ export default function ResultReport({
           jobId: reportJobId,
           report,
           subject: "Votre diagnostic Attentiq (PDF)",
-          body: "Vous trouverez votre diagnostic en piece jointe.",
+          body: "Vous trouverez votre diagnostic en pièce jointe.",
         }),
       });
       const payload = (await response.json().catch(() => null)) as

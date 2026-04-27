@@ -158,7 +158,7 @@ function summarizeV2Result(result: Record<string, unknown>): ReportSummary | nul
           severity: normalizeText(item.severity),
           cause:
             normalizeText(item.cause) ??
-            "Cause non detaillee dans la sortie pipeline.",
+            "Cause non détaillée dans la sortie pipeline.",
         }))
         .slice(0, 20)
     : [];
@@ -235,7 +235,7 @@ function summarizeReport(result: Record<string, unknown>) {
           severity: normalizeText(item.severity),
           cause:
             normalizeText(item.cause) ??
-            "Cause non detaillee dans la sortie pipeline.",
+            "Cause non détaillée dans la sortie pipeline.",
         }))
         .slice(0, 20)
     : [];
@@ -550,7 +550,7 @@ async function buildReportPdf(params: {
   drawSectionCard("Impact estime", params.audienceLossEstimate, `Job ${params.jobId}`);
 
   if (params.drops.length === 0) {
-    drawSectionCard("Points de chute", "Aucune chute detaillee.", `Job ${params.jobId}`);
+    drawSectionCard("Points de chute", "Aucune chute détaillée.", `Job ${params.jobId}`);
   } else {
     const dropHeaderTop = drawCard(34, `Job ${params.jobId}`);
     page.drawText("Points de chute", {
