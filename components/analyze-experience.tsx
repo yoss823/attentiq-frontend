@@ -371,8 +371,18 @@ export default function AnalyzeExperience({
               lineHeight: 1.7,
             }}
           >
-            Paiement confirme — le rapport complet est maintenant debloque sur
-            cette analyse.
+            {jobId ? (
+              <>
+                Paiement confirme — le rapport complet est maintenant debloque
+                sur cette analyse.
+              </>
+            ) : (
+              <>
+                Paiement confirme — votre acces premium est actif. Lancez une
+                analyse ci-dessous : le rapport complet sera debloque pour cette
+                session.
+              </>
+            )}
           </div>
         )}
 

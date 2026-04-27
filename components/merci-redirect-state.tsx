@@ -141,18 +141,31 @@ export default function MerciRedirectState({
         const hasReportContext = Boolean(
           setPremiumPayload.jobId || setPremiumPayload.videoUrl
         );
+        const plan = setPremiumPayload.plan;
+        const isSubscription =
+          plan === "5" || plan === "pack15";
+
+        if (hasReportContext) {
+          router.replace(
+            buildResultHref({
+              jobId: setPremiumPayload.jobId,
+              videoUrl: setPremiumPayload.videoUrl,
+            })
+          );
+          return;
+        }
+
+        if (isSubscription) {
+          router.replace("/compte?from=checkout");
+          return;
+        }
 
         router.replace(
-          hasReportContext
-            ? buildResultHref({
-                jobId: setPremiumPayload.jobId,
-                videoUrl: setPremiumPayload.videoUrl,
-              })
-            : buildAnalyzeHref({
-                jobId: setPremiumPayload.jobId,
-                videoUrl: setPremiumPayload.videoUrl,
-                paid: setPremiumPayload.paid,
-              })
+          buildAnalyzeHref({
+            jobId: setPremiumPayload.jobId,
+            videoUrl: setPremiumPayload.videoUrl,
+            paid: setPremiumPayload.paid,
+          })
         );
       } catch (error) {
         console.error("[merci] verify-session failed", error);

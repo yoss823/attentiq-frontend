@@ -17,6 +17,7 @@ type SubscriberAccountPageProps = {
   searchParams: Promise<{
     email?: string | string[] | undefined;
     loginError?: string | string[] | undefined;
+    from?: string | string[] | undefined;
   }>;
 };
 
@@ -79,6 +80,8 @@ export default async function SubscriberAccountPage({
   const loginError = Array.isArray(params.loginError)
     ? params.loginError[0]
     : params.loginError;
+  const fromParam = Array.isArray(params.from) ? params.from[0] : params.from;
+  const fromCheckout = fromParam === "checkout";
   const { account, payments, analyses } = email
     ? await getSubscriberAccountByEmail(email)
     : { account: null, payments: [], analyses: [] };
@@ -98,6 +101,25 @@ export default async function SubscriberAccountPage({
           padding: "28px 16px 72px",
         }}
       >
+        {fromCheckout && (
+          <div
+            style={{
+              marginBottom: "20px",
+              padding: "14px 16px",
+              borderRadius: "18px",
+              border: "1px solid rgba(52, 211, 153, 0.24)",
+              background: "rgba(52, 211, 153, 0.08)",
+              color: "#86efac",
+              fontSize: "14px",
+              lineHeight: 1.7,
+            }}
+          >
+            Abonnement confirme. Utilisez la meme adresse e-mail que sur Stripe
+            pour ouvrir votre espace abonne, puis lancez une analyse : chaque
+            rapport complet sera debloque selon votre quota.
+          </div>
+        )}
+
         <Link
           href="/"
           style={{
