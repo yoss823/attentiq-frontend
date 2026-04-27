@@ -129,7 +129,7 @@ export default function AccountLoginForm({
         {isSubmitting
           ? "Envoi…"
           : isSameSessionEmail
-            ? "Ouvrir l&apos;espace client"
+            ? "Ouvrir l'espace client"
             : "Recevoir un lien"}
       </button>
 

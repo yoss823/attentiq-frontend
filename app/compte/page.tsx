@@ -2,6 +2,7 @@ import type { Metadata } from "next";
 import { cookies } from "next/headers";
 import Link from "next/link";
 import AccountLoginForm from "@/components/account-login-form";
+import { buildResultHref } from "@/lib/checkout-context";
 import { getOfferBySlug } from "@/lib/offer-config";
 import { getSubscriberAccountByEmail } from "@/lib/subscriber-store";
 import { ACCOUNT_SESSION_COOKIE_NAME, normalizeAccountEmail } from "@/lib/account-session";
@@ -50,6 +51,19 @@ function formatAnalysisType(type: "video" | "text" | "image" | "unknown") {
   if (type === "text") return "Texte";
   if (type === "image") return "Image";
   return "Autre";
+}
+
+function httpSourceUrlForResult(sourceLabel: string | null) {
+  const raw = sourceLabel?.trim();
+  if (!raw) return null;
+  try {
+    const parsed = new URL(raw);
+    return parsed.protocol === "http:" || parsed.protocol === "https:"
+      ? raw
+      : null;
+  } catch {
+    return null;
+  }
 }
 
 export default async function SubscriberAccountPage({
@@ -405,6 +419,78 @@ export default async function SubscriberAccountPage({
               <section
                 style={{
                   borderRadius: "24px",
+                  border: "1px solid rgba(0, 212, 255, 0.22)",
+                  background:
+                    "linear-gradient(135deg, rgba(0, 212, 255, 0.08) 0%, rgba(8, 12, 18, 0.96) 100%)",
+                  padding: "20px",
+                  display: "grid",
+                  gap: "12px",
+                }}
+              >
+                <p
+                  style={{
+                    margin: 0,
+                    fontSize: "11px",
+                    textTransform: "uppercase",
+                    letterSpacing: "0.18em",
+                    fontWeight: 800,
+                    color: "var(--accent)",
+                  }}
+                >
+                  Assistant post-diagnostic
+                </p>
+                <p
+                  style={{
+                    margin: 0,
+                    fontSize: "14px",
+                    lineHeight: 1.75,
+                    color: "rgba(237, 242, 247, 0.85)",
+                  }}
+                >
+                  Posez des questions sur votre rapport. Le contexte du diagnostic est
+                  pris en charge automatiquement lorsque vous ouvrez l&apos;assistant
+                  depuis la page d&apos;un rapport ; depuis le compte, vous pouvez
+                  tout de meme ouvrir l&apos;assistant (exemple si aucun rapport en
+                  session).
+                </p>
+                <div style={{ display: "flex", flexWrap: "wrap", gap: "12px" }}>
+                  <Link
+                    href="/chat"
+                    style={{
+                      display: "inline-flex",
+                      alignItems: "center",
+                      justifyContent: "center",
+                      borderRadius: "999px",
+                      padding: "12px 20px",
+                      textDecoration: "none",
+                      fontSize: "14px",
+                      fontWeight: 800,
+                      background: "linear-gradient(135deg, var(--accent), #79e7ff)",
+                      color: "#041017",
+                    }}
+                  >
+                    Ouvrir l&apos;assistant
+                  </Link>
+                  <Link
+                    href="/guide?format=video"
+                    style={{
+                      display: "inline-flex",
+                      alignItems: "center",
+                      justifyContent: "center",
+                      color: "var(--text-secondary)",
+                      textDecoration: "none",
+                      fontSize: "13px",
+                      fontWeight: 700,
+                    }}
+                  >
+                    Guide du rapport
+                  </Link>
+                </div>
+              </section>
+
+              <section
+                style={{
+                  borderRadius: "24px",
                   border: "1px solid var(--border)",
                   background: "rgba(255,255,255,0.03)",
                   padding: "20px",
@@ -546,6 +632,29 @@ export default async function SubscriberAccountPage({
                             Source: {analysis.sourceLabel}
                           </p>
                         )}
+                        <div style={{ marginTop: "10px" }}>
+                          <Link
+                            href={buildResultHref({
+                              jobId: analysis.jobId,
+                              videoUrl: httpSourceUrlForResult(analysis.sourceLabel),
+                            })}
+                            style={{
+                              display: "inline-flex",
+                              alignItems: "center",
+                              justifyContent: "center",
+                              borderRadius: "999px",
+                              padding: "10px 16px",
+                              textDecoration: "none",
+                              fontSize: "13px",
+                              fontWeight: 800,
+                              background: "rgba(0, 212, 255, 0.16)",
+                              color: "#a5f3fc",
+                              border: "1px solid rgba(34, 211, 238, 0.35)",
+                            }}
+                          >
+                            Voir le rapport complet
+                          </Link>
+                        </div>
                       </div>
                     ))}
                   </div>
