@@ -296,131 +296,335 @@ async function buildReportPdf(params: {
   let page = pdfDoc.addPage(pageSize); // A4
   const font = await pdfDoc.embedFont(StandardFonts.Helvetica);
   const bold = await pdfDoc.embedFont(StandardFonts.HelveticaBold);
-  const margin = 48;
-  let y = 790;
+  const margin = 34;
+  const contentWidth = pageSize[0] - margin * 2;
+  let y = 0;
+  let pageIndex = 1;
 
-  const drawHeaderBand = (title: string, subtitle: string) => {
+  const colors = {
+    bg: rgb(0.02, 0.08, 0.13),
+    bgSoft: rgb(0.05, 0.11, 0.17),
+    card: rgb(0.96, 0.98, 1),
+    cardBorder: rgb(0.84, 0.9, 0.96),
+    title: rgb(0.03, 0.16, 0.23),
+    text: rgb(0.12, 0.16, 0.2),
+    muted: rgb(0.33, 0.4, 0.46),
+    accent: rgb(0.0, 0.66, 0.8),
+    accentSoft: rgb(0.88, 0.96, 1),
+  };
+
+  const startPage = (subtitle: string) => {
     page.drawRectangle({
       x: 0,
-      y: 768,
+      y: 0,
       width: pageSize[0],
-      height: 74,
-      color: rgb(0.03, 0.18, 0.22),
+      height: pageSize[1],
+      color: rgb(0.99, 1, 1),
     });
-    page.drawText(title, {
+    page.drawRectangle({
+      x: 0,
+      y: pageSize[1] - 112,
+      width: pageSize[0],
+      height: 112,
+      color: colors.bg,
+    });
+    page.drawRectangle({
+      x: 0,
+      y: pageSize[1] - 118,
+      width: pageSize[0],
+      height: 6,
+      color: colors.accent,
+    });
+    page.drawText("ATTENTIQ - Rapport complet", {
       x: margin,
-      y: 812,
-      size: 18,
+      y: pageSize[1] - 48,
+      size: 20,
       font: bold,
-      color: rgb(0.62, 0.95, 1),
+      color: rgb(0.7, 0.95, 1),
     });
     page.drawText(subtitle, {
       x: margin,
-      y: 792,
+      y: pageSize[1] - 70,
+      size: 11,
+      font,
+      color: rgb(0.84, 0.92, 0.96),
+    });
+    page.drawText(`Page ${pageIndex}`, {
+      x: pageSize[0] - margin - 44,
+      y: pageSize[1] - 70,
       size: 10,
       font,
-      color: rgb(0.83, 0.91, 0.95),
+      color: rgb(0.72, 0.84, 0.9),
     });
-    y = 748;
+    y = pageSize[1] - 134;
   };
 
-  const ensureSpace = (requiredHeight: number) => {
+  const addNewPage = (subtitle: string) => {
+    page = pdfDoc.addPage(pageSize);
+    pageIndex += 1;
+    startPage(subtitle);
+  };
+
+  const ensureSpace = (requiredHeight: number, subtitle: string) => {
     if (y - requiredHeight >= margin) {
       return;
     }
-    page = pdfDoc.addPage(pageSize);
-    drawHeaderBand("ATTENTIQ - Rapport complet", `Job ${params.jobId}`);
+    addNewPage(subtitle);
   };
 
-  const draw = (text: string, size = 11, isBold = false, color = rgb(0.1, 0.12, 0.16)) => {
-    ensureSpace(size + 8);
-    page.drawText(text, {
+  const drawCard = (height: number, subtitle: string, tone: "default" | "accent" = "default") => {
+    ensureSpace(height, subtitle);
+    page.drawRectangle({
       x: margin,
-      y,
-      size,
-      font: isBold ? bold : font,
-      color,
+      y: y - height,
+      width: contentWidth,
+      height,
+      color: tone === "accent" ? colors.accentSoft : colors.card,
+      borderColor: tone === "accent" ? rgb(0.67, 0.86, 0.95) : colors.cardBorder,
+      borderWidth: 1,
     });
-    y -= size + 6;
+    const topY = y - 18;
+    y -= height + 10;
+    return topY;
   };
 
-  const drawWrapped = (text: string, size = 10, isBold = false) => {
-    for (const line of splitTextLines(text, 95)) {
-      draw(line, size, isBold);
+  const drawSectionCard = (sectionTitle: string, content: string, subtitle: string) => {
+    const lines = splitTextLines(content, 94);
+    const cardHeight = 40 + lines.length * 14;
+    const topY = drawCard(cardHeight, subtitle);
+    page.drawText(sectionTitle, {
+      x: margin + 14,
+      y: topY,
+      size: 11,
+      font: bold,
+      color: colors.title,
+    });
+    let lineY = topY - 18;
+    for (const line of lines) {
+      page.drawText(line, {
+        x: margin + 14,
+        y: lineY,
+        size: 10,
+        font,
+        color: colors.text,
+      });
+      lineY -= 14;
     }
   };
 
-  const drawSectionTitle = (text: string) => {
-    ensureSpace(28);
-    page.drawRectangle({
-      x: margin - 8,
-      y: y - 6,
-      width: pageSize[0] - margin * 2 + 16,
-      height: 22,
-      color: rgb(0.93, 0.97, 0.99),
-    });
-    draw(text, 12, true, rgb(0.05, 0.18, 0.24));
+  const severityTone = (severity: string | null) => {
+    const key = (severity ?? "").toLowerCase();
+    if (key === "critical" || key === "high") return rgb(0.75, 0.08, 0.08);
+    if (key === "medium") return rgb(0.76, 0.35, 0.04);
+    return rgb(0.46, 0.44, 0.12);
   };
 
-  drawHeaderBand("ATTENTIQ - Rapport complet", "Diagnostic PDF premium");
-  draw(`Job ID: ${params.jobId}`, 10);
-  draw(`Genere le: ${new Date().toLocaleString("fr-FR")}`, 10);
-  y -= 8;
-  draw(params.title, 14, true);
+  startPage("Diagnostic PDF premium");
+
+  const titleLines = splitTextLines(params.title, 50);
+  const sourceLines = params.sourceUrl ? splitTextLines(params.sourceUrl, 74) : [];
+  const heroHeight =
+    76 +
+    titleLines.length * 14 +
+    (params.author ? 14 : 0) +
+    (params.durationSeconds != null ? 14 : 0) +
+    sourceLines.length * 12;
+  const heroTop = drawCard(heroHeight, `Job ${params.jobId}`, "accent");
+
+  page.drawText(`Job ID: ${params.jobId}`, {
+    x: margin + 14,
+    y: heroTop,
+    size: 10,
+    font,
+    color: colors.muted,
+  });
+  page.drawText(`Genere le: ${new Date().toLocaleString("fr-FR")}`, {
+    x: margin + 14,
+    y: heroTop - 13,
+    size: 10,
+    font,
+    color: colors.muted,
+  });
+
+  let heroTextY = heroTop - 34;
+  for (const line of titleLines) {
+    page.drawText(line, {
+      x: margin + 14,
+      y: heroTextY,
+      size: 14,
+      font: bold,
+      color: colors.title,
+    });
+    heroTextY -= 15;
+  }
   if (params.author) {
-    draw(`Auteur: ${params.author}`, 10);
+    page.drawText(`Auteur: ${params.author}`, {
+      x: margin + 14,
+      y: heroTextY - 2,
+      size: 10,
+      font,
+      color: colors.text,
+    });
+    heroTextY -= 14;
   }
-  if (typeof params.durationSeconds === "number") {
-    draw(`Duree: ${Math.max(0, Math.round(params.durationSeconds))}s`, 10);
+  if (params.durationSeconds != null) {
+    page.drawText(`Duree: ${Math.max(0, Math.round(params.durationSeconds))}s`, {
+      x: margin + 14,
+      y: heroTextY - 2,
+      size: 10,
+      font,
+      color: colors.text,
+    });
+    heroTextY -= 14;
   }
-  if (params.sourceUrl) {
-    drawWrapped(`Source: ${params.sourceUrl}`, 9);
+  if (sourceLines.length > 0) {
+    page.drawText("Source:", {
+      x: margin + 14,
+      y: heroTextY - 2,
+      size: 10,
+      font: bold,
+      color: colors.text,
+    });
+    let sy = heroTextY - 14;
+    for (const line of sourceLines) {
+      page.drawText(line, {
+        x: margin + 14,
+        y: sy,
+        size: 9,
+        font,
+        color: colors.muted,
+      });
+      sy -= 12;
+    }
   }
-  if (params.score) {
-    draw(`Retention score: ${params.score}/10`, 11, true);
-  }
 
-  y -= 8;
-  drawSectionTitle("Resume global");
-  drawWrapped(params.summary, 10);
+  const scoreCardTop = heroTop - 8;
+  const scoreCardX = margin + contentWidth - 130;
+  page.drawRectangle({
+    x: scoreCardX,
+    y: scoreCardTop - 82,
+    width: 116,
+    height: 74,
+    color: colors.bgSoft,
+    borderColor: rgb(0.2, 0.39, 0.5),
+    borderWidth: 1,
+  });
+  page.drawText("SCORE", {
+    x: scoreCardX + 10,
+    y: scoreCardTop - 20,
+    size: 9,
+    font: bold,
+    color: rgb(0.72, 0.86, 0.93),
+  });
+  page.drawText(params.score ? `${params.score}/10` : "N/A", {
+    x: scoreCardX + 10,
+    y: scoreCardTop - 53,
+    size: 26,
+    font: bold,
+    color: rgb(0.8, 0.95, 1),
+  });
 
-  y -= 8;
-  drawSectionTitle("Regle de decrochage");
-  drawWrapped(params.dropRule, 10);
+  drawSectionCard("Resume global", params.summary, `Job ${params.jobId}`);
+  drawSectionCard("Regle de decrochage", params.dropRule, `Job ${params.jobId}`);
+  drawSectionCard("Perception spectateur", params.creatorPerception, `Job ${params.jobId}`);
+  drawSectionCard("Impact estime", params.audienceLossEstimate, `Job ${params.jobId}`);
 
-  y -= 8;
-  drawSectionTitle("Perception spectateur");
-  drawWrapped(params.creatorPerception, 10);
-
-  y -= 8;
-  drawSectionTitle("Impact estime");
-  drawWrapped(params.audienceLossEstimate, 10);
-
-  y -= 8;
-  drawSectionTitle("Points de chute");
   if (params.drops.length === 0) {
-    draw("- Aucune chute detaillee", 10);
+    drawSectionCard("Points de chute", "Aucune chute detaillee.", `Job ${params.jobId}`);
   } else {
-    params.drops.forEach((drop, idx) => {
+    const dropHeaderTop = drawCard(34, `Job ${params.jobId}`);
+    page.drawText("Points de chute", {
+      x: margin + 14,
+      y: dropHeaderTop - 2,
+      size: 12,
+      font: bold,
+      color: colors.title,
+    });
+
+    for (let i = 0; i < params.drops.length; i += 1) {
+      const drop = params.drops[i];
+      const causeLines = splitTextLines(drop.cause, 82);
+      const rowHeight = 48 + causeLines.length * 13;
+      const rowTop = drawCard(rowHeight, `Job ${params.jobId}`);
       const timeLabel =
         typeof drop.timestampSeconds === "number"
           ? `${Math.max(0, Math.round(drop.timestampSeconds))}s`
           : "?s";
-      const severityLabel = drop.severity ? drop.severity.toUpperCase() : "INCONNUE";
-      draw(`${idx + 1}. ${timeLabel} · ${severityLabel}`, 10, true);
-      drawWrapped(`Cause: ${drop.cause}`, 10);
-      y -= 2;
-    });
+      const severityLabel = (drop.severity ?? "inconnue").toUpperCase();
+      const sevColor = severityTone(drop.severity);
+
+      page.drawRectangle({
+        x: margin + 14,
+        y: rowTop - 38,
+        width: 56,
+        height: 28,
+        color: colors.bgSoft,
+      });
+      page.drawText(timeLabel, {
+        x: margin + 26,
+        y: rowTop - 28,
+        size: 11,
+        font: bold,
+        color: rgb(0.77, 0.92, 0.98),
+      });
+
+      page.drawRectangle({
+        x: margin + 78,
+        y: rowTop - 24,
+        width: 88,
+        height: 16,
+        color: rgb(1, 1, 1),
+        borderColor: sevColor,
+        borderWidth: 1,
+      });
+      page.drawText(severityLabel, {
+        x: margin + 84,
+        y: rowTop - 19,
+        size: 8,
+        font: bold,
+        color: sevColor,
+      });
+
+      let cy = rowTop - 44;
+      for (const line of causeLines) {
+        page.drawText(line, {
+          x: margin + 78,
+          y: cy,
+          size: 10,
+          font,
+          color: colors.text,
+        });
+        cy -= 13;
+      }
+    }
   }
 
-  y -= 8;
-  drawSectionTitle("Actions prioritaires");
   if (params.actions.length === 0) {
-    draw("- Aucune action disponible", 10);
+    drawSectionCard("Actions prioritaires", "Aucune action disponible.", `Job ${params.jobId}`);
   } else {
-    params.actions.forEach((action, idx) => {
-      drawWrapped(`${idx + 1}. ${action}`, 10);
+    const actionLines = params.actions.flatMap((action, idx) =>
+      splitTextLines(`${idx + 1}. ${action}`, 90)
+    );
+    const actionHeight = 42 + actionLines.length * 14;
+    const actionTop = drawCard(actionHeight, `Job ${params.jobId}`);
+    page.drawText("Actions prioritaires", {
+      x: margin + 14,
+      y: actionTop,
+      size: 11,
+      font: bold,
+      color: colors.title,
     });
+    let ay = actionTop - 18;
+    for (const line of actionLines) {
+      page.drawText(line, {
+        x: margin + 14,
+        y: ay,
+        size: 10,
+        font,
+        color: colors.text,
+      });
+      ay -= 14;
+    }
   }
 
   return Buffer.from(await pdfDoc.save());
