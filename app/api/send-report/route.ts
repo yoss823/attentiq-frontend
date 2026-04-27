@@ -40,7 +40,130 @@ type ReportSummary = {
   actions: string[];
 };
 
+function toFiniteNumber(value: unknown) {
+  return typeof value === "number" && Number.isFinite(value) ? value : null;
+}
+
+function normalizeV2Score(value: unknown) {
+  const raw = toFiniteNumber(value);
+  if (raw == null) return null;
+  const on10 = raw <= 1 ? raw * 10 : raw;
+  return Math.max(0, Math.min(10, on10)).toFixed(1);
+}
+
+function humanizeV2Label(label: string | null) {
+  if (!label) return null;
+  return label
+    .replace(/_/g, " ")
+    .replace(/\s+/g, " ")
+    .trim();
+}
+
+function summarizeV2Result(result: Record<string, unknown>): ReportSummary | null {
+  const diagnostic =
+    result.diagnostic && typeof result.diagnostic === "object"
+      ? (result.diagnostic as Record<string, unknown>)
+      : null;
+  if (!diagnostic) {
+    return null;
+  }
+
+  const hasV2DiagnosticShape =
+    typeof diagnostic.explanation === "string" ||
+    typeof diagnostic.label === "string" ||
+    typeof diagnostic.score === "number";
+  if (!hasV2DiagnosticShape) {
+    return null;
+  }
+
+  const inputFormat = normalizeText(result.inputFormat);
+  const defaultTitle =
+    inputFormat === "text"
+      ? "Diagnostic d'attention (texte)"
+      : inputFormat === "image"
+        ? "Diagnostic d'attention (image)"
+        : "Diagnostic d'attention (video)";
+  const score = normalizeV2Score(diagnostic.score);
+  const summary =
+    normalizeText(diagnostic.explanation) ?? "Aucun resume fourni.";
+  const dropRule =
+    humanizeV2Label(normalizeText(diagnostic.label)) ??
+    "Aucune regle formelle.";
+
+  const dashboard = Array.isArray(result.dashboard)
+    ? result.dashboard.filter(
+        (item): item is Record<string, unknown> =>
+          Boolean(item && typeof item === "object")
+      )
+    : [];
+  const creatorPerception =
+    dashboard.length > 0
+      ? `Signaux releves: ${dashboard
+          .slice(0, 4)
+          .map((metric) => {
+            const label = normalizeText(metric.label) ?? "indicateur";
+            const value =
+              typeof metric.value === "number" || typeof metric.value === "string"
+                ? String(metric.value)
+                : "n/a";
+            return `${label} (${value})`;
+          })
+          .join(" · ")}`
+      : "Perception non disponible.";
+
+  const audienceLossEstimate =
+    score != null
+      ? `Score ${score}/10 : ce score mesure la tenue d'attention percue, pas une prediction de vues.`
+      : "Estimation d'impact non disponible.";
+
+  const actions = Array.isArray(result.actions)
+    ? result.actions
+        .filter(
+          (item): item is Record<string, unknown> =>
+            Boolean(item && typeof item === "object")
+        )
+        .map((item) => normalizeText(item.label))
+        .filter((label): label is string => Boolean(label))
+        .slice(0, 12)
+    : [];
+
+  const drops = Array.isArray(result.attentionDrops)
+    ? result.attentionDrops
+        .filter(
+          (item): item is Record<string, unknown> =>
+            Boolean(item && typeof item === "object")
+        )
+        .map((item) => ({
+          timestampSeconds: toFiniteNumber(item.timestampSeconds),
+          severity: normalizeText(item.severity),
+          cause:
+            normalizeText(item.cause) ??
+            "Cause non detaillee dans la sortie pipeline.",
+        }))
+        .slice(0, 20)
+    : [];
+
+  return {
+    title: normalizeText(result.id) ? `${defaultTitle} (${result.id})` : defaultTitle,
+    sourceUrl: normalizeText(result.sourceUrl),
+    author: "@attentiq",
+    durationSeconds: toFiniteNumber(result.durationSeconds),
+    score,
+    summary,
+    dropRule,
+    creatorPerception,
+    audienceLossEstimate,
+    drops,
+    actions,
+  };
+}
+
 function summarizeReport(result: Record<string, unknown>) {
+  const v2Summary = summarizeV2Result(result);
+  if (v2Summary) {
+    return v2Summary;
+  }
+
   const data =
     result.data && typeof result.data === "object"
       ? (result.data as Record<string, unknown>)

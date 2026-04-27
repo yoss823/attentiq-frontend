@@ -102,7 +102,8 @@ export async function POST(req: NextRequest) {
             host.includes("127.0.0.1") ||
             host.includes("0.0.0.0"))
       );
-      const proto = forwardedProto ?? (isLocalHost ? "http" : "https");
+      // Force HTTP on localhost to avoid SSL browser errors from emailed links.
+      const proto = isLocalHost ? "http" : forwardedProto ?? "https";
       const appBaseUrl = host ? `${proto}://${host}` : null;
       const accountLoginUrl = appBaseUrl
         ? `${appBaseUrl}/api/account/login?email=${encodeURIComponent(
