@@ -486,7 +486,7 @@ export default function VideosPage() {
                       whiteSpace: "nowrap",
                     }}
                   >
-                    Recommande
+                    Recommandé
                   </div>
                 )}
 

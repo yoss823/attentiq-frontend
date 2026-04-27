@@ -354,7 +354,7 @@ export default function AnalyzeExperience({
               textDecoration: "none",
             }}
           >
-            Comment ca marche
+            Comment ça marche
           </Link>
         </nav>
 
@@ -373,13 +373,13 @@ export default function AnalyzeExperience({
           >
             {jobId ? (
               <>
-                Paiement confirme — le rapport complet est maintenant debloque
+                Paiement confirmé — le rapport complet est maintenant débloqué
                 sur cette analyse.
               </>
             ) : (
               <>
-                Paiement confirme — votre acces premium est actif. Lancez une
-                analyse ci-dessous : le rapport complet sera debloque pour cette
+                Paiement confirmé — votre accès premium est actif. Lancez une
+                analyse ci-dessous : le rapport complet sera débloqué pour cette
                 session.
               </>
             )}
@@ -439,7 +439,7 @@ export default function AnalyzeExperience({
               color: "var(--text-primary)",
             }}
           >
-            Analyse video courte, rapide.
+            Analyse vidéo courte, rapide.
           </h1>
           <p
             style={{
@@ -569,7 +569,7 @@ export default function AnalyzeExperience({
                   color: "var(--text-muted)",
                 }}
               >
-                Video source max 60 s (Short, Reel, extrait).
+                Vidéo source max 60 s (Short, Reel, extrait).
               </p>
               <div
                 style={{
@@ -583,15 +583,15 @@ export default function AnalyzeExperience({
                   lineHeight: 1.6,
                 }}
               >
-                URL supportees: TikTok, YouTube Shorts, Instagram Reel, Snapchat
+                URL supportées : TikTok, YouTube Shorts, Instagram Reel, Snapchat
                 Spotlight.
                 <br />
-                Exemple TikTok recommande:{" "}
+                Exemple TikTok recommandé :{" "}
                 <code style={{ color: "#67e8f9" }}>
                   https://www.tiktok.com/@coach.wingue/video/7518098447518403862
                 </code>
                 <br />
-                Evitez les paramètres longs de tracking{" "}
+                Évitez les paramètres longs de tracking{" "}
                 <code style={{ color: "#67e8f9" }}>
                   ?is_from_webapp=...
                 </code>
@@ -644,7 +644,7 @@ export default function AnalyzeExperience({
                   >
                     {selectedFile
                       ? selectedFile.name
-                      : "Choisir un fichier video…"}
+                      : "Choisir un fichier vidéo…"}
                   </button>
 
                   <button
@@ -686,7 +686,7 @@ export default function AnalyzeExperience({
                     lineHeight: 1.5,
                   }}
                 >
-                  Formats acceptes : MP4, MOV, WebM · Max 500 Mo · Max 60 s
+                  Formats acceptés : MP4, MOV, WebM · Max 500 Mo · Max 60 s
                 </p>
               </div>
             </form>
@@ -741,7 +741,7 @@ export default function AnalyzeExperience({
                     textDecoration: "underline",
                   }}
                 >
-                  Debloquer une offre →
+                  Débloquer une offre →
                 </Link>
               )}
             </div>
@@ -755,7 +755,7 @@ export default function AnalyzeExperience({
               color: "var(--text-muted)",
             }}
           >
-            Vos donnees ne sont pas stockees.{" "}
+            Vos données ne sont pas stockées.{" "}
             <Link
               href="/transparence"
               style={{ color: "var(--text-secondary)", textDecoration: "none" }}

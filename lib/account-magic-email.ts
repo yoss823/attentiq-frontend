@@ -32,7 +32,7 @@ export async function sendAccountMagicLoginEmail(params: {
   const subject = "Votre lien de connexion Attentiq";
   const html = `
     <p>Bonjour,</p>
-    <p>Voici votre lien securise pour ouvrir votre espace client Attentiq (valable quelques minutes) :</p>
+    <p>Voici votre lien sécurisé pour ouvrir votre espace client Attentiq (valable quelques minutes) :</p>
     <p><a href="${escapeHtml(params.magicUrl)}">Ouvrir mon espace client</a></p>
     <p style="color:#666;font-size:13px;">Si vous n&apos;avez pas demande ce lien, ignorez simplement cet email.</p>
     <p>— L&apos;equipe Attentiq</p>

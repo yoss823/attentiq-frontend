@@ -155,7 +155,7 @@ export default function AccountLoginForm({
           disabled={isSameSessionEmail}
           onChange={(e) => setRememberLongSession(e.target.checked)}
         />
-        Rester connecte plus longtemps sur cet appareil (90 jours)
+        Rester connecté plus longtemps sur cet appareil (90 jours)
       </label>
 
       {isSameSessionEmail && (
@@ -168,8 +168,8 @@ export default function AccountLoginForm({
             color: "var(--text-secondary)",
           }}
         >
-          Vous etes deja connecte avec cet email. Le tableau ci-dessous est
-          votre espace client : faites defiler la page pour voir quota et
+          Vous êtes déjà connecté avec cet e-mail. Le tableau ci-dessous est
+          votre espace client : faites défiler la page pour voir quota et
           historique.
         </p>
       )}
@@ -187,7 +187,7 @@ export default function AccountLoginForm({
             lineHeight: 1.65,
           }}
         >
-          Si cet email correspond a un compte Attentiq, vous allez recevoir un lien
+          Si cet e-mail correspond à un compte Attentiq, vous allez recevoir un lien
           de connexion (valable quelques minutes). Ouvrez-le sur cet appareil pour
           activer la session.
         </div>

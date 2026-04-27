@@ -120,7 +120,7 @@ function buildGroqModelInput(
   const maxTranscriptSegments = 40;
   const reportText =
     diagnostic.reportText.length > maxReportChars
-      ? `${diagnostic.reportText.slice(0, maxReportChars)}\n[... rapport tronque pour limite de contexte ...]`
+      ? `${diagnostic.reportText.slice(0, maxReportChars)}\n[... rapport tronqué (limite de contexte) ...]`
       : diagnostic.reportText;
   const transcript = (diagnostic.transcript ?? []).slice(0, maxTranscriptSegments);
   const slim = {

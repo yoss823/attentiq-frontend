@@ -403,8 +403,8 @@ export default function ResultPageShell({
 
   return (
     <ResultState
-      title="Aucun rapport trouve"
-      message="Lancez une analyse depuis la page video avec une URL publique (TikTok, Shorts, Reel ou Spotlight)."
+      title="Aucun rapport trouvé"
+      message="Lancez une analyse depuis la page vidéo avec une URL publique (TikTok, Shorts, Reel ou Spotlight)."
     />
   );
 }

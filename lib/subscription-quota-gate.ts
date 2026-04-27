@@ -36,7 +36,7 @@ export async function enforceSubscriptionQuotaGate(
       shouldBlock: true,
       reason: "missing_subscriber_email",
       userMessage:
-        "Cet abonnement n'est pas encore rattache a un email client. Revalidez le paiement depuis la page Merci.",
+        "Cet abonnement n'est pas encore rattaché à un e-mail client. Revalidez le paiement depuis la page Merci.",
     };
   }
 
@@ -50,7 +50,7 @@ export async function enforceSubscriptionQuotaGate(
     return {
       shouldBlock: true,
       reason: "quota_exhausted",
-      userMessage: `Quota mensuel atteint (${quota} analyses). Votre compteur se reinitialise au prochain mois.`,
+      userMessage: `Quota mensuel atteint (${quota} analyses). Votre compteur se réinitialise au prochain mois.`,
     };
   }
 
@@ -58,6 +58,6 @@ export async function enforceSubscriptionQuotaGate(
     shouldBlock: true,
     reason: "subscriber_account_unavailable",
     userMessage:
-      "Impossible de verifier votre quota abonne pour le moment. Reessayez dans quelques instants.",
+      "Impossible de vérifier votre quota abonné pour le moment. Réessayez dans quelques instants.",
   };
 }

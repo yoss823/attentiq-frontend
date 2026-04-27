@@ -447,7 +447,7 @@ export default function HomePage() {
                       whiteSpace: "nowrap",
                     }}
                   >
-                    Recommande
+                    Recommandé
                   </div>
                 )}
 

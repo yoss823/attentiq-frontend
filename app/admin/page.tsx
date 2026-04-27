@@ -78,7 +78,7 @@ export default async function AdminPage({ searchParams }: AdminPageProps) {
             color: "var(--text-primary)",
           }}
         >
-          Vue rapide abonnes + analyses
+          Vue rapide abonnés + analyses
         </h1>
         <p
           style={{
@@ -89,9 +89,9 @@ export default async function AdminPage({ searchParams }: AdminPageProps) {
             color: "rgba(237, 242, 247, 0.78)",
           }}
         >
-          Ceci lit uniquement ce qui est deja en base Postgres (comptes abonnes,
-          paiements enregistres, analyses rattachees). Ce n&apos;est pas une
-          analytics marketing complete du site.
+          Ceci lit uniquement ce qui est déjà en base Postgres (comptes abonnés,
+          paiements enregistrés, analyses rattachées). Ce n&apos;est pas une
+          analytics marketing complète du site.
         </p>
 
         <div
@@ -103,10 +103,10 @@ export default async function AdminPage({ searchParams }: AdminPageProps) {
           }}
         >
           {[
-            { label: "Comptes abonnes", value: String(snapshot.totals.subscriberAccounts) },
+            { label: "Comptes abonnés", value: String(snapshot.totals.subscriberAccounts) },
             { label: "Comptes actifs", value: String(snapshot.totals.activeSubscriberAccounts) },
-            { label: "Paiements enregistres", value: String(snapshot.totals.paymentEvents) },
-            { label: "Analyses enregistrees", value: String(snapshot.totals.analysisEvents) },
+            { label: "Paiements enregistrés", value: String(snapshot.totals.paymentEvents) },
+            { label: "Analyses enregistrées", value: String(snapshot.totals.analysisEvents) },
             {
               label: "Emails distincts (analyses)",
               value: String(snapshot.totals.distinctAnalysisEmails),
@@ -168,7 +168,7 @@ export default async function AdminPage({ searchParams }: AdminPageProps) {
                 color: "var(--accent)",
               }}
             >
-              Abonnes recents
+              Abonnés récents
             </p>
             <div style={{ marginTop: "12px", display: "grid", gap: "10px" }}>
               {snapshot.recentSubscribers.length === 0 ? (

@@ -102,16 +102,16 @@ export default function CheckoutSuccessState({
     : "/compte";
 
   const title = isSubscription
-    ? "Paiement confirme - acces abonne active"
+    ? "Paiement confirmé — accès abonné actif"
     : hasUnlockedReport
-      ? "Paiement confirme - rapport complet debloque"
-      : "Paiement confirme";
+      ? "Paiement confirmé — rapport complet débloqué"
+      : "Paiement confirmé";
 
   const description = isSubscription
-    ? "Votre acces premium est actif. Vous pouvez ouvrir l'espace abonne avec votre email Stripe."
+    ? "Votre accès premium est actif. Vous pouvez ouvrir l'espace abonné avec votre e-mail Stripe."
     : hasUnlockedReport
-      ? "Le rapport en cours est debloque. Vous pouvez revenir tout de suite au detail complet."
-      : "Paiement enregistre. Revenez au rapport depuis cet onglet pour activer le deblocage.";
+      ? "Le rapport en cours est débloqué. Vous pouvez revenir tout de suite au détail complet."
+      : "Paiement enregistré. Revenez au rapport depuis cet onglet pour activer le déblocage.";
 
   return (
     <main

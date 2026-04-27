@@ -112,7 +112,7 @@ function scoreAppearance(score: number | null | undefined) {
   if (score >= 5) {
     return {
       color: "#fb923c",
-      label: "Base a renforcer",
+      label: "Base à renforcer",
       border: "rgba(251, 146, 60, 0.24)",
       glow: "rgba(251, 146, 60, 0.1)",
     };
@@ -120,7 +120,7 @@ function scoreAppearance(score: number | null | undefined) {
 
   return {
     color: "#f87171",
-    label: "Priorite a corriger",
+    label: "Priorité à corriger",
     border: "rgba(248, 113, 113, 0.24)",
     glow: "rgba(248, 113, 113, 0.1)",
   };
@@ -128,7 +128,7 @@ function scoreAppearance(score: number | null | undefined) {
 
 function formatDuration(seconds: number | undefined) {
   if (seconds == null || Number.isNaN(seconds)) {
-    return "Duree inconnue";
+    return "Durée inconnue";
   }
 
   const rounded = Math.max(0, Math.round(seconds));
@@ -220,9 +220,9 @@ function clampTextForTeaser(text: string, maxLength: number) {
 }
 
 function buildTeaserDropHeadline(index: number) {
-  if (index === 0) return "Debut de la video";
-  if (index === 1) return "Milieu de la video";
-  return "Fin de la video";
+  if (index === 0) return "Début de la vidéo";
+  if (index === 1) return "Milieu de la vidéo";
+  return "Fin de la vidéo";
 }
 
 function deriveCategories(
@@ -277,16 +277,16 @@ function buildStructuralCards(
 
   return [
     {
-      eyebrow: "Resume structurel",
+      eyebrow: "Résumé structurel",
       body:
         diagnostic?.global_summary ??
         "Le rapport n'a pas remonté de résumé structurel détaillé.",
     },
     {
-      eyebrow: "Mecanique de chute",
+      eyebrow: "Mécanique de chute",
       body:
         diagnostic?.drop_off_rule ??
-        "Aucune regle de chute n'a ete formalisée dans ce diagnostic.",
+        "Aucune règle de chute n'a été formalisée dans ce diagnostic.",
     },
     {
       eyebrow: "Perception spectateur",
@@ -295,7 +295,7 @@ function buildStructuralCards(
         "La perception du créateur n'est pas détaillée dans cette réponse.",
     },
     {
-      eyebrow: "Impact estime",
+      eyebrow: "Impact estimé",
       body:
         diagnostic?.audience_loss_estimate ??
         "Aucune estimation d'impact audience n'est disponible.",
@@ -712,7 +712,7 @@ export default function ResultReport({
         );
         return;
       }
-      setSendPdfFeedback(`PDF envoye a ${email}.`);
+      setSendPdfFeedback(`PDF envoyé à ${email}.`);
     } catch {
       setSendPdfFeedback("Impossible d'envoyer le PDF pour le moment.");
     } finally {
@@ -780,7 +780,7 @@ export default function ResultReport({
                 fontWeight: 900,
               }}
             >
-              Reessayer
+              Réessayer
             </Link>
             <Link
               href="/"
@@ -794,7 +794,7 @@ export default function ResultReport({
                 fontWeight: 800,
               }}
             >
-              Retour a l&apos;accueil
+              Retour à l&apos;accueil
             </Link>
           </div>
         </Panel>
@@ -1559,14 +1559,14 @@ export default function ResultReport({
               title="Coach Attentiq"
               subtitle="Posez vos questions sur ce rapport"
               suggestedPrompts={assistantPrompts}
-              footerNote="Coach centre sur ce rapport complet et son plan d'action."
+              footerNote="Coach centré sur ce rapport complet et son plan d'action."
               maxAssistantReplies={maxAssistantRepliesForReport}
               paywallHref={analyzeHref}
             />
 
             <Panel style={{ marginBottom: "14px" }}>
               <SectionHeader
-                eyebrow="Plan d'action priorise"
+                eyebrow="Plan d'action priorisé"
                 title="Quoi corriger d'abord, ensuite, puis tester"
               />
 
@@ -1843,17 +1843,17 @@ export default function ResultReport({
                     lineHeight: 1.7,
                   }}
                 >
-                  Le rapport complet débloque : timestamps exacts des pertes
+                  Avec le rapport complet : timestamps exacts des pertes
                   d&apos;attention, causes détaillées par chute (verbal / rythme /
-                  visuel), lien entre les chutes et plan d&apos;action priorise.
+                  visuel), liens entre les chutes et plan d&apos;action priorisé.
                 </div>
               )}
             </Panel>
 
             <Panel style={{ marginBottom: "14px" }}>
               <SectionHeader
-                eyebrow="Preview actions"
-                title="Premieres corrections visibles"
+                eyebrow="Aperçu des actions"
+                title="Premières corrections visibles"
               />
 
               {previewActions.length > 0 ? (
@@ -1911,7 +1911,7 @@ export default function ResultReport({
                     color: "var(--text-secondary)",
                   }}
                 >
-                  Aucune action simple n&apos;a ete remontee dans le teaser gratuit.
+                  Aucune action simple n&apos;a été remontée dans le teaser gratuit.
                 </p>
               )}
 
@@ -1934,7 +1934,7 @@ export default function ResultReport({
               variant="floating"
               defaultOpen={false}
               title="Assistant Attentiq"
-              subtitle="Je peux vous aider a mieux comprendre"
+              subtitle="Je peux vous aider à mieux comprendre"
               suggestedPrompts={assistantPrompts}
               footerNote="Assistant limité à ce teaser et à votre diagnostic actuel."
               maxAssistantReplies={1}

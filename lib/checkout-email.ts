@@ -68,7 +68,7 @@ export async function sendCheckoutThankYouEmail(params: {
     ${base ? `<p><a href="${escapeHtml(base)}">Ouvrir Attentiq</a></p>` : ""}
     ${
       compteUrl
-        ? `<p>Pour votre espace client (quota / historique), rendez-vous sur <a href="${escapeHtml(compteUrl)}">la page Compte</a> et demandez un lien de connexion securise.</p>`
+        ? `<p>Pour votre espace client (quota / historique), rendez-vous sur <a href="${escapeHtml(compteUrl)}">la page Compte</a> et demandez un lien de connexion sécurisé.</p>`
         : ""
     }
     <p style="color:#666;font-size:13px;">Réf. session : ${escapeHtml(params.sessionId)}</p>
