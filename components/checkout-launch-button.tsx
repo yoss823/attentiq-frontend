@@ -4,6 +4,10 @@ import { useState } from "react";
 import type { CSSProperties } from "react";
 import type { AttentiqOffer } from "@/lib/offer-config";
 import { persistPendingCheckout } from "@/lib/access-state";
+import {
+  getCheckoutPrefillEmailForClient,
+  withStripePrefilledEmail,
+} from "@/lib/stripe-prefill-url";
 
 type CheckoutLaunchButtonProps = {
   offer: AttentiqOffer;
@@ -20,7 +24,7 @@ export default function CheckoutLaunchButton({
   videoUrl = null,
   style,
   idleLabel = "Continuer vers Stripe",
-  loadingLabel = "Connexion a Stripe...",
+  loadingLabel = "Connexion à Stripe...",
 }: CheckoutLaunchButtonProps) {
   const [isPreparingCheckout, setIsPreparingCheckout] = useState(false);
 
@@ -34,6 +38,7 @@ export default function CheckoutLaunchButton({
         }
 
         setIsPreparingCheckout(true);
+        const prefillEmail = getCheckoutPrefillEmailForClient();
         persistPendingCheckout({
           offerSlug: offer.slug,
           jobId,
@@ -50,6 +55,7 @@ export default function CheckoutLaunchButton({
               offerSlug: offer.slug,
               jobId,
               videoUrl,
+              prefillEmail: prefillEmail ?? undefined,
             }),
           });
 
@@ -61,13 +67,15 @@ export default function CheckoutLaunchButton({
           const redirectUrl =
             typeof payload.redirectUrl === "string" && payload.redirectUrl
               ? payload.redirectUrl
-              : offer.stripeUrl;
+              : withStripePrefilledEmail(offer.stripeUrl, prefillEmail);
 
           window.location.assign(redirectUrl);
           return;
         } catch (error) {
           console.error("[checkout] prepare failed", error);
-          window.location.assign(offer.stripeUrl);
+          window.location.assign(
+            withStripePrefilledEmail(offer.stripeUrl, prefillEmail)
+          );
         } finally {
           setIsPreparingCheckout(false);
         }

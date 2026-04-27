@@ -7,20 +7,20 @@ import {
 import CheckoutLaunchButton from "@/components/checkout-launch-button";
 
 const FREE_ITEMS = [
-  "Resume global du diagnostic",
-  "Jusqu'a 3 chutes visibles",
-  "Jusqu'a 2 actions visibles",
+  "Résumé global du diagnostic",
+  "Jusqu'à 3 chutes visibles",
+  "Jusqu'à 2 actions visibles",
 ];
 
 const COMPLETE_ITEMS = [
-  "Timeline complete des chutes",
+  "Timeline complète des chutes",
   "Pour chaque chute : importance, cause, et type (verbal, rythme ou visuel)",
-  "Diagnostic structurel + plan d'actions priorise",
+  "Diagnostic structurel + plan d'actions priorisé",
 ];
 
 const CHECKOUT_BUTTON_LABELS = {
-  idle: "Payer et debloquer",
-  loading: "Connexion a Stripe...",
+  idle: "Payer et débloquer",
+  loading: "Connexion à Stripe...",
 };
 
 type PremiumPaywallProps = {
@@ -94,7 +94,7 @@ export default function PremiumPaywall({
               color: "var(--accent)",
             }}
           >
-            Debloquer le complet
+            Débloquer le complet
           </span>
         </div>
 
@@ -119,9 +119,9 @@ export default function PremiumPaywall({
             maxWidth: "48rem",
           }}
         >
-          Le rapport gratuit reste volontairement limite. Choisissez une offre
-          si vous voulez debloquer un vrai effet produit visible immediatement,
-          ou passer en abonnement avec creation de compte via l&apos;email
+          Le rapport gratuit reste volontairement limité. Choisissez une offre
+          si vous voulez débloquer un vrai effet produit visible immédiatement,
+          ou passer en abonnement avec création de compte via l&apos;email
           Stripe.
         </p>
 
@@ -322,7 +322,7 @@ export default function PremiumPaywall({
                       letterSpacing: "0.14em",
                     }}
                   >
-                    Recommande
+                    Recommandé
                   </span>
                 )}
               </div>
@@ -336,7 +336,7 @@ export default function PremiumPaywall({
                     color: "rgba(237, 242, 247, 0.74)",
                   }}
                 >
-                  Compte abonne cree via email Stripe
+                  Compte abonné créé via email Stripe
                 </p>
               )}
               <span

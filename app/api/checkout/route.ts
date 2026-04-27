@@ -17,15 +17,24 @@ function getBaseUrl(req: NextRequest) {
 
 export async function POST(req: NextRequest) {
   try {
-    const { jobId, videoUrl } = await req.json();
+    const body = (await req.json()) as {
+      jobId?: unknown;
+      videoUrl?: unknown;
+      customerEmail?: unknown;
+    };
+    const customerEmail =
+      typeof body.customerEmail === "string" ? body.customerEmail.trim() : "";
 
-    if (!jobId) {
+    if (typeof body.jobId !== "string" || !body.jobId.trim()) {
       return NextResponse.json({ error: "jobId manquant" }, { status: 400 });
     }
 
-    if (!videoUrl) {
+    if (typeof body.videoUrl !== "string" || !body.videoUrl.trim()) {
       return NextResponse.json({ error: "videoUrl manquante" }, { status: 400 });
     }
+
+    const jobId = body.jobId.trim();
+    const videoUrl = body.videoUrl.trim();
 
     const PRICE_ID =
       process.env.STRIPE_PRICE_SINGLE_REPORT ||
@@ -38,7 +47,7 @@ export async function POST(req: NextRequest) {
 
     const baseUrl = getBaseUrl(req);
 
-    const session = await stripe.checkout.sessions.create({
+    const sessionParams: Stripe.Checkout.SessionCreateParams = {
       mode: "payment",
       payment_method_types: ["card"],
       line_items: [
@@ -51,9 +60,15 @@ export async function POST(req: NextRequest) {
         jobId,
         videoUrl,
       },
-      success_url: `${baseUrl}/merci?session_id={CHECKOUT_SESSION_ID}&jobId=${jobId}`,
+      success_url: `${baseUrl}/merci?session_id={CHECKOUT_SESSION_ID}&jobId=${encodeURIComponent(jobId)}`,
       cancel_url: `${baseUrl}/analyze`,
-    });
+    };
+
+    if (customerEmail && customerEmail.includes("@")) {
+      sessionParams.customer_email = customerEmail;
+    }
+
+    const session = await stripe.checkout.sessions.create(sessionParams);
 
     if (!session.url) {
       throw new Error("Stripe session URL manquante");

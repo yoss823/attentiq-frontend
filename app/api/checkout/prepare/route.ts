@@ -5,6 +5,7 @@ import {
   getCheckoutContextCookieMaxAgeSeconds,
 } from "@/lib/checkout-session";
 import { getOfferBySlug } from "@/lib/offer-config";
+import { withStripePrefilledEmail } from "@/lib/stripe-prefill-url";
 
 export const runtime = "nodejs";
 
@@ -12,6 +13,8 @@ type PrepareCheckoutBody = {
   offerSlug?: unknown;
   jobId?: unknown;
   videoUrl?: unknown;
+  /** Préremplit l'email sur les Payment Links Stripe (`prefilled_email`). */
+  prefillEmail?: unknown;
 };
 
 function normalizeString(value: unknown) {
@@ -48,9 +51,19 @@ export async function POST(request: NextRequest) {
     );
   }
 
+  const prefillFromBody = normalizeString(body.prefillEmail);
+  const prefillFromEnv =
+    typeof process.env.STRIPE_CHECKOUT_PREFILL_EMAIL === "string"
+      ? process.env.STRIPE_CHECKOUT_PREFILL_EMAIL.trim()
+      : null;
+  const redirectUrl = withStripePrefilledEmail(
+    offer.stripeUrl,
+    prefillFromBody ?? prefillFromEnv ?? undefined
+  );
+
   const response = NextResponse.json({
     ok: true,
-    redirectUrl: offer.stripeUrl,
+    redirectUrl,
   });
 
   const canonicalOfferSlug = offer.slug;

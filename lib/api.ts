@@ -117,6 +117,8 @@ export async function getJobStatus(jobId: string) {
 export async function createCheckoutSession(params: {
   jobId: string;
   videoUrl: string;
+  /** Préremplit l'email sur Checkout (sessions API). */
+  customerEmail?: string;
 }) {
   const res = await fetch("/api/checkout", {
     method: "POST",

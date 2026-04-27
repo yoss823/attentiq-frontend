@@ -32,6 +32,11 @@ export default function AccountLoginForm({
     setIsSubmitting(true);
     setRequestError(null);
     try {
+      try {
+        window.localStorage.setItem("attentiq_checkout_prefill_email", trimmed);
+      } catch {
+        /* ignore quota / private mode */
+      }
       if (
         normalizedSession &&
         trimmed.toLowerCase() === normalizedSession
