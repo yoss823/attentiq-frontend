@@ -20,6 +20,26 @@ function normalizeText(value: unknown) {
   return typeof value === "string" && value.trim() ? value.trim() : null;
 }
 
+type ReportDrop = {
+  timestampSeconds: number | null;
+  severity: string | null;
+  cause: string;
+};
+
+type ReportSummary = {
+  title: string;
+  sourceUrl: string | null;
+  author: string | null;
+  durationSeconds: number | null;
+  score: string | null;
+  summary: string;
+  dropRule: string;
+  creatorPerception: string;
+  audienceLossEstimate: string;
+  drops: ReportDrop[];
+  actions: string[];
+};
+
 function summarizeReport(result: Record<string, unknown>) {
   const data =
     result.data && typeof result.data === "object"
@@ -53,20 +73,46 @@ function summarizeReport(result: Record<string, unknown>) {
       : null;
   const summary = normalizeText(diagnostic?.global_summary) ?? "Aucun resume fourni.";
   const dropRule = normalizeText(diagnostic?.drop_off_rule) ?? "Aucune regle formelle.";
+  const creatorPerception =
+    normalizeText(diagnostic?.creator_perception) ?? "Perception non disponible.";
+  const audienceLossEstimate =
+    normalizeText(diagnostic?.audience_loss_estimate) ??
+    "Estimation d'impact non disponible.";
   const actions = Array.isArray(diagnostic?.corrective_actions)
     ? diagnostic.corrective_actions
         .filter((item): item is string => typeof item === "string" && item.trim().length > 0)
-        .slice(0, 5)
+        .slice(0, 12)
+    : [];
+  const drops = Array.isArray(diagnostic?.attention_drops)
+    ? diagnostic.attention_drops
+        .filter((item): item is Record<string, unknown> => Boolean(item && typeof item === "object"))
+        .map((item) => ({
+          timestampSeconds:
+            typeof item.timestamp_seconds === "number" ? item.timestamp_seconds : null,
+          severity: normalizeText(item.severity),
+          cause:
+            normalizeText(item.cause) ??
+            "Cause non detaillee dans la sortie pipeline.",
+        }))
+        .slice(0, 20)
     : [];
 
   return {
     title,
     sourceUrl,
+    author: normalizeText(metadata?.author),
+    durationSeconds:
+      typeof metadata?.duration_seconds === "number"
+        ? metadata.duration_seconds
+        : null,
     score,
     summary,
     dropRule,
+    creatorPerception,
+    audienceLossEstimate,
+    drops,
     actions,
-  };
+  } satisfies ReportSummary;
 }
 
 function summarizeFromClientReport(reportPayload: unknown) {
@@ -112,19 +158,34 @@ async function buildReportPdf(params: {
   jobId: string;
   title: string;
   sourceUrl: string | null;
+  author: string | null;
+  durationSeconds: number | null;
   score: string | null;
   summary: string;
   dropRule: string;
+  creatorPerception: string;
+  audienceLossEstimate: string;
+  drops: ReportDrop[];
   actions: string[];
 }) {
   const pdfDoc = await PDFDocument.create();
-  const page = pdfDoc.addPage([595, 842]); // A4
+  const pageSize: [number, number] = [595, 842];
+  let page = pdfDoc.addPage(pageSize); // A4
   const font = await pdfDoc.embedFont(StandardFonts.Helvetica);
   const bold = await pdfDoc.embedFont(StandardFonts.HelveticaBold);
   const margin = 48;
   let y = 790;
 
+  const ensureSpace = (requiredHeight: number) => {
+    if (y - requiredHeight >= margin) {
+      return;
+    }
+    page = pdfDoc.addPage(pageSize);
+    y = 790;
+  };
+
   const draw = (text: string, size = 11, isBold = false, color = rgb(0.1, 0.12, 0.16)) => {
+    ensureSpace(size + 8);
     page.drawText(text, {
       x: margin,
       y,
@@ -135,15 +196,25 @@ async function buildReportPdf(params: {
     y -= size + 6;
   };
 
+  const drawWrapped = (text: string, size = 10, isBold = false) => {
+    for (const line of splitTextLines(text, 95)) {
+      draw(line, size, isBold);
+    }
+  };
+
   draw("ATTENTIQ - Diagnostic PDF", 16, true);
   draw(`Job ID: ${params.jobId}`, 10);
   draw(`Genere le: ${new Date().toLocaleString("fr-FR")}`, 10);
   y -= 8;
   draw(params.title, 14, true);
+  if (params.author) {
+    draw(`Auteur: ${params.author}`, 10);
+  }
+  if (typeof params.durationSeconds === "number") {
+    draw(`Duree: ${Math.max(0, Math.round(params.durationSeconds))}s`, 10);
+  }
   if (params.sourceUrl) {
-    for (const line of splitTextLines(`Source: ${params.sourceUrl}`, 90)) {
-      draw(line, 9);
-    }
+    drawWrapped(`Source: ${params.sourceUrl}`, 9);
   }
   if (params.score) {
     draw(`Retention score: ${params.score}/10`, 11, true);
@@ -151,14 +222,35 @@ async function buildReportPdf(params: {
 
   y -= 8;
   draw("Resume global", 12, true);
-  for (const line of splitTextLines(params.summary, 95)) {
-    draw(line, 10);
-  }
+  drawWrapped(params.summary, 10);
 
   y -= 8;
   draw("Regle de decrochage", 12, true);
-  for (const line of splitTextLines(params.dropRule, 95)) {
-    draw(line, 10);
+  drawWrapped(params.dropRule, 10);
+
+  y -= 8;
+  draw("Perception spectateur", 12, true);
+  drawWrapped(params.creatorPerception, 10);
+
+  y -= 8;
+  draw("Impact estime", 12, true);
+  drawWrapped(params.audienceLossEstimate, 10);
+
+  y -= 8;
+  draw("Points de chute", 12, true);
+  if (params.drops.length === 0) {
+    draw("- Aucune chute detaillee", 10);
+  } else {
+    params.drops.forEach((drop, idx) => {
+      const timeLabel =
+        typeof drop.timestampSeconds === "number"
+          ? `${Math.max(0, Math.round(drop.timestampSeconds))}s`
+          : "?s";
+      const severityLabel = drop.severity ? drop.severity.toUpperCase() : "INCONNUE";
+      draw(`${idx + 1}. ${timeLabel} · ${severityLabel}`, 10, true);
+      drawWrapped(`Cause: ${drop.cause}`, 10);
+      y -= 2;
+    });
   }
 
   y -= 8;
@@ -167,9 +259,7 @@ async function buildReportPdf(params: {
     draw("- Aucune action disponible", 10);
   } else {
     params.actions.forEach((action, idx) => {
-      for (const [lineIdx, line] of splitTextLines(`${idx + 1}. ${action}`, 95).entries()) {
-        draw(lineIdx === 0 ? line : `   ${line}`, 10);
-      }
+      drawWrapped(`${idx + 1}. ${action}`, 10);
     });
   }
 
