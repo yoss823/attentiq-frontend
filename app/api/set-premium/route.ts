@@ -76,6 +76,16 @@ export async function POST(req: NextRequest) {
           message?: string;
         }
       | undefined;
+    let reportPdfEmail:
+      | {
+          status:
+            | "sent"
+            | "skipped_no_recipient"
+            | "skipped_no_job"
+            | "failed";
+          message?: string;
+        }
+      | undefined;
 
     if (!customerEmail) {
       console.warn(
@@ -87,12 +97,18 @@ export async function POST(req: NextRequest) {
         req.headers.get("x-forwarded-host") ?? req.headers.get("host");
       const proto = req.headers.get("x-forwarded-proto") ?? "https";
       const appBaseUrl = host ? `${proto}://${host}` : null;
+      const accountLoginUrl = appBaseUrl
+        ? `${appBaseUrl}/api/account/login?email=${encodeURIComponent(
+            customerEmail
+          )}`
+        : null;
 
       const sendResult = await sendCheckoutThankYouEmail({
         to: customerEmail,
         offerSlug: resolvedOfferSlug,
         sessionId,
         appBaseUrl,
+        accountLoginUrl,
       });
 
       if ("skipped" in sendResult && sendResult.skipped) {
@@ -111,6 +127,49 @@ export async function POST(req: NextRequest) {
       } else {
         thankYouEmail = { status: "failed", message: "unexpected_send_result" };
       }
+
+      if (!resolvedJobId) {
+        reportPdfEmail = { status: "skipped_no_job" };
+      } else if (!appBaseUrl) {
+        reportPdfEmail = {
+          status: "failed",
+          message: "missing_app_base_url_for_internal_send_report",
+        };
+      } else {
+        try {
+          const pdfResponse = await fetch(`${appBaseUrl}/api/send-report`, {
+            method: "POST",
+            headers: {
+              "content-type": "application/json",
+            },
+            body: JSON.stringify({
+              email: customerEmail,
+              jobId: resolvedJobId,
+              subject: "Votre diagnostic Attentiq (PDF)",
+              body: "Vous trouverez votre diagnostic en piece jointe.",
+            }),
+          });
+          if (!pdfResponse.ok) {
+            const pdfPayload = (await pdfResponse.json().catch(() => null)) as
+              | { error?: string; userMessage?: string }
+              | null;
+            reportPdfEmail = {
+              status: "failed",
+              message:
+                pdfPayload?.userMessage ??
+                pdfPayload?.error ??
+                `http_${pdfResponse.status}`,
+            };
+          } else {
+            reportPdfEmail = { status: "sent" };
+          }
+        } catch (error) {
+          reportPdfEmail = {
+            status: "failed",
+            message: error instanceof Error ? error.message : "send_report_failed",
+          };
+        }
+      }
     }
 
     return NextResponse.json({
@@ -122,6 +181,7 @@ export async function POST(req: NextRequest) {
       videoUrl: resolvedVideoUrl,
       customerEmail,
       thankYouEmail,
+      reportPdfEmail,
     });
   } catch (error) {
     console.error("[set-premium] error:", error);

@@ -25,15 +25,26 @@ function summarizeReport(result: Record<string, unknown>) {
       ? (result.data as Record<string, unknown>)
       : null;
   const metadata =
-    data?.metadata && typeof data.metadata === "object"
+    ((data?.metadata && typeof data.metadata === "object"
       ? (data.metadata as Record<string, unknown>)
-      : null;
+      : null) ??
+      (result.metadata && typeof result.metadata === "object"
+        ? (result.metadata as Record<string, unknown>)
+        : null)) ||
+    null;
   const diagnostic =
-    data?.diagnostic && typeof data.diagnostic === "object"
+    ((data?.diagnostic && typeof data.diagnostic === "object"
       ? (data.diagnostic as Record<string, unknown>)
-      : null;
+      : null) ??
+      (result.diagnostic && typeof result.diagnostic === "object"
+        ? (result.diagnostic as Record<string, unknown>)
+        : null)) ||
+    null;
 
-  const title = normalizeText(metadata?.title) ?? "Diagnostic Attentiq";
+  const title =
+    normalizeText(metadata?.title) ??
+    normalizeText(result.text) ??
+    "Diagnostic Attentiq";
   const sourceUrl = normalizeText(metadata?.url);
   const score =
     typeof diagnostic?.retention_score === "number"
