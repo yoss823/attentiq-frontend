@@ -2,9 +2,9 @@ import type { Metadata } from "next";
 import MerciRedirectState from "@/components/merci-redirect-state";
 
 export const metadata: Metadata = {
-  title: "Verification du paiement — Attentiq",
+  title: "Vérification du paiement — Attentiq",
   description:
-    "Attentiq verifie votre session Stripe avant d'activer l'acces premium et de rouvrir la bonne analyse.",
+    "Attentiq vérifie votre session Stripe avant d'activer l'accès premium et de rouvrir la bonne analyse.",
 };
 
 type MerciPageProps = {

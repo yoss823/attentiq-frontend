@@ -373,10 +373,10 @@ export default function HomePage() {
             >
               Lancez <strong style={{ color: "rgba(237, 242, 247, 0.95)" }}>1 analyse gratuite par format</strong> : aperçu limité, clair et rapide — en général{" "}
               <strong style={{ color: "rgba(237, 242, 247, 0.95)" }}>
-                1 a 2 signaux cles
+                1 à 2 signaux clés
               </strong>{" "}
-              sans carte bancaire. Le complet debloque le detail (timestamps,
-              causes, plan priorise).
+              sans carte bancaire. Le complet débloque le détail (timestamps,
+              causes, plan priorisé).
             </p>
           </div>
         </section>

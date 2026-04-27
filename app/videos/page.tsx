@@ -235,15 +235,15 @@ export default function VideosPage() {
             <strong style={{ color: "rgba(237, 242, 247, 0.95)" }}>
               Gratuit :
             </strong>{" "}
-            jusqu&apos;a{" "}
+            jusqu&apos;à{" "}
             <strong style={{ color: "rgba(237, 242, 247, 0.95)" }}>
-              1 analyse video
+              1 analyse vidéo
             </strong>{" "}
-            avec un aperçu court (1 a 2 signaux).{" "}
+            avec un aperçu court (1 à 2 signaux).{" "}
             <strong style={{ color: "rgba(237, 242, 247, 0.95)" }}>
               Payant :
             </strong>{" "}
-            rapport complet detaille (timestamps exacts + plan priorise).
+            rapport complet détaillé (timestamps exacts + plan priorisé).
           </p>
 
           {/* Platform badges */}

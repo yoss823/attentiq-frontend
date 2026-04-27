@@ -231,15 +231,15 @@ export default function TextPage() {
             <strong style={{ color: "rgba(237, 242, 247, 0.95)" }}>
               Gratuit :
             </strong>{" "}
-            jusqu&apos;a{" "}
+            jusqu&apos;à{" "}
             <strong style={{ color: "rgba(237, 242, 247, 0.95)" }}>
               1 analyse texte
             </strong>{" "}
-            avec un aperçu court (1 a 2 signaux).{" "}
+            avec un aperçu court (1 à 2 signaux).{" "}
             <strong style={{ color: "rgba(237, 242, 247, 0.95)" }}>
               Payant :
             </strong>{" "}
-            rapport complet detaille et plan clair.
+            rapport complet détaillé et plan clair.
           </p>
 
           <div style={{ display: "flex", gap: "12px", flexWrap: "wrap" }}>

@@ -1,24 +1,24 @@
 export const ANALYZE_PROGRESS_STEPS = [
   {
-    label: "Verification de l'URL et recuperation de la video",
+    label: "Vérification de l'URL et récupération de la vidéo",
     helper:
-      "Attentiq verifie l'URL (TikTok, YouTube, Instagram, Snapchat) ou le fichier, puis lance la collecte.",
+      "Attentiq vérifie l'URL (TikTok, YouTube, Instagram, Snapchat) ou le fichier, puis lance la collecte.",
     startMs: 0,
   },
   {
-    label: "Transcription et reperage des ruptures",
-    helper: "La piste audio et le rythme sont inspectes pour isoler les moments de decrochage.",
+    label: "Transcription et repérage des ruptures",
+    helper: "La piste audio et le rythme sont inspectés pour isoler les moments de décrochage.",
     startMs: 15_000,
   },
   {
-    label: "Synthese du diagnostic d'attention",
+    label: "Synthèse du diagnostic d'attention",
     helper:
-      "Le teaser gratuit liste quelques chutes precises ; le complet expose toute la timeline et les analyses liees.",
+      "Le teaser gratuit liste quelques chutes précises ; le complet expose toute la timeline et les analyses liées.",
     startMs: 42_000,
   },
   {
     label: "Mise en forme du rapport",
-    helper: "Le rapport est assemble avant la redirection vers votre resultat.",
+    helper: "Le rapport est assemblé avant la redirection vers votre résultat.",
     startMs: 72_000,
   },
 ] as const;

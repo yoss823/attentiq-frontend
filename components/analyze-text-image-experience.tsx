@@ -263,8 +263,8 @@ export default function AnalyzeTextImageExperience({
         }}
       >
         {mode === "text"
-          ? "Collez un texte a auditer"
-          : "Envoyez une image a auditer"}
+          ? "Collez un texte à auditer"
+          : "Envoyez une image à auditer"}
       </h2>
       <p
         style={{
@@ -274,9 +274,9 @@ export default function AnalyzeTextImageExperience({
           color: "var(--text-secondary)",
         }}
       >
-        Meme moteur que la video : version gratuite = 1 analyse par format,
-        avec un aperçu volontairement court (1 a 2 signaux). Le rapport complet
-        se debloque avec une offre payante.
+        Même moteur que la vidéo : version gratuite = 1 analyse par format,
+        avec un aperçu volontairement court (1 à 2 signaux). Le rapport complet
+        se débloque avec une offre payante.
       </p>
 
       {mode === "text" ? (
