@@ -1,6 +1,7 @@
 "use client";
 
 import Link from "next/link";
+import { useState } from "react";
 import type { CSSProperties, ReactNode } from "react";
 import InlineChatbot from "@/components/inline-chatbot";
 import StripeCta from "@/components/stripe-cta";
@@ -578,6 +579,58 @@ export default function ResultReport({
   initialPremiumEntitlement = null,
   reportJobId = null,
 }: ResultReportProps) {
+  const [isSendingPdf, setIsSendingPdf] = useState(false);
+  const [sendPdfFeedback, setSendPdfFeedback] = useState<string | null>(null);
+
+  async function handleSendPdf() {
+    if (!reportJobId) {
+      setSendPdfFeedback(
+        "Ce rapport n'a pas de job ID exploitable pour generer le PDF."
+      );
+      return;
+    }
+
+    const rawEmail = window.prompt("Email du client pour envoyer le PDF :");
+    const email = rawEmail?.trim() ?? "";
+    if (!email) {
+      return;
+    }
+
+    setIsSendingPdf(true);
+    setSendPdfFeedback(null);
+    try {
+      const response = await fetch("/api/send-report", {
+        method: "POST",
+        headers: {
+          "content-type": "application/json",
+        },
+        body: JSON.stringify({
+          email,
+          jobId: reportJobId,
+          subject: "Votre diagnostic Attentiq (PDF)",
+          body: "Vous trouverez votre diagnostic en piece jointe.",
+        }),
+      });
+      const payload = (await response.json().catch(() => null)) as
+        | { error?: string; userMessage?: string }
+        | null;
+
+      if (!response.ok) {
+        setSendPdfFeedback(
+          payload?.userMessage ??
+            payload?.error ??
+            "Echec de l'envoi du PDF. Reessayez."
+        );
+        return;
+      }
+      setSendPdfFeedback(`PDF envoye a ${email}.`);
+    } catch {
+      setSendPdfFeedback("Impossible d'envoyer le PDF pour le moment.");
+    } finally {
+      setIsSendingPdf(false);
+    }
+  }
+
   if (report.data.status === "error") {
     return (
       <main
@@ -814,29 +867,71 @@ export default function ResultReport({
           </Link>
 
           <div
-            style={{
-              padding: "8px 12px",
-              borderRadius: "999px",
-              border: isPremiumUnlocked
-                ? "1px solid rgba(52, 211, 153, 0.22)"
-                : "1px solid rgba(0, 212, 255, 0.18)",
-              background: isPremiumUnlocked
-                ? "rgba(52, 211, 153, 0.08)"
-                : "rgba(0, 212, 255, 0.08)",
-              color: isPremiumUnlocked ? "#86efac" : "var(--accent)",
-              fontSize: "11px",
-              fontWeight: 800,
-              textTransform: "uppercase",
-              letterSpacing: "0.18em",
-            }}
+            style={{ display: "flex", alignItems: "center", gap: "10px", flexWrap: "wrap" }}
           >
-            {isPremiumUnlocked
-              ? isSubscriptionEntitlement
-                ? "Acces abonne actif"
-                : "Rapport complet debloque"
-              : "Rapport gratuit · teaser"}
+            <button
+              type="button"
+              onClick={handleSendPdf}
+              disabled={!reportJobId || isSendingPdf}
+              style={{
+                minHeight: "36px",
+                borderRadius: "999px",
+                border: "1px solid rgba(0, 212, 255, 0.24)",
+                background: !reportJobId
+                  ? "rgba(107, 114, 128, 0.2)"
+                  : "rgba(0, 212, 255, 0.12)",
+                color: !reportJobId ? "rgba(203, 213, 225, 0.7)" : "#67e8f9",
+                padding: "0 14px",
+                fontSize: "12px",
+                fontWeight: 800,
+                letterSpacing: "0.04em",
+                cursor: !reportJobId || isSendingPdf ? "not-allowed" : "pointer",
+              }}
+            >
+              {isSendingPdf ? "Envoi PDF..." : "Envoyer PDF client"}
+            </button>
+            <div
+              style={{
+                padding: "8px 12px",
+                borderRadius: "999px",
+                border: isPremiumUnlocked
+                  ? "1px solid rgba(52, 211, 153, 0.22)"
+                  : "1px solid rgba(0, 212, 255, 0.18)",
+                background: isPremiumUnlocked
+                  ? "rgba(52, 211, 153, 0.08)"
+                  : "rgba(0, 212, 255, 0.08)",
+                color: isPremiumUnlocked ? "#86efac" : "var(--accent)",
+                fontSize: "11px",
+                fontWeight: 800,
+                textTransform: "uppercase",
+                letterSpacing: "0.18em",
+              }}
+            >
+              {isPremiumUnlocked
+                ? isSubscriptionEntitlement
+                  ? "Acces abonne actif"
+                  : "Rapport complet debloque"
+                : "Rapport gratuit · teaser"}
+            </div>
           </div>
         </nav>
+
+        {sendPdfFeedback && (
+          <div
+            style={{
+              marginBottom: "14px",
+              padding: "12px 14px",
+              borderRadius: "14px",
+              border: "1px solid rgba(103, 232, 249, 0.25)",
+              background: "rgba(0, 212, 255, 0.09)",
+              color: "#bae6fd",
+              fontSize: "13px",
+              lineHeight: 1.6,
+            }}
+          >
+            {sendPdfFeedback}
+          </div>
+        )}
 
         {isPremiumUnlocked && (
           <AccessBanner

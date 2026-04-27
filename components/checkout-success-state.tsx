@@ -96,6 +96,10 @@ export default function CheckoutSuccessState({
       restoredContext.jobId
     );
   const isSubscription = unlockResult?.unlockMode === "subscription";
+  const subscriberEmail = unlockResult?.entitlement.subscriberEmail ?? null;
+  const accountHref = subscriberEmail
+    ? `/compte?email=${encodeURIComponent(subscriberEmail)}`
+    : "/compte";
 
   const title = isSubscription
     ? "Paiement confirmé — accès abonné activé"
@@ -325,7 +329,7 @@ export default function CheckoutSuccessState({
 
           {isSubscription && (
             <Link
-              href="/compte"
+              href={accountHref}
               style={{
                 display: "inline-flex",
                 alignItems: "center",

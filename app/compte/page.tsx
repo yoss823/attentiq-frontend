@@ -1,7 +1,9 @@
 import type { Metadata } from "next";
+import { cookies } from "next/headers";
 import Link from "next/link";
 import { getOfferBySlug } from "@/lib/offer-config";
 import { getSubscriberAccountByEmail } from "@/lib/subscriber-store";
+import { ACCOUNT_SESSION_COOKIE_NAME, normalizeAccountEmail } from "@/lib/account-session";
 
 export const metadata: Metadata = {
   title: "Compte abonne — Attentiq",
@@ -10,7 +12,10 @@ export const metadata: Metadata = {
 };
 
 type SubscriberAccountPageProps = {
-  searchParams: Promise<{ email?: string | string[] | undefined }>;
+  searchParams: Promise<{
+    email?: string | string[] | undefined;
+    loginError?: string | string[] | undefined;
+  }>;
 };
 
 function formatDate(value: string | null) {
@@ -32,15 +37,36 @@ function formatQuota(monthlyQuota: number | null, monthlyUsed: number) {
   return `${monthlyUsed} / ${monthlyQuota} utilise(s)`;
 }
 
+function formatRemaining(monthlyQuota: number | null, monthlyUsed: number) {
+  if (monthlyQuota == null) {
+    return "Illimite";
+  }
+  return String(Math.max(monthlyQuota - monthlyUsed, 0));
+}
+
+function formatAnalysisType(type: "video" | "text" | "image" | "unknown") {
+  if (type === "video") return "Video";
+  if (type === "text") return "Texte";
+  if (type === "image") return "Image";
+  return "Autre";
+}
+
 export default async function SubscriberAccountPage({
   searchParams,
 }: SubscriberAccountPageProps) {
   const params = await searchParams;
+  const cookieStore = await cookies();
+  const sessionEmail = normalizeAccountEmail(
+    cookieStore.get(ACCOUNT_SESSION_COOKIE_NAME)?.value ?? null
+  );
   const rawEmail = Array.isArray(params.email) ? params.email[0] : params.email;
-  const email = rawEmail?.trim().toLowerCase() ?? "";
-  const { account, payments } = email
+  const email = normalizeAccountEmail(rawEmail) ?? sessionEmail ?? "";
+  const loginError = Array.isArray(params.loginError)
+    ? params.loginError[0]
+    : params.loginError;
+  const { account, payments, analyses } = email
     ? await getSubscriberAccountByEmail(email)
-    : { account: null, payments: [] };
+    : { account: null, payments: [], analyses: [] };
 
   return (
     <main
@@ -157,7 +183,7 @@ export default async function SubscriberAccountPage({
           </p>
 
           <form
-            action="/compte"
+            action="/api/account/login"
             method="get"
             style={{
               marginTop: "24px",
@@ -196,9 +222,70 @@ export default async function SubscriberAccountPage({
                 cursor: "pointer",
               }}
             >
-              Charger
+              Se connecter
             </button>
           </form>
+
+          {sessionEmail && (
+            <div
+              style={{
+                marginTop: "12px",
+                display: "flex",
+                alignItems: "center",
+                justifyContent: "space-between",
+                gap: "12px",
+              }}
+            >
+              <p style={{ margin: 0, fontSize: "13px", color: "var(--text-secondary)" }}>
+                Session active : {sessionEmail}
+              </p>
+              <Link
+                href="/api/account/logout"
+                style={{
+                  color: "#fca5a5",
+                  fontSize: "13px",
+                  fontWeight: 700,
+                  textDecoration: "none",
+                }}
+              >
+                Se deconnecter
+              </Link>
+            </div>
+          )}
+
+          {loginError === "missing_email" && (
+            <div
+              style={{
+                marginTop: "18px",
+                padding: "16px",
+                borderRadius: "20px",
+                border: "1px solid rgba(251, 146, 60, 0.24)",
+                background: "rgba(251, 146, 60, 0.08)",
+                color: "#fdba74",
+                fontSize: "14px",
+                lineHeight: 1.75,
+              }}
+            >
+              Saisissez l&apos;email utilise lors du paiement Stripe pour ouvrir votre compte.
+            </div>
+          )}
+
+          {loginError === "not_found" && (
+            <div
+              style={{
+                marginTop: "18px",
+                padding: "16px",
+                borderRadius: "20px",
+                border: "1px solid rgba(251, 146, 60, 0.24)",
+                background: "rgba(251, 146, 60, 0.08)",
+                color: "#fdba74",
+                fontSize: "14px",
+                lineHeight: 1.75,
+              }}
+            >
+              Aucun compte abonne actif pour cet email. Verifiez votre adresse de paiement.
+            </div>
+          )}
 
           {email && !account && (
             <div
@@ -237,6 +324,14 @@ export default async function SubscriberAccountPage({
                     label: "Quota mensuel",
                     value: formatQuota(account.monthlyQuota, account.monthlyUsed),
                     helper: `Periode ouverte le ${formatDate(account.quotaPeriodStartedAt)}`,
+                  },
+                  {
+                    label: "Analyses restantes",
+                    value: formatRemaining(account.monthlyQuota, account.monthlyUsed),
+                    helper:
+                      account.monthlyQuota == null
+                        ? "Aucune limite mensuelle"
+                        : `Sur ${account.monthlyQuota} analyses / mois`,
                   },
                   {
                     label: "Dernier paiement",
@@ -389,19 +484,69 @@ export default async function SubscriberAccountPage({
                 >
                   Historique rapports
                 </p>
-                <p
-                  style={{
-                    margin: "14px 0 0",
-                    fontSize: "14px",
-                    lineHeight: 1.75,
-                    color: "rgba(237, 242, 247, 0.8)",
-                  }}
-                >
-                  Le shell abonne expose deja l&apos;etat d&apos;acces et le quota
-                  simple. Le rattachement automatique rapport -&gt; email Stripe
-                  reste le prochain branchement pour afficher un historique de
-                  rapports persistant.
-                </p>
+                {analyses.length > 0 ? (
+                  <div style={{ marginTop: "14px", display: "grid", gap: "10px" }}>
+                    {analyses.map((analysis) => (
+                      <div
+                        key={`${analysis.jobId}-${analysis.createdAt}`}
+                        style={{
+                          display: "grid",
+                          gap: "4px",
+                          padding: "14px 16px",
+                          borderRadius: "18px",
+                          border: "1px solid var(--border)",
+                          background: "rgba(0,0,0,0.14)",
+                        }}
+                      >
+                        <p
+                          style={{
+                            margin: 0,
+                            fontSize: "14px",
+                            fontWeight: 700,
+                            color: "var(--text-primary)",
+                          }}
+                        >
+                          {formatAnalysisType(analysis.contentType)} · {formatDate(analysis.createdAt)}
+                        </p>
+                        <p
+                          style={{
+                            margin: 0,
+                            fontSize: "12px",
+                            lineHeight: 1.7,
+                            color: "var(--text-secondary)",
+                            wordBreak: "break-all",
+                          }}
+                        >
+                          Job: {analysis.jobId}
+                        </p>
+                        {analysis.sourceLabel && (
+                          <p
+                            style={{
+                              margin: 0,
+                              fontSize: "12px",
+                              lineHeight: 1.6,
+                              color: "var(--text-secondary)",
+                              wordBreak: "break-all",
+                            }}
+                          >
+                            Source: {analysis.sourceLabel}
+                          </p>
+                        )}
+                      </div>
+                    ))}
+                  </div>
+                ) : (
+                  <p
+                    style={{
+                      margin: "14px 0 0",
+                      fontSize: "14px",
+                      lineHeight: 1.75,
+                      color: "rgba(237, 242, 247, 0.8)",
+                    }}
+                  >
+                    Aucune analyse rattachee a ce compte pour l&apos;instant.
+                  </p>
+                )}
               </section>
             </div>
           )}

@@ -46,6 +46,13 @@ export type SubscriberPaymentEvent = {
   receivedAt: string;
 };
 
+export type SubscriberAnalysisEvent = {
+  jobId: string;
+  contentType: "video" | "text" | "image" | "unknown";
+  sourceLabel: string | null;
+  createdAt: string;
+};
+
 export type RecordedPaymentSession = {
   stripeSessionId: string;
   offerSlug: string | null;
@@ -63,6 +70,8 @@ export type VerifiedCheckoutContext = {
   createdAt: string;
   updatedAt: string;
 };
+
+type SubscriberAnalysisContentType = "video" | "text" | "image" | "unknown";
 
 let pool: Pool | null = null;
 let schemaReadyPromise: Promise<void> | null = null;
@@ -145,6 +154,22 @@ async function ensureSchema() {
     await db.query(`
       create index if not exists subscriber_quota_charges_email_idx
       on subscriber_quota_charges (email, charged_at desc);
+    `);
+
+    await db.query(`
+      create table if not exists subscriber_analysis_events (
+        email text not null,
+        job_id text not null,
+        content_type text not null default 'unknown',
+        source_label text,
+        created_at timestamptz not null default now(),
+        primary key (email, job_id)
+      );
+    `);
+
+    await db.query(`
+      create index if not exists subscriber_analysis_events_email_idx
+      on subscriber_analysis_events (email, created_at desc);
     `);
   })();
 
@@ -331,9 +356,10 @@ export async function recordStripeCheckoutCompletionIfAbsent(
 export async function getSubscriberAccountByEmail(email: string): Promise<{
   account: SubscriberAccountSummary | null;
   payments: SubscriberPaymentEvent[];
+  analyses: SubscriberAnalysisEvent[];
 }> {
   if (!process.env.DATABASE_URL) {
-    return { account: null, payments: [] };
+    return { account: null, payments: [], analyses: [] };
   }
 
   await ensureSchema();
@@ -393,6 +419,26 @@ export async function getSubscriberAccountByEmail(email: string): Promise<{
     [normalizedEmail]
   );
 
+  const analysesResult = await db.query<{
+    job_id: string;
+    content_type: string;
+    source_label: string | null;
+    created_at: Date;
+  }>(
+    `
+      select
+        job_id,
+        content_type,
+        source_label,
+        created_at
+      from subscriber_analysis_events
+      where email = $1
+      order by created_at desc
+      limit 50
+    `,
+    [normalizedEmail]
+  );
+
   const accountRow = accountResult.rows[0];
 
   return {
@@ -418,7 +464,50 @@ export async function getSubscriberAccountByEmail(email: string): Promise<{
       currency: row.currency,
       receivedAt: row.received_at.toISOString(),
     })),
+    analyses: analysesResult.rows.map((row) => ({
+      jobId: row.job_id,
+      contentType:
+        row.content_type === "video" ||
+        row.content_type === "text" ||
+        row.content_type === "image"
+          ? row.content_type
+          : "unknown",
+      sourceLabel: row.source_label,
+      createdAt: row.created_at.toISOString(),
+    })),
   };
+}
+
+export async function recordSubscriberAnalysisIfAbsent(params: {
+  email: string;
+  jobId: string;
+  contentType?: SubscriberAnalysisContentType;
+  sourceLabel?: string | null;
+}) {
+  if (!process.env.DATABASE_URL) {
+    return;
+  }
+
+  await ensureSchema();
+  const db = getPool();
+  await db.query(
+    `
+      insert into subscriber_analysis_events (
+        email,
+        job_id,
+        content_type,
+        source_label
+      )
+      values ($1, $2, $3, $4)
+      on conflict (email, job_id) do nothing
+    `,
+    [
+      normalizeEmail(params.email),
+      params.jobId,
+      params.contentType ?? "unknown",
+      params.sourceLabel?.trim() || null,
+    ]
+  );
 }
 
 export async function getRecordedPaymentSession(
