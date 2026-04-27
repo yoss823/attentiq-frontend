@@ -523,7 +523,7 @@ export default function ChatExperience() {
               marginBottom: "14px",
             }}
           >
-            RetentionScan / Attentiq
+            Assistant Attentiq
           </p>
           <h1
             style={{

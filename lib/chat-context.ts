@@ -1,7 +1,7 @@
 import { polishDiagnosticFrenchForDisplay } from "@/lib/diagnostic-locale-fr";
 import {
   formatAttentiqReport,
-  mockSalesWithEvaResponse,
+  mockAttentiqDemoAnalyzeResponse,
   type AttentiqReport,
   type Diagnostic,
   type TranscriptSegment,
@@ -41,7 +41,7 @@ export function buildChatDiagnosticContext(
 
 export function getDemoChatDiagnosticContext(): ChatDiagnosticContext {
   return buildChatDiagnosticContext(
-    formatAttentiqReport(mockSalesWithEvaResponse())
+    formatAttentiqReport(mockAttentiqDemoAnalyzeResponse())
   );
 }
 

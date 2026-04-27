@@ -8,9 +8,9 @@ import { getSubscriberAccountByEmail } from "@/lib/subscriber-store";
 import { ACCOUNT_SESSION_COOKIE_NAME, normalizeAccountEmail } from "@/lib/account-session";
 
 export const metadata: Metadata = {
-  title: "Compte abonne — Attentiq",
+  title: "Compte abonné — Attentiq",
   description:
-    "Etat d'acces abonne Attentiq, quota mensuel simple et historique de paiements rattaches a l'email Stripe.",
+    "État d'accès abonné Attentiq, quota mensuel simple et historique de paiements rattachés à l'email Stripe.",
 };
 
 type SubscriberAccountPageProps = {
@@ -34,21 +34,21 @@ function formatDate(value: string | null) {
 
 function formatQuota(monthlyQuota: number | null, monthlyUsed: number) {
   if (monthlyQuota == null) {
-    return `Illimite · ${monthlyUsed} utilise(s) ce mois`;
+    return `Illimité · ${monthlyUsed} analyse(s) ce mois`;
   }
 
-  return `${monthlyUsed} / ${monthlyQuota} utilise(s)`;
+  return `${monthlyUsed} / ${monthlyQuota} analyse(s)`;
 }
 
 function formatRemaining(monthlyQuota: number | null, monthlyUsed: number) {
   if (monthlyQuota == null) {
-    return "Illimite";
+    return "Illimité";
   }
   return String(Math.max(monthlyQuota - monthlyUsed, 0));
 }
 
 function formatAnalysisType(type: "video" | "text" | "image" | "unknown") {
-  if (type === "video") return "Video";
+  if (type === "video") return "Vidéo";
   if (type === "text") return "Texte";
   if (type === "image") return "Image";
   return "Autre";
@@ -114,9 +114,9 @@ export default async function SubscriberAccountPage({
               lineHeight: 1.7,
             }}
           >
-            Abonnement confirme. Utilisez la meme adresse e-mail que sur Stripe
-            pour ouvrir votre espace abonne, puis lancez une analyse : chaque
-            rapport complet sera debloque selon votre quota.
+            Abonnement confirmé. Utilisez la même adresse e-mail que sur Stripe
+            pour ouvrir votre espace abonné, puis lancez une analyse : chaque
+            rapport complet sera débloqué selon votre quota.
           </div>
         )}
 
@@ -148,7 +148,7 @@ export default async function SubscriberAccountPage({
           >
             ←
           </span>
-          Retour a l&apos;accueil
+          Retour à l&apos;accueil
         </Link>
 
         <section
@@ -190,7 +190,7 @@ export default async function SubscriberAccountPage({
                 color: "var(--accent)",
               }}
             >
-              Compte abonne
+              Compte abonné
             </span>
           </div>
 
@@ -215,10 +215,10 @@ export default async function SubscriberAccountPage({
               color: "rgba(237, 242, 247, 0.8)",
             }}
           >
-            Saisissez l&apos;email Stripe du compte abonne : nous vous envoyons un
-            lien de connexion securise (une seule utilisation, quelques minutes).
-            Sur le meme navigateur, la session peut rester active sans recliquer le
-            lien a chaque visite.
+            Saisissez l&apos;email Stripe du compte abonné : nous vous envoyons un
+            lien de connexion sécurisé (une seule utilisation, quelques minutes).
+            Sur le même navigateur, la session peut rester active sans rouvrir le
+            lien à chaque visite.
           </p>
 
           <AccountLoginForm initialEmail={email} sessionEmail={sessionEmail} />
@@ -245,7 +245,7 @@ export default async function SubscriberAccountPage({
                   textDecoration: "none",
                 }}
               >
-                Se deconnecter
+                Se déconnecter
               </Link>
             </div>
           )}
@@ -263,7 +263,7 @@ export default async function SubscriberAccountPage({
                 lineHeight: 1.75,
               }}
             >
-              Saisissez l&apos;email utilise lors du paiement Stripe pour ouvrir votre compte.
+              Saisissez l&apos;email utilisé lors du paiement Stripe pour ouvrir votre compte.
             </div>
           )}
 
@@ -280,7 +280,7 @@ export default async function SubscriberAccountPage({
                 lineHeight: 1.75,
               }}
             >
-              Aucun compte actif pour cet email. Verifiez l&apos;adresse de paiement.
+              Aucun compte actif pour cet e-mail. Vérifiez l&apos;adresse de paiement.
             </div>
           )}
 
@@ -297,7 +297,7 @@ export default async function SubscriberAccountPage({
                 lineHeight: 1.75,
               }}
             >
-              La connexion n&apos;a pas pu etre confirmee. Reessayez dans un instant.
+              La connexion n&apos;a pas pu être confirmée. Réessayez dans un instant.
             </div>
           )}
 
@@ -314,7 +314,7 @@ export default async function SubscriberAccountPage({
                 lineHeight: 1.75,
               }}
             >
-              Ce lien de connexion est expire ou deja utilise. Demandez un nouveau
+              Ce lien de connexion est expiré ou déjà utilisé. Demandez un nouveau
               lien depuis cette page.
             </div>
           )}
@@ -333,7 +333,7 @@ export default async function SubscriberAccountPage({
               }}
             >
               La connexion directe par lien email sans jeton n&apos;est plus active.
-              Utilisez le bouton pour recevoir un lien securise.
+              Utilisez le bouton pour recevoir un lien sécurisé.
             </div>
           )}
 
@@ -350,8 +350,8 @@ export default async function SubscriberAccountPage({
                 lineHeight: 1.75,
               }}
             >
-              Aucun abonnement actif trouve pour cet email. Verifiez
-              l&apos;adresse Stripe ou reessayez dans quelques minutes.
+              Aucun abonnement actif trouvé pour cet e-mail. Vérifiez
+              l&apos;adresse Stripe ou réessayez dans quelques minutes.
             </div>
           )}
 
@@ -373,7 +373,7 @@ export default async function SubscriberAccountPage({
                   {
                     label: "Quota mensuel",
                     value: formatQuota(account.monthlyQuota, account.monthlyUsed),
-                    helper: `Periode ouverte le ${formatDate(account.quotaPeriodStartedAt)}`,
+                    helper: `Période ouverte le ${formatDate(account.quotaPeriodStartedAt)}`,
                   },
                   {
                     label: "Analyses restantes",
@@ -472,7 +472,7 @@ export default async function SubscriberAccountPage({
                   Posez des questions sur votre rapport. Le contexte du diagnostic est
                   pris en charge automatiquement lorsque vous ouvrez l&apos;assistant
                   depuis la page d&apos;un rapport ; depuis le compte, vous pouvez
-                  tout de meme ouvrir l&apos;assistant (exemple si aucun rapport en
+                  tout de même ouvrir l&apos;assistant (exemple si aucun rapport en
                   session).
                 </p>
                 <div style={{ display: "flex", flexWrap: "wrap", gap: "12px" }}>
@@ -555,7 +555,7 @@ export default async function SubscriberAccountPage({
                           {payment.offerSlug
                             ? getOfferBySlug(payment.offerSlug)?.name ??
                               payment.offerSlug.replaceAll("-", " ")
-                            : "Paiement non mappe"}
+                            : "Paiement non mappé"}
                         </p>
                         <p
                           style={{
@@ -580,7 +580,7 @@ export default async function SubscriberAccountPage({
                       color: "var(--text-secondary)",
                     }}
                   >
-                    Aucun paiement rattache n&apos;a encore ete enregistre.
+                    Aucun paiement rattaché n&apos;a encore été enregistré.
                   </p>
                 )}
               </section>
@@ -689,7 +689,7 @@ export default async function SubscriberAccountPage({
                       color: "rgba(237, 242, 247, 0.8)",
                     }}
                   >
-                    Aucune analyse rattachee a ce compte pour l&apos;instant.
+                    Aucune analyse rattachée à ce compte pour l&apos;instant.
                   </p>
                 )}
               </section>

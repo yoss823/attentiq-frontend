@@ -313,17 +313,16 @@ export async function analyzeVideo(
 // ─── Mock for local development ────────────────────────────────────────────
 
 /**
- * Returns a mock RailwayResponse for @saleswitheva — used when
- * RAILWAY_BASE_URL is not configured or for local UI testing.
+ * Réponse fictive pour démo locale / absence de backend (UI, chat, route analyze mock).
  */
-export function mockSalesWithEvaResponse(): RailwayResponse {
+export function mockAttentiqDemoAnalyzeResponse(): RailwayResponse {
   return {
-    request_id: "mock-saleswitheva-001",
+    request_id: "mock-attentiq-demo-001",
     status: "success",
     metadata: {
-      url: "https://www.tiktok.com/@saleswitheva/video/7380000000000000000",
+      url: "https://www.tiktok.com/@attentiq_demo/video/7380000000000000000",
       platform: "tiktok",
-      author: "@saleswitheva",
+      author: "@attentiq_demo",
       title: "Comment doubler ses ventes en 30 jours sans publicité",
       duration_seconds: 47,
       hashtags: ["#sales", "#entrepreneur", "#tiktokbusiness"],

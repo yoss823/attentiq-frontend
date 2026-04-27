@@ -1,5 +1,5 @@
 import { NextRequest, NextResponse } from "next/server";
-import { formatAttentiqReport, mockSalesWithEvaResponse } from "@/lib/railway-client";
+import { formatAttentiqReport, mockAttentiqDemoAnalyzeResponse } from "@/lib/railway-client";
 import { URL_PIPELINE_VERSION, buildPipelineHeaders, preflightRailwayUrl, resolveVideoUrl, startRailwayAnalyze, UrlIntakeError } from "@/lib/railway-server";
 import {
   parsePremiumEntitlement,
@@ -62,7 +62,7 @@ export async function POST(req: NextRequest) {
   }
 
   if (!process.env.RAILWAY_BASE_URL) {
-    const mockData = mockSalesWithEvaResponse();
+    const mockData = mockAttentiqDemoAnalyzeResponse();
     const report = formatAttentiqReport(mockData);
     return NextResponse.json({ report, demo: true, pipelineVersion: URL_PIPELINE_VERSION }, { headers: buildPipelineHeaders() });
   }

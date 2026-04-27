@@ -280,7 +280,7 @@ function buildStructuralCards(
       eyebrow: "Resume structurel",
       body:
         diagnostic?.global_summary ??
-        "Le rapport n'a pas remonte de resume structurel detaille.",
+        "Le rapport n'a pas remonté de résumé structurel détaillé.",
     },
     {
       eyebrow: "Mecanique de chute",
@@ -292,7 +292,7 @@ function buildStructuralCards(
       eyebrow: "Perception spectateur",
       body:
         diagnostic?.creator_perception ??
-        "La perception du createur n'est pas detaillee dans cette reponse.",
+        "La perception du créateur n'est pas détaillée dans cette réponse.",
     },
     {
       eyebrow: "Impact estime",
@@ -344,7 +344,7 @@ function buildAssistantPrompts(
     return [
       `Que corriger en premier vers ${firstTimestamp} ?`,
       `Comment traiter le point ${primaryCategory} sans casser le reste ?`,
-      "Resumons le diagnostic structurel en 3 decisions",
+      "Résumons le diagnostic structurel en 3 décisions",
       "Transforme le plan d'action en check-list de tournage",
       isLikelyMusicOnly
         ? "Que peut-on conclure avec une piste surtout musicale ?"
@@ -660,7 +660,7 @@ export default function ResultReport({
   async function handleSendPdf() {
     if (!isPremiumUnlocked) {
       setSendPdfFeedback(
-        "Le PDF complet est reserve au rapport debloque. Passez au premium pour le recevoir."
+        "Le PDF complet est réservé au rapport débloqué. Passez au premium pour le recevoir."
       );
       return;
     }
@@ -854,7 +854,7 @@ export default function ResultReport({
   );
   const summary = polishDiagnosticFrenchForDisplay(
     diagnostic?.global_summary ??
-      "Attentiq a prepare un diagnostic d'attention limite pour vous aider a decider si le rapport complet vaut le deblocage."
+      "Attentiq a préparé un diagnostic d'attention limité pour vous aider à décider si le rapport complet vaut le déblocage."
   );
   const dropOffRuleDisplay = polishDiagnosticFrenchForDisplay(
     diagnostic?.drop_off_rule ?? ""
@@ -872,15 +872,15 @@ export default function ResultReport({
   const teaserDropStatHelper =
     isPremiumUnlocked
       ? isVideoContent
-        ? "timeline complete visible, avec toute la chronologie detectee"
-        : "timeline detaillee visible, avec toute la progression detectee"
+        ? "timeline complète visible, avec toute la chronologie détectée"
+        : "timeline détaillée visible, avec toute la progression détectée"
       : previewDrops.length === 0
         ? isVideoContent
           ? `Aucune chute listée dans cet aperçu ; le score et le résumé restent utiles. Jusqu'à ${FREE_TEASER_LIMITS.drops} chutes chronologiques après déblocage.`
           : `Aucun point de friction listé dans cet aperçu ; le score et le résumé restent utiles. Jusqu'à ${FREE_TEASER_LIMITS.drops} points détaillés après déblocage.`
         : isVideoContent
-          ? `jusqu'a ${FREE_TEASER_LIMITS.drops} chutes visibles avant le deblocage`
-          : `jusqu'a ${FREE_TEASER_LIMITS.drops} points de friction visibles avant le deblocage`;
+          ? `jusqu'à ${FREE_TEASER_LIMITS.drops} chutes visibles avant le déblocage`
+          : `jusqu'à ${FREE_TEASER_LIMITS.drops} points de friction visibles avant le déblocage`;
   const hiddenPreviewTotal = hiddenDropsCount + hiddenActionsCount;
   const teaserHiddenStatValue: ReactNode =
     isPremiumUnlocked
@@ -895,10 +895,10 @@ export default function ResultReport({
       ? "resume structurel, perception et impact relus ensemble"
       : hiddenPreviewTotal === 0
         ? "Même sans détail masqué ici, le rapport complet ajoute timeline, niveaux d'impact par chute et plan priorisé."
-        : "les parties detaillees restent reservees au rapport complet";
+        : "les parties détaillées restent réservées au rapport complet";
   const analysisModeLabel = isAudioOnly
-    ? "Mode detecte: audio principalement (lecture visuelle limitee)"
-    : "Mode detecte: audio + visuel + texte a l'ecran (selon le signal disponible)";
+    ? "Mode détecté : audio principalement (lecture visuelle limitée)"
+    : "Mode détecté : audio + visuel + texte à l'écran (selon le signal disponible)";
 
   return (
     <main
@@ -1045,7 +1045,7 @@ export default function ResultReport({
                   letterSpacing: "0.18em",
                 }}
               >
-                {isPremiumUnlocked ? "Rapport complet debloque" : "Rapport gratuit · teaser"}
+                {isPremiumUnlocked ? "Rapport complet débloqué" : "Rapport gratuit · teaser"}
               </div>
             )}
           </div>
@@ -1070,16 +1070,16 @@ export default function ResultReport({
 
         {isPremiumUnlocked && (
           <AccessBanner
-            eyebrow={wasRecentlyUnlocked ? "Paiement confirme" : "Acces premium"}
+            eyebrow={wasRecentlyUnlocked ? "Paiement confirmé" : "Accès premium"}
             title={
               isSubscriptionEntitlement
-                ? "Paiement confirme — rapport complet debloque"
-                : "Paiement confirme — rapport complet debloque"
+                ? "Abonnement actif — ce rapport en version complète"
+                : "Paiement confirmé — rapport complet débloqué"
             }
             subtitle={
               isSubscriptionEntitlement
-                ? "La timeline complete, le diagnostic structurel detaille, le plan d'action priorise et l'assistant coach sont maintenant visibles sur ce rapport."
-                : "Le teaser a bascule vers la version complete. Vous voyez maintenant toutes les chutes, leur importance (Critique, Fort…), leur type (verbal, rythme, visuel) et le plan d'action priorise."
+                ? "La timeline complète, le diagnostic structurel détaillé, le plan d'action priorisé et l'assistant coach sont maintenant visibles sur ce rapport."
+                : "Le teaser a basculé vers la version complète. Vous voyez maintenant toutes les chutes, leur importance (Critique, Fort…), leur type (verbal, rythme, visuel) et le plan d'action priorisé."
             }
             border="rgba(52, 211, 153, 0.24)"
             glow="rgba(52, 211, 153, 0.12)"
@@ -1101,11 +1101,11 @@ export default function ResultReport({
             }}
           >
             {isLikelyMusicOnly
-              ? "Piste surtout musicale detectee: le detail verbal peut etre peu fiable. Le diagnostic doit etre lu surtout sur le rythme global."
-              : "Mode audio uniquement: ce rapport reste utile pour le rythme, mais il sera moins precis sur les signaux visuels."}{" "}
+              ? "Piste surtout musicale détectée : le détail verbal peut être peu fiable. Le diagnostic doit être lu surtout sur le rythme global."
+              : "Mode audio uniquement : ce rapport reste utile pour le rythme, mais il sera moins précis sur les signaux visuels."}{" "}
             {isPremiumUnlocked
-              ? "Le complet reste debloque avec cette limite explicite."
-              : "Le teaser reste volontairement limite dans ce contexte."}
+              ? "Le complet reste débloqué avec cette limite explicite."
+              : "Le teaser reste volontairement limité dans ce contexte."}
             {!isPremiumUnlocked && (
               <>
                 {" "}
@@ -1117,7 +1117,7 @@ export default function ResultReport({
                     fontWeight: 700,
                   }}
                 >
-                  Reessayer en upload video
+                  Réessayer en upload vidéo
                 </Link>
                 {" "}pour tenter une lecture audio + visuelle complete.
               </>
@@ -1188,7 +1188,7 @@ export default function ResultReport({
               >
                 {isPremiumUnlocked
                   ? "Votre rapport complet d'attention."
-                  : `Ce que votre ${contentLabel} laisse deja voir.`}
+                  : `Ce que votre ${contentLabel} laisse déjà voir.`}
               </h1>
               <p
                 style={{
@@ -1275,24 +1275,24 @@ export default function ResultReport({
             label={
               isPremiumUnlocked
                 ? isVideoContent
-                  ? "Chutes detectees"
-                  : "Points detectes"
+                  ? "Chutes détectées"
+                  : "Points détectés"
                 : "Teaser gratuit"
             }
             value={teaserDropStatValue}
             helper={teaserDropStatHelper}
           />
           <StatCard
-            label={isPremiumUnlocked ? "Actions priorisees" : "Actions visibles"}
+            label={isPremiumUnlocked ? "Actions priorisées" : "Actions visibles"}
             value={`${isPremiumUnlocked ? allActions.length : previewActions.length}`}
             helper={
               isPremiumUnlocked
-                ? "plan d'action complet avec priorite d'execution"
-                : `jusqu'a ${FREE_TEASER_LIMITS.actions} actions visibles dans le gratuit`
+                ? "plan d'action complet avec priorité d'exécution"
+                : `jusqu'à ${FREE_TEASER_LIMITS.actions} actions visibles dans le gratuit`
             }
           />
           <StatCard
-            label={isPremiumUnlocked ? "Lecture structurelle" : "Sections masquees"}
+            label={isPremiumUnlocked ? "Lecture structurelle" : "Sections masquées"}
             value={teaserHiddenStatValue}
             helper={teaserHiddenStatHelper}
           />
@@ -1353,7 +1353,7 @@ export default function ResultReport({
           <>
             <Panel style={{ marginBottom: "14px" }}>
               <SectionHeader
-                eyebrow={isVideoContent ? "Timeline complete" : "Timeline detaillee"}
+                eyebrow={isVideoContent ? "Timeline complète" : "Timeline détaillée"}
                 title={
                   isVideoContent
                     ? "Toutes les chutes et leur nature"
@@ -1496,8 +1496,8 @@ export default function ResultReport({
                     color: "var(--text-secondary)",
                   }}
                 >
-                  Aucune chute supplementaire n&apos;a ete structuree dans ce
-                  rapport, mais le diagnostic detaille reste disponible
+                  Aucune chute supplémentaire n&apos;a été structurée dans ce
+                  rapport, mais le diagnostic détaillé reste disponible
                   ci-dessous.
                 </p>
               )}
@@ -1666,7 +1666,7 @@ export default function ResultReport({
                     color: "var(--text-secondary)",
                   }}
                 >
-                  Aucun plan d&apos;action supplementaire n&apos;a ete remonte dans ce
+                  Aucun plan d&apos;action supplémentaire n&apos;a été remonté dans ce
                   diagnostic complet.
                 </p>
               )}
@@ -1711,7 +1711,7 @@ export default function ResultReport({
                     const severity = SEVERITY_CONFIG[drop.severity];
                     const teaserCause = clampTextForTeaser(
                       isLikelyMusicOnly
-                        ? "Signal de rythme detecte sur une piste majoritairement musicale. Le detail verbal exact est reserve au rapport complet."
+                        ? "Signal de rythme détecté sur une piste majoritairement musicale. Le détail verbal exact est réservé au rapport complet."
                         : drop.cause,
                       120
                     );
@@ -1825,8 +1825,8 @@ export default function ResultReport({
               >
                 {hiddenDropsCount > 0
                   ? isVideoContent
-                    ? `${hiddenDropsCount} chute(s) supplementaire(s) restent masquees dans le rapport gratuit.`
-                    : `${hiddenDropsCount} point(s) supplementaire(s) restent masques dans le rapport gratuit.`
+                    ? `${hiddenDropsCount} chute(s) supplémentaire(s) restent masquées dans le rapport gratuit.`
+                    : `${hiddenDropsCount} point(s) supplémentaire(s) restent masqués dans le rapport gratuit.`
                   : "Le rapport complet ajoute surtout plus de contexte et une priorisation plus fine."}
               </div>
 
@@ -1843,8 +1843,8 @@ export default function ResultReport({
                     lineHeight: 1.7,
                   }}
                 >
-                  Le rapport complet debloque : timestamps exacts des pertes
-                  d&apos;attention, causes detaillees par chute (verbal / rythme /
+                  Le rapport complet débloque : timestamps exacts des pertes
+                  d&apos;attention, causes détaillées par chute (verbal / rythme /
                   visuel), lien entre les chutes et plan d&apos;action priorise.
                 </div>
               )}
@@ -1924,8 +1924,8 @@ export default function ResultReport({
                 }}
               >
                 {hiddenActionsCount > 0
-                  ? `${hiddenActionsCount} action(s) supplementaire(s) restent reservees au rapport complet.`
-                  : "Le rapport complet sert surtout a passer de l'aperçu a la priorisation detaillee."}
+                  ? `${hiddenActionsCount} action(s) supplémentaire(s) restent réservées au rapport complet.`
+                  : "Le rapport complet sert surtout à passer de l'aperçu à la priorisation détaillée."}
               </p>
             </Panel>
 
@@ -1936,7 +1936,7 @@ export default function ResultReport({
               title="Assistant Attentiq"
               subtitle="Je peux vous aider a mieux comprendre"
               suggestedPrompts={assistantPrompts}
-              footerNote="Assistant limite a ce teaser et a votre diagnostic actuel."
+              footerNote="Assistant limité à ce teaser et à votre diagnostic actuel."
               maxAssistantReplies={1}
               paywallHref="#offres-premium"
             />
@@ -1960,7 +1960,7 @@ export default function ResultReport({
                 }}
               >
                 <LockedPreviewCard
-                  title={isVideoContent ? "Timeline complete" : "Timeline detaillee"}
+                  title={isVideoContent ? "Timeline complète" : "Timeline détaillée"}
                   helper={
                     isVideoContent
                       ? "Toutes les chutes sont visibles avec leur niveau d'impact et leur categorie verbale, rythme ou visuelle."
@@ -1968,11 +1968,11 @@ export default function ResultReport({
                   }
                 />
                 <LockedPreviewCard
-                  title="Diagnostic structurel detaille"
+                  title="Diagnostic structurel détaillé"
                   helper="Le complet reconnecte les chutes entre elles et explique la logique de rupture."
                 />
                 <LockedPreviewCard
-                  title="Plan d'actions priorise"
+                  title="Plan d'actions priorisé"
                   helper="Vous voyez quoi corriger d'abord, quoi couper ensuite, et ce qui peut attendre."
                 />
               </div>
@@ -1991,7 +1991,7 @@ export default function ResultReport({
         >
           <SectionHeader
             eyebrow="Suite"
-            title={isPremiumUnlocked ? "Executer et comparer" : "Continuer ou debloquer"}
+            title={isPremiumUnlocked ? "Exécuter et comparer" : "Continuer ou débloquer"}
           />
           <p
             style={{
@@ -2002,8 +2002,8 @@ export default function ResultReport({
             }}
           >
             {isPremiumUnlocked
-              ? `Le rapport complet sert maintenant a executer. Corrigez d'abord la priorite numero un, puis relancez un autre ${contentLabel} pour comparer une nouvelle version.`
-              : "Le gratuit sert a qualifier rapidement la valeur du diagnostic. Soit vous debloquez le rapport complet, soit vous essayez un autre format gratuit (video, texte ou image)."}
+              ? `Le rapport complet sert maintenant à exécuter. Corrigez d'abord la priorité numéro un, puis relancez un autre ${contentLabel} pour comparer une nouvelle version.`
+              : "Le gratuit sert à qualifier rapidement la valeur du diagnostic. Soit vous débloquez le rapport complet, soit vous essayez un autre format gratuit (vidéo, texte ou image)."}
           </p>
 
           <div
