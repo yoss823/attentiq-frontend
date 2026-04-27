@@ -9,6 +9,23 @@ export const runtime = "nodejs";
 
 const COOKIE_MAX_AGE_SECONDS = 31 * 24 * 60 * 60;
 
+function shouldUseSecureCookie(request: NextRequest) {
+  const host =
+    request.headers.get("x-forwarded-host") ?? request.headers.get("host") ?? "";
+  const isLocalHost =
+    host.includes("localhost") ||
+    host.includes("127.0.0.1") ||
+    host.includes("0.0.0.0");
+  if (isLocalHost) {
+    return false;
+  }
+  const forwardedProto = request.headers.get("x-forwarded-proto");
+  if (forwardedProto) {
+    return forwardedProto.split(",")[0].trim() === "https";
+  }
+  return request.nextUrl.protocol === "https:";
+}
+
 export async function GET(request: NextRequest) {
   const email = normalizeAccountEmail(request.nextUrl.searchParams.get("email"));
   if (!email) {
@@ -28,7 +45,7 @@ export async function GET(request: NextRequest) {
     value: email,
     path: "/",
     httpOnly: true,
-    secure: true,
+    secure: shouldUseSecureCookie(request),
     sameSite: "lax",
     maxAge: COOKIE_MAX_AGE_SECONDS,
   });

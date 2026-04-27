@@ -52,9 +52,7 @@ export default function InlineChatbot({
   showAttentionNudge = true,
 }: InlineChatbotProps) {
   const isFloating = variant === "floating";
-  const [isOpen, setIsOpen] = useState(() =>
-    isFloating ? true : defaultOpen
-  );
+  const [isOpen, setIsOpen] = useState(defaultOpen);
   const [messages, setMessages] = useState<ChatMessage[]>([]);
   const [input, setInput] = useState("");
   const [isSending, setIsSending] = useState(false);

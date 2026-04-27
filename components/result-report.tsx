@@ -658,6 +658,12 @@ export default function ResultReport({
   const [sendPdfFeedback, setSendPdfFeedback] = useState<string | null>(null);
 
   async function handleSendPdf() {
+    if (!isPremiumUnlocked) {
+      setSendPdfFeedback(
+        "Le PDF complet est reserve au rapport debloque. Passez au premium pour le recevoir."
+      );
+      return;
+    }
     if (!reportJobId) {
       setSendPdfFeedback(
         "Ce rapport n'a pas de job ID exploitable pour generer le PDF."
@@ -964,21 +970,32 @@ export default function ResultReport({
             <button
               type="button"
               onClick={handleSendPdf}
-              disabled={!reportJobId || isSendingPdf}
+              disabled={!reportJobId || isSendingPdf || !isPremiumUnlocked}
               style={{
                 minHeight: "36px",
                 borderRadius: "999px",
                 border: "1px solid rgba(0, 212, 255, 0.24)",
-                background: !reportJobId
+                background: !reportJobId || !isPremiumUnlocked
                   ? "rgba(107, 114, 128, 0.2)"
                   : "rgba(0, 212, 255, 0.12)",
-                color: !reportJobId ? "rgba(203, 213, 225, 0.7)" : "#67e8f9",
+                color:
+                  !reportJobId || !isPremiumUnlocked
+                    ? "rgba(203, 213, 225, 0.7)"
+                    : "#67e8f9",
                 padding: "0 14px",
                 fontSize: "12px",
                 fontWeight: 800,
                 letterSpacing: "0.04em",
-                cursor: !reportJobId || isSendingPdf ? "not-allowed" : "pointer",
+                cursor:
+                  !reportJobId || isSendingPdf || !isPremiumUnlocked
+                    ? "not-allowed"
+                    : "pointer",
               }}
+              title={
+                isPremiumUnlocked
+                  ? "Recevoir le PDF"
+                  : "Disponible apres deblocage premium"
+              }
             >
               {isSendingPdf ? "Envoi PDF..." : "Recevoir mon rapport PDF"}
             </button>
@@ -1063,6 +1080,22 @@ export default function ResultReport({
             {isPremiumUnlocked
               ? "Le complet reste debloque avec cette limite explicite."
               : "Le teaser reste volontairement limite dans ce contexte."}
+            {!isPremiumUnlocked && (
+              <>
+                {" "}
+                <Link
+                  href="/analyze?input=upload"
+                  style={{
+                    color: "#fde68a",
+                    textDecoration: "underline",
+                    fontWeight: 700,
+                  }}
+                >
+                  Reessayer en upload video
+                </Link>
+                {" "}pour tenter une lecture audio + visuelle complete.
+              </>
+            )}
           </div>
         )}
 
@@ -1472,7 +1505,7 @@ export default function ResultReport({
             <InlineChatbot
               diagnosticContext={buildChatDiagnosticContext(report)}
               variant="floating"
-              defaultOpen
+              defaultOpen={false}
               title="Coach Attentiq"
               subtitle="Posez vos questions sur ce rapport"
               suggestedPrompts={assistantPrompts}
@@ -1849,9 +1882,9 @@ export default function ResultReport({
             <InlineChatbot
               diagnosticContext={buildChatDiagnosticContext(report)}
               variant="floating"
-              defaultOpen
+              defaultOpen={false}
               title="Assistant Attentiq"
-              subtitle="Une question sur ce diagnostic ?"
+              subtitle="Je peux vous aider a mieux comprendre"
               suggestedPrompts={assistantPrompts}
               footerNote="Assistant limite a ce teaser et a votre diagnostic actuel."
               maxAssistantReplies={1}
