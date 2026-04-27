@@ -17,6 +17,24 @@ type AnalyzeExperienceProps = {
   initialPaid?: boolean;
 };
 
+function normalizePreferredPublicVideoUrl(rawUrl: string) {
+  const trimmed = rawUrl.trim();
+  try {
+    const parsed = new URL(trimmed);
+    const host = parsed.hostname.toLowerCase();
+    const isTikTok = host.includes("tiktok.com");
+    const isCanonicalTikTokPath = /\/@[^/]+\/video\/\d+/i.test(parsed.pathname);
+    if (isTikTok && isCanonicalTikTokPath) {
+      parsed.search = "";
+      parsed.hash = "";
+      return parsed.toString();
+    }
+    return trimmed;
+  } catch {
+    return trimmed;
+  }
+}
+
 export default function AnalyzeExperience({
   initialJobId = null,
   initialVideoUrl = null,
@@ -106,8 +124,11 @@ export default function AnalyzeExperience({
 
   async function handleSubmit(e: React.FormEvent) {
     e.preventDefault();
-    const trimmedUrl = videoUrl.trim();
+    const trimmedUrl = normalizePreferredPublicVideoUrl(videoUrl);
     if (!trimmedUrl) return;
+    if (trimmedUrl !== videoUrl) {
+      setVideoUrl(trimmedUrl);
+    }
 
     setIsAnalyzing(true);
     setError(null);
@@ -483,7 +504,7 @@ export default function AnalyzeExperience({
                     type="url"
                     value={videoUrl}
                     onChange={(e) => setVideoUrl(e.target.value)}
-                    placeholder="https://www.tiktok.com/... ou youtube.com/shorts/..."
+                    placeholder="https://www.tiktok.com/@user/video/1234567890"
                     required
                     style={{
                       minHeight: "54px",
@@ -538,6 +559,32 @@ export default function AnalyzeExperience({
                 La video source doit faire moins de 60 secondes (Short, Reel,
                 extrait).
               </p>
+              <div
+                style={{
+                  marginTop: "8px",
+                  padding: "10px 12px",
+                  borderRadius: "12px",
+                  border: "1px solid rgba(0, 212, 255, 0.14)",
+                  background: "rgba(0, 212, 255, 0.06)",
+                  color: "rgba(237, 242, 247, 0.82)",
+                  fontSize: "12px",
+                  lineHeight: 1.6,
+                }}
+              >
+                URL supportees: TikTok, YouTube Shorts, Instagram Reel, Snapchat
+                Spotlight.
+                <br />
+                Exemple TikTok recommande:{" "}
+                <code style={{ color: "#67e8f9" }}>
+                  https://www.tiktok.com/@coach.wingue/video/7518098447518403862
+                </code>
+                <br />
+                Evitez les paramètres longs de tracking{" "}
+                <code style={{ color: "#67e8f9" }}>
+                  ?is_from_webapp=...
+                </code>
+                ; Attentiq nettoie automatiquement le lien TikTok si besoin.
+              </div>
             </>
           ) : (
             <form onSubmit={handleUpload}>
