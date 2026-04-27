@@ -109,6 +109,52 @@ function buildModelInput(
   ].join("\n");
 }
 
+/** Groq a une fenêtre de contexte plus petite : évite d'envoyer tout le rapport texte brut. */
+function buildGroqModelInput(
+  message: string,
+  history: ChatTurn[],
+  diagnostic: ChatDiagnosticContext
+): string {
+  const maxReportChars = 12_000;
+  const maxTranscriptSegments = 40;
+  const reportText =
+    diagnostic.reportText.length > maxReportChars
+      ? `${diagnostic.reportText.slice(0, maxReportChars)}\n[... rapport tronque pour limite de contexte ...]`
+      : diagnostic.reportText;
+  const transcript = (diagnostic.transcript ?? []).slice(0, maxTranscriptSegments);
+  const slim = {
+    requestId: diagnostic.requestId,
+    status: diagnostic.status,
+    partial: diagnostic.partial,
+    metadata: diagnostic.metadata,
+    diagnostic: diagnostic.diagnostic,
+    transcript,
+    reportText,
+  };
+  const historyText =
+    history.length > 0
+      ? history
+          .map(
+            (turn) =>
+              `${turn.role === "assistant" ? "Assistant" : "Utilisateur"}: ${turn.content}`
+          )
+          .join("\n")
+      : "Aucun historique.";
+
+  return [
+    "DIAGNOSTIC DE SESSION (extrait pour le chat)",
+    JSON.stringify(slim, null, 2),
+    "",
+    "HISTORIQUE RÉCENT",
+    historyText,
+    "",
+    "QUESTION ACTUELLE",
+    `Utilisateur: ${message}`,
+    "",
+    "Réponds maintenant en respectant strictement les règles.",
+  ].join("\n");
+}
+
 function extractResponseText(payload: unknown): string | null {
   if (!payload || typeof payload !== "object") {
     return null;
@@ -154,7 +200,7 @@ async function tryGroqChat(
         { role: "system", content: SYSTEM_PROMPT },
         {
           role: "user",
-          content: buildModelInput(message, history, diagnostic),
+          content: buildGroqModelInput(message, history, diagnostic),
         },
       ],
       max_tokens: 400,
