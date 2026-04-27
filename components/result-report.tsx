@@ -164,10 +164,63 @@ function formatAuthor(author: string | undefined) {
   return author.startsWith("@") ? author : `@${author}`;
 }
 
+function detectLikelyMusicOnly(report: AttentiqReport) {
+  const diagnostic = report.data.diagnostic;
+  const metadata = report.data.metadata;
+  const warningText =
+    (typeof diagnostic?.warning === "string" ? diagnostic.warning : "") +
+    " " +
+    (typeof metadata?.title === "string" ? metadata.title : "");
+  const warningHint =
+    /audio\s*only|musique|music|instrumental|original sound|son original/i.test(
+      warningText
+    );
+
+  const transcript = Array.isArray(report.data.transcript)
+    ? report.data.transcript
+    : [];
+  const transcriptText = transcript
+    .map((segment) => (typeof segment?.text === "string" ? segment.text : ""))
+    .join(" ")
+    .toLowerCase();
+  const tokens = transcriptText
+    .replace(/[^\p{L}\p{N}\s]/gu, " ")
+    .split(/\s+/)
+    .filter((token) => token.length >= 2);
+  const lexicalTokens = tokens.filter(
+    (token) =>
+      ![
+        "la",
+        "na",
+        "oh",
+        "hey",
+        "yo",
+        "music",
+        "musique",
+        "beat",
+        "sound",
+      ].includes(token)
+  );
+  const hasMeaningfulSpeech = lexicalTokens.length >= 12;
+
+  return (
+    !hasMeaningfulSpeech &&
+    (warningHint ||
+      report.partial ||
+      report.data.status === "partial" ||
+      diagnostic?.mode === "audio_only")
+  );
+}
+
 function deriveCategories(
   text: string | null | undefined,
-  isAudioOnly: boolean
+  isAudioOnly: boolean,
+  forceRhythmOnly: boolean = false
 ): DiagnosticCategory[] {
+  if (forceRhythmOnly) {
+    return ["rythme"];
+  }
+
   const value = (text ?? "").toLowerCase();
   const categories = new Set<DiagnosticCategory>();
 
@@ -197,7 +250,7 @@ function deriveCategories(
   }
 
   if (categories.size === 0) {
-    categories.add(isAudioOnly ? "verbal" : "rythme");
+    categories.add("rythme");
   }
 
   return Array.from(categories);
@@ -261,12 +314,17 @@ function buildActionPriorityLabel(index: number) {
 function buildAssistantPrompts(
   report: AttentiqReport,
   isPremiumUnlocked: boolean,
-  isAudioOnly: boolean
+  isAudioOnly: boolean,
+  isLikelyMusicOnly: boolean
 ) {
   const diagnostic = report.data.diagnostic;
   const firstDrop = diagnostic?.attention_drops?.[0];
   const firstTimestamp = firstDrop ? formatTimestamp(firstDrop.timestamp_seconds) : "le debut";
-  const firstCategories = deriveCategories(firstDrop?.cause, isAudioOnly);
+  const firstCategories = deriveCategories(
+    firstDrop?.cause,
+    isAudioOnly,
+    isLikelyMusicOnly
+  );
   const primaryCategory = CATEGORY_CONFIG[firstCategories[0]].label.toLowerCase();
 
   if (isPremiumUnlocked) {
@@ -275,7 +333,9 @@ function buildAssistantPrompts(
       `Comment traiter le point ${primaryCategory} sans casser le reste ?`,
       "Resumons le diagnostic structurel en 3 decisions",
       "Transforme le plan d'action en check-list de tournage",
-      isAudioOnly
+      isLikelyMusicOnly
+        ? "Que peut-on conclure avec une piste surtout musicale ?"
+        : isAudioOnly
         ? "Que peut-on encore conclure avec l'audio uniquement ?"
         : "Quel test visuel ferais-tu en premier ?",
       "Qu'est-ce qui est critique vs secondaire ?",
@@ -286,7 +346,9 @@ function buildAssistantPrompts(
     "Quel est le probleme principal visible ici ?",
     `Que veut dire la chute vers ${firstTimestamp} ?`,
     "Le teaser suffit-il pour payer le complet ?",
-    isAudioOnly
+    isLikelyMusicOnly
+      ? "Ce diagnostic est-il fiable sur une piste surtout musicale ?"
+      : isAudioOnly
       ? "Que peut-on conclure malgre le mode audio-only ?"
       : "Qu'est-ce qui semble surtout verbal, rythme ou visuel ?",
     "Par quoi commencer si je ne change qu'une chose ?",
@@ -734,10 +796,12 @@ export default function ResultReport({
   const hiddenActionsCount = Math.max(0, allActions.length - previewActions.length);
   const score = diagnostic?.retention_score ?? null;
   const scoreUI = scoreAppearance(score);
+  const isLikelyMusicOnly = detectLikelyMusicOnly(report);
   const isAudioOnly =
     report.data.status === "partial" ||
     report.partial ||
     diagnostic?.mode === "audio_only" ||
+    isLikelyMusicOnly ||
     !(diagnostic?.attention_drops?.length);
   const { entitlement, isPremiumUnlocked, isSubscriptionEntitlement } =
     resolvePremiumAccessState({
@@ -754,7 +818,8 @@ export default function ResultReport({
   const assistantPrompts = buildAssistantPrompts(
     report,
     isPremiumUnlocked,
-    isAudioOnly
+    isAudioOnly,
+    isLikelyMusicOnly
   );
   const summary = polishDiagnosticFrenchForDisplay(
     diagnostic?.global_summary ??
@@ -965,8 +1030,9 @@ export default function ResultReport({
               lineHeight: 1.7,
             }}
           >
-            Mode audio uniquement: ce rapport reste utile pour le verbal et le
-            rythme, mais il sera moins precis sur les signaux visuels.{" "}
+            {isLikelyMusicOnly
+              ? "Piste surtout musicale detectee: le detail verbal peut etre peu fiable. Le diagnostic doit etre lu surtout sur le rythme global."
+              : "Mode audio uniquement: ce rapport reste utile pour le rythme, mais il sera moins precis sur les signaux visuels."}{" "}
             {isPremiumUnlocked
               ? "Le complet reste debloque avec cette limite explicite."
               : "Le teaser reste volontairement limite dans ce contexte."}
@@ -1189,7 +1255,11 @@ export default function ResultReport({
                 <div style={{ display: "grid", gap: "12px" }}>
                   {allDrops.map((drop, index) => {
                     const severity = SEVERITY_CONFIG[drop.severity];
-                    const categories = deriveCategories(drop.cause, isAudioOnly);
+                    const categories = deriveCategories(
+                      drop.cause,
+                      isAudioOnly,
+                      isLikelyMusicOnly
+                    );
 
                     return (
                       <div
@@ -1298,7 +1368,9 @@ export default function ResultReport({
                               color: "rgba(237, 242, 247, 0.88)",
                             }}
                           >
-                            {drop.cause}
+                            {isLikelyMusicOnly
+                              ? "Piste majoritairement musicale: ce point est une hypothese de rythme et non une interpretation verbale fiable."
+                              : drop.cause}
                           </p>
                         </div>
                       </div>
@@ -1516,8 +1588,10 @@ export default function ResultReport({
                   cause et niveau d&apos;impact. Le rapport complet ajoute les{" "}
                   <strong>{allDrops.length - FREE_TEASER_LIMITS.drops}+</strong>{" "}
                   suivantes, la timeline entière, les liens entre chutes, le détail
-                  par axe (verbal / rythme / visuel quand le signal existe) et un plan
-                  d&apos;action priorisé étendu.
+                  {isLikelyMusicOnly
+                    ? " de rythme (fiabilite verbale reduite sur piste musicale)"
+                    : " par axe (verbal / rythme / visuel quand le signal existe)"}{" "}
+                  et un plan d&apos;action priorisé étendu.
                 </div>
               )}
 
@@ -1588,7 +1662,9 @@ export default function ResultReport({
                               color: "rgba(237, 242, 247, 0.88)",
                             }}
                           >
-                            {drop.cause}
+                            {isLikelyMusicOnly
+                              ? "Piste majoritairement musicale: ce point doit etre lu comme signal de dynamique/rythme."
+                              : drop.cause}
                           </p>
                         </div>
                       </div>
