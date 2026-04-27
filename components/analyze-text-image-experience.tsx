@@ -274,10 +274,9 @@ export default function AnalyzeTextImageExperience({
           color: "var(--text-secondary)",
         }}
       >
-        Meme moteur que la video : en essai gratuit, aperçu limité (2 a 3
-        points max.). Version gratuite : jusqu&apos;a 3 analyses au total avec
-        profondeur reduite ; le rapport complet se debloque avec une offre
-        payante.
+        Meme moteur que la video : version gratuite = jusqu&apos;a 3 analyses,
+        avec un aperçu volontairement court (1 a 2 signaux). Le rapport complet
+        se debloque avec une offre payante.
       </p>
 
       {mode === "text" ? (

@@ -104,7 +104,7 @@ function ResultState({
             color: "var(--accent)",
           }}
         >
-          RetentionScan / Result
+          Attentiq / Rapport
         </p>
         <h1
           style={{
@@ -418,8 +418,8 @@ export default function ResultPageShell({
 
   return (
     <ResultState
-      title="Aucune URL a analyser"
-      message="Collez une URL publique (TikTok, YouTube Shorts, Reel Instagram ou Snapchat Spotlight) sur la page d'analyse pour generer un rapport complet."
+      title="Aucun rapport trouve"
+      message="Lancez une analyse depuis la page video avec une URL publique (TikTok, Shorts, Reel ou Spotlight)."
     />
   );
 }

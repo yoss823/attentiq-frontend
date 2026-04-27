@@ -166,7 +166,7 @@ export default async function SubscriberAccountPage({
               color: "var(--text-primary)",
             }}
           >
-            Etat d&apos;acces et quota simple.
+            Votre compte et vos analyses.
           </h1>
 
           <p
@@ -178,8 +178,8 @@ export default async function SubscriberAccountPage({
               color: "rgba(237, 242, 247, 0.8)",
             }}
           >
-            Cet espace se base sur l&apos;email utilise dans Stripe pour les
-            abonnements 49EUR et 99EUR. Le gratuit ne demande aucun compte.
+            Connectez-vous avec l&apos;email utilise au paiement Stripe pour voir
+            votre quota et l&apos;historique de vos rapports.
           </p>
 
           <form
@@ -196,7 +196,7 @@ export default async function SubscriberAccountPage({
               type="email"
               name="email"
               defaultValue={email}
-              placeholder="email utilise dans Stripe"
+              placeholder="votre email de paiement Stripe"
               style={{
                 minHeight: "54px",
                 borderRadius: "18px",
@@ -283,7 +283,7 @@ export default async function SubscriberAccountPage({
                 lineHeight: 1.75,
               }}
             >
-              Aucun compte abonne actif pour cet email. Verifiez votre adresse de paiement.
+              Aucun compte actif pour cet email. Verifiez l&apos;adresse de paiement.
             </div>
           )}
 
@@ -300,8 +300,8 @@ export default async function SubscriberAccountPage({
                 lineHeight: 1.75,
               }}
             >
-              Aucun abonnement actif n&apos;a ete trouve pour cet email. Verifiez
-              l&apos;adresse de paiement Stripe ou attendez la reception du webhook.
+              Aucun abonnement actif trouve pour cet email. Verifiez
+              l&apos;adresse Stripe ou reessayez dans quelques minutes.
             </div>
           )}
 
@@ -330,8 +330,8 @@ export default async function SubscriberAccountPage({
                     value: formatRemaining(account.monthlyQuota, account.monthlyUsed),
                     helper:
                       account.monthlyQuota == null
-                        ? "Aucune limite mensuelle"
-                        : `Sur ${account.monthlyQuota} analyses / mois`,
+                        ? "Pas de limite mensuelle"
+                        : `${account.monthlyQuota} analyses max / mois`,
                   },
                   {
                     label: "Dernier paiement",

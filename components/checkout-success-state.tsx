@@ -102,16 +102,16 @@ export default function CheckoutSuccessState({
     : "/compte";
 
   const title = isSubscription
-    ? "Paiement confirmé — accès abonné activé"
+    ? "Paiement confirme - acces abonne active"
     : hasUnlockedReport
-      ? "Paiement confirmé — rapport complet débloqué"
-      : "Paiement confirmé";
+      ? "Paiement confirme - rapport complet debloque"
+      : "Paiement confirme";
 
   const description = isSubscription
-    ? "Votre accès premium est actif sur cet appareil et le compte abonné est prêt à être rattaché à votre email Stripe dans l'espace compte."
+    ? "Votre acces premium est actif. Vous pouvez ouvrir l'espace abonne avec votre email Stripe."
     : hasUnlockedReport
-      ? "Le rapport en cours a été marqué comme débloqué. Vous pouvez revenir immédiatement à la timeline complète, au diagnostic structurel détaillé et au plan d'action priorisé."
-      : "Le paiement a bien été enregistré. Si vous revenez depuis le même onglet, Attentiq débloquera le rapport courant automatiquement.";
+      ? "Le rapport en cours est debloque. Vous pouvez revenir tout de suite au detail complet."
+      : "Paiement enregistre. Revenez au rapport depuis cet onglet pour activer le deblocage.";
 
   return (
     <main
@@ -324,7 +324,7 @@ export default function CheckoutSuccessState({
               fontWeight: 900,
             }}
           >
-            Voir mon rapport
+              Ouvrir mon rapport
           </Link>
 
           {isSubscription && (
@@ -365,7 +365,7 @@ export default function CheckoutSuccessState({
               fontWeight: 800,
             }}
           >
-            Analyser une autre vidéo
+              Analyser une autre video
           </Link>
         </div>
       </section>

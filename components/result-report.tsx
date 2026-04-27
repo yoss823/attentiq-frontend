@@ -418,7 +418,7 @@ function AccessBanner({
         style={{
           margin: "12px 0 0",
           fontSize: "14px",
-          lineHeight: 1.8,
+              lineHeight: 1.65,
           color: "rgba(237, 242, 247, 0.84)",
           maxWidth: "44rem",
         }}
@@ -1218,7 +1218,7 @@ export default function ResultReport({
         <Panel style={{ marginBottom: "14px" }}>
           <SectionHeader
             eyebrow={isPremiumUnlocked ? "Diagnostic complet" : "Resume gratuit"}
-            title={isPremiumUnlocked ? "Lecture complete" : "Lecture immediate"}
+                title={isPremiumUnlocked ? "Lecture complete" : "Lecture rapide"}
           />
           <p
             style={{
@@ -1594,7 +1594,7 @@ export default function ResultReport({
             <Panel style={{ marginBottom: "14px" }}>
               <SectionHeader
                 eyebrow={isVideoContent ? "Apercu gratuit" : "Apercu gratuit"}
-                title="Ce que vous voyez en 20 secondes"
+                title="Ce que vous voyez tout de suite"
               />
 
               {allDrops.length > FREE_TEASER_LIMITS.drops && (
@@ -1770,7 +1770,7 @@ export default function ResultReport({
             <Panel style={{ marginBottom: "14px" }}>
               <SectionHeader
                 eyebrow="Preview actions"
-                title="Les premieres corrections visibles"
+                title="Premieres corrections visibles"
               />
 
               {previewActions.length > 0 ? (
@@ -1914,7 +1914,7 @@ export default function ResultReport({
         >
           <SectionHeader
             eyebrow="Suite"
-            title={isPremiumUnlocked ? "Executer ou comparer" : "Repartir ou debloquer"}
+            title={isPremiumUnlocked ? "Executer et comparer" : "Continuer ou debloquer"}
           />
           <p
             style={{

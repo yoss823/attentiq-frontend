@@ -12,7 +12,7 @@ import {
 export const metadata: Metadata = {
   title: "Analysez vos photos — Attentiq",
   description:
-    "Analyse de rétention pour vos visuels. Aperçu gratuit limité, puis 9 €, 35 €/mois ou 89 €/mois (même grille que la vidéo).",
+    "Analyse de rétention pour vos visuels : jusqu'à 3 analyses gratuites (aperçu court), puis rapport complet payant.",
 };
 
 const features = [
@@ -216,9 +216,8 @@ export default function ImagesPage() {
               maxWidth: "44rem",
             }}
           >
-            Attentiq identifie les zones de votre visuel qui captent ou perdent
-            l&apos;attention — avec les causes et un plan d&apos;actions concret
-            pour composer plus efficacement.
+            Attentiq montre vite ce qui attire ou fait fuir l&apos;attention,
+            puis quoi corriger d&apos;abord.
           </p>
           <p
             style={{
@@ -230,17 +229,17 @@ export default function ImagesPage() {
             }}
           >
             <strong style={{ color: "rgba(237, 242, 247, 0.95)" }}>
-              Essai gratuit :
+              Gratuit :
             </strong>{" "}
-            aperçu limité — en général{" "}
+            jusqu&apos;a{" "}
             <strong style={{ color: "rgba(237, 242, 247, 0.95)" }}>
-              2 à 3 points
+              3 analyses
             </strong>{" "}
-            maximum (score, zones sensibles, pistes).{" "}
+            avec un aperçu court (1 a 2 signaux).{" "}
             <strong style={{ color: "rgba(237, 242, 247, 0.95)" }}>
               Payant :
             </strong>{" "}
-            le rapport complet — à l&apos;unité (9 €) ou en abonnement.
+            rapport complet detaille et plan priorise.
           </p>
 
           <div style={{ display: "flex", gap: "12px", flexWrap: "wrap" }}>
@@ -329,7 +328,7 @@ export default function ImagesPage() {
                 maxWidth: "44rem",
               }}
             >
-              L&apos;essai gratuit ne montre qu&apos;un aperçu (2 à 3 points).
+              Le gratuit montre un aperçu court (1 à 2 signaux).
               Ci-dessous : ce que débloque le rapport payant.
             </p>
             <div
@@ -409,7 +408,7 @@ export default function ImagesPage() {
               maxWidth: "40rem",
             }}
           >
-            Essai gratuit : aperçu limité (2 à 3 points max.) via le formulaire
+            Gratuit : jusqu&apos;a 3 analyses avec aperçu court via le formulaire
             ci-dessus — sans carte bancaire.
           </p>
 

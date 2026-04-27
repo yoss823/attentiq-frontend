@@ -118,7 +118,7 @@ const TRANSPARENCE_FAQ = [
   },
   {
     q: "L'aperçu gratuit montre quoi exactement ?",
-    a: "Un extrait utile pour décider (souvent 2 à 3 points saillants) ; le complet détaille la timeline ou l'équivalent sur texte et image.",
+    a: "Un extrait utile pour décider : jusqu'a 3 analyses gratuites, avec un aperçu court (souvent 1 a 2 signaux). Le complet détaille la timeline ou l'équivalent sur texte et image.",
   },
   {
     q: "Mes données servent à entraîner des modèles ?",

@@ -10,7 +10,7 @@ import {
 export const metadata: Metadata = {
   title: "Analysez vos vidéos — Attentiq",
   description:
-    "Analyse vidéo pour Shorts, Reels et TikTok : aperçu gratuit limité, puis 9 €, 35 €/mois (5 rapports) ou 89 €/mois (15 rapports).",
+    "Analyse vidéo pour Shorts, Reels et TikTok : jusqu'à 3 analyses gratuites (aperçu court), puis rapport complet payant.",
 };
 
 const platforms = [
@@ -220,8 +220,8 @@ export default function VideosPage() {
               maxWidth: "44rem",
             }}
           >
-            Attentiq identifie les secondes où votre audience décroche — causes
-            précises et plan d&apos;actions pour vos prochaines vidéos.
+            Attentiq montre vite où l&apos;attention casse, puis quoi corriger en
+            priorité.
           </p>
           <p
             style={{
@@ -233,18 +233,17 @@ export default function VideosPage() {
             }}
           >
             <strong style={{ color: "rgba(237, 242, 247, 0.95)" }}>
-              Essai gratuit :
+              Gratuit :
             </strong>{" "}
-            aperçu limité — en général{" "}
+            jusqu&apos;a{" "}
             <strong style={{ color: "rgba(237, 242, 247, 0.95)" }}>
-              2 à 3 points
+              3 analyses
             </strong>{" "}
-            maximum (score, chutes, pistes).{" "}
+            avec un aperçu court (1 a 2 signaux).{" "}
             <strong style={{ color: "rgba(237, 242, 247, 0.95)" }}>
               Payant :
             </strong>{" "}
-            le rapport complet — à l&apos;unité (9 €) ou en abonnement dès que
-            vous enchaînez les sorties.
+            rapport complet detaille (timestamps exacts + plan priorise).
           </p>
 
           {/* Platform badges */}
@@ -362,7 +361,7 @@ export default function VideosPage() {
                 maxWidth: "44rem",
               }}
             >
-              L&apos;essai gratuit ne montre qu&apos;un aperçu (2 à 3 points).
+              Le gratuit montre un aperçu court (1 à 2 signaux).
               Ci-dessous : ce que débloque le rapport payant.
             </p>
             <div
@@ -442,7 +441,7 @@ export default function VideosPage() {
               maxWidth: "40rem",
             }}
           >
-            Essai gratuit : aperçu limité (2 à 3 points max.) via le bouton «
+            Gratuit : jusqu&apos;a 3 analyses avec aperçu court via le bouton «
             Analyser gratuitement » dans la bannière — sans carte bancaire.
           </p>
 

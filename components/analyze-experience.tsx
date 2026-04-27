@@ -426,7 +426,7 @@ export default function AnalyzeExperience({
               color: "var(--text-primary)",
             }}
           >
-            Analysez une video courte.
+            Analyse video courte, rapide.
           </h1>
           <p
             style={{
@@ -438,8 +438,8 @@ export default function AnalyzeExperience({
             }}
           >
             {inputMode === "url"
-              ? "Collez une URL publique : TikTok, YouTube Shorts, Reel Instagram ou Snapchat Spotlight. La video doit durer moins de 60 secondes. Version gratuite : jusqu'a 3 analyses et un aperçu volontairement court (1 a 2 points cle)."
-              : "Importez votre fichier (MP4, MOV, WebM), moins de 60 secondes. Version gratuite : jusqu'a 3 analyses et un aperçu volontairement court (1 a 2 points cle)."}
+              ? "Collez une URL publique (TikTok, Shorts, Reel, Spotlight). Video max 60 s. Gratuit : jusqu'a 3 analyses, avec un aperçu court (1 a 2 signaux)."
+              : "Importez un fichier (MP4, MOV, WebM), video max 60 s. Gratuit : jusqu'a 3 analyses, avec un aperçu court (1 a 2 signaux)."}
           </p>
 
           {/* Mode toggle */}
@@ -544,7 +544,7 @@ export default function AnalyzeExperience({
                           : "0 18px 52px rgba(0, 212, 255, 0.18)",
                     }}
                   >
-                    Analyser →
+                    Lancer l&apos;analyse →
                   </button>
                 </div>
               </form>
@@ -556,8 +556,7 @@ export default function AnalyzeExperience({
                   color: "var(--text-muted)",
                 }}
               >
-                La video source doit faire moins de 60 secondes (Short, Reel,
-                extrait).
+                Video source max 60 s (Short, Reel, extrait).
               </p>
               <div
                 style={{
@@ -662,7 +661,7 @@ export default function AnalyzeExperience({
                           : "0 18px 52px rgba(0, 212, 255, 0.18)",
                     }}
                   >
-                    Analyser →
+                    Lancer l&apos;analyse →
                   </button>
                 </div>
 

@@ -10,7 +10,7 @@ import {
 export const metadata: Metadata = {
   title: "Attentiq — Analyse d'attention multi-formats",
   description:
-    "Attentiq lit vos vidéos, images et textes comme un spectateur pour repérer ce qui fait décrocher l'attention et quoi améliorer.",
+    "Attentiq montre vite où l'attention chute sur vos vidéos, images et textes, puis quoi corriger en priorité.",
 };
 
 export default function HomePage() {
@@ -198,13 +198,13 @@ export default function HomePage() {
             style={{
               margin: "0 0 28px",
               fontSize: "17px",
-              lineHeight: 1.8,
+              lineHeight: 1.65,
               color: "rgba(237, 242, 247, 0.8)",
               maxWidth: "44rem",
             }}
           >
-            Attentiq analyse vos vidéos, images et textes pour identifier ce
-            qui ne fonctionne pas et vous dire quoi améliorer, concrètement.
+            Voyez en quelques secondes ce qui fait décrocher, puis ce qu&apos;il
+            faut corriger en premier.
           </p>
 
           <div style={{ display: "flex", gap: "12px", flexWrap: "wrap" }}>
@@ -360,7 +360,7 @@ export default function HomePage() {
                 color: "var(--text-primary)",
               }}
             >
-              2 min max pour decider
+              Vous decidez vite
             </h2>
             <p
               style={{
@@ -371,13 +371,12 @@ export default function HomePage() {
                 maxWidth: "48rem",
               }}
             >
-              Lancez une analyse gratuite : aperçu limité — en général{" "}
+              Lancez jusqu&apos;a <strong style={{ color: "rgba(237, 242, 247, 0.95)" }}>3 analyses gratuites</strong> : aperçu limité, clair et rapide — en général{" "}
               <strong style={{ color: "rgba(237, 242, 247, 0.95)" }}>
-                2 à 3 points
+                1 a 2 signaux cles
               </strong>{" "}
-              maximum (chutes visibles, actions prioritaires, etc.) — sans carte
-              bancaire. Le rapport complet se débloque en un clic si vous voulez
-              aller plus loin.
+              sans carte bancaire. Le complet debloque le detail (timestamps,
+              causes, plan priorise).
             </p>
           </div>
         </section>
