@@ -14,7 +14,10 @@ export default function AccountLoginForm({
 }: AccountLoginFormProps) {
   const router = useRouter();
   const [email, setEmail] = useState(initialEmail);
+  const [rememberLongSession, setRememberLongSession] = useState(false);
   const [isSubmitting, setIsSubmitting] = useState(false);
+  const [magicSent, setMagicSent] = useState(false);
+  const [requestError, setRequestError] = useState<string | null>(null);
 
   const normalizedSession = useMemo(
     () => sessionEmail?.trim().toLowerCase() ?? "",
@@ -27,6 +30,7 @@ export default function AccountLoginForm({
     if (!trimmed || isSubmitting) return;
 
     setIsSubmitting(true);
+    setRequestError(null);
     try {
       if (
         normalizedSession &&
@@ -37,11 +41,11 @@ export default function AccountLoginForm({
         return;
       }
 
-      const res = await fetch("/api/account/session", {
+      const res = await fetch("/api/account/magic/request", {
         method: "POST",
         headers: { "content-type": "application/json" },
         credentials: "include",
-        body: JSON.stringify({ email: trimmed }),
+        body: JSON.stringify({ email: trimmed, remember: rememberLongSession }),
       });
 
       if (!res.ok) {
@@ -49,18 +53,23 @@ export default function AccountLoginForm({
           | { error?: string }
           | null;
         const code = payload?.error;
-        if (code === "ACCOUNT_NOT_FOUND") {
-          router.push(
-            `/compte?email=${encodeURIComponent(trimmed)}&loginError=not_found`
+        if (code === "EMAIL_NOT_CONFIGURED") {
+          setRequestError(
+            "L'envoi d'email n'est pas configuré sur ce serveur (clé Resend manquante)."
           );
           return;
         }
-        router.push("/compte?loginError=unknown");
+        if (code === "EMAIL_SEND_FAILED") {
+          setRequestError(
+            "L'email de connexion n'a pas pu être envoyé. Réessayez dans un instant."
+          );
+          return;
+        }
+        setRequestError("Impossible d'envoyer le lien pour le moment. Réessayez.");
         return;
       }
 
-      router.push(`/compte?email=${encodeURIComponent(trimmed)}`);
-      router.refresh();
+      setMagicSent(true);
     } finally {
       setIsSubmitting(false);
     }
@@ -84,7 +93,11 @@ export default function AccountLoginForm({
         type="email"
         name="email"
         value={email}
-        onChange={(e) => setEmail(e.target.value)}
+        onChange={(e) => {
+          setEmail(e.target.value);
+          setMagicSent(false);
+          setRequestError(null);
+        }}
         placeholder="votre email de paiement Stripe"
         style={{
           minHeight: "54px",
@@ -114,11 +127,31 @@ export default function AccountLoginForm({
         }}
       >
         {isSubmitting
-          ? "Connexion…"
+          ? "Envoi…"
           : isSameSessionEmail
             ? "Ouvrir l&apos;espace client"
-            : "Se connecter"}
+            : "Recevoir un lien"}
       </button>
+
+      <label
+        style={{
+          gridColumn: "1 / -1",
+          display: "flex",
+          alignItems: "center",
+          gap: "10px",
+          fontSize: "13px",
+          color: "var(--text-secondary)",
+          userSelect: "none",
+        }}
+      >
+        <input
+          type="checkbox"
+          checked={rememberLongSession}
+          disabled={isSameSessionEmail}
+          onChange={(e) => setRememberLongSession(e.target.checked)}
+        />
+        Rester connecte plus longtemps sur cet appareil (90 jours)
+      </label>
 
       {isSameSessionEmail && (
         <p
@@ -134,6 +167,42 @@ export default function AccountLoginForm({
           votre espace client : faites defiler la page pour voir quota et
           historique.
         </p>
+      )}
+
+      {magicSent && (
+        <div
+          style={{
+            gridColumn: "1 / -1",
+            padding: "14px 16px",
+            borderRadius: "18px",
+            border: "1px solid rgba(52, 211, 153, 0.28)",
+            background: "rgba(52, 211, 153, 0.08)",
+            color: "#bbf7d0",
+            fontSize: "13px",
+            lineHeight: 1.65,
+          }}
+        >
+          Si cet email correspond a un compte Attentiq, vous allez recevoir un lien
+          de connexion (valable quelques minutes). Ouvrez-le sur cet appareil pour
+          activer la session.
+        </div>
+      )}
+
+      {requestError && (
+        <div
+          style={{
+            gridColumn: "1 / -1",
+            padding: "14px 16px",
+            borderRadius: "18px",
+            border: "1px solid rgba(251, 146, 60, 0.24)",
+            background: "rgba(251, 146, 60, 0.08)",
+            color: "#fdba74",
+            fontSize: "13px",
+            lineHeight: 1.65,
+          }}
+        >
+          {requestError}
+        </div>
       )}
     </form>
   );

@@ -105,18 +105,12 @@ export async function POST(req: NextRequest) {
       // Force HTTP on localhost to avoid SSL browser errors from emailed links.
       const proto = isLocalHost ? "http" : forwardedProto ?? "https";
       const appBaseUrl = host ? `${proto}://${host}` : null;
-      const accountLoginUrl = appBaseUrl
-        ? `${appBaseUrl}/api/account/login?email=${encodeURIComponent(
-            customerEmail
-          )}`
-        : null;
 
       const sendResult = await sendCheckoutThankYouEmail({
         to: customerEmail,
         offerSlug: resolvedOfferSlug,
         sessionId,
         appBaseUrl,
-        accountLoginUrl,
       });
 
       if ("skipped" in sendResult && sendResult.skipped) {

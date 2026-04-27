@@ -179,8 +179,10 @@ export default async function SubscriberAccountPage({
               color: "rgba(237, 242, 247, 0.8)",
             }}
           >
-            Connectez-vous avec l&apos;email utilise au paiement Stripe pour voir
-            votre quota et l&apos;historique de vos rapports.
+            Saisissez l&apos;email Stripe du compte abonne : nous vous envoyons un
+            lien de connexion securise (une seule utilisation, quelques minutes).
+            Sur le meme navigateur, la session peut rester active sans recliquer le
+            lien a chaque visite.
           </p>
 
           <AccountLoginForm initialEmail={email} sessionEmail={sessionEmail} />
@@ -260,6 +262,42 @@ export default async function SubscriberAccountPage({
               }}
             >
               La connexion n&apos;a pas pu etre confirmee. Reessayez dans un instant.
+            </div>
+          )}
+
+          {loginError === "magic_invalid" && (
+            <div
+              style={{
+                marginTop: "18px",
+                padding: "16px",
+                borderRadius: "20px",
+                border: "1px solid rgba(251, 146, 60, 0.24)",
+                background: "rgba(251, 146, 60, 0.08)",
+                color: "#fdba74",
+                fontSize: "14px",
+                lineHeight: 1.75,
+              }}
+            >
+              Ce lien de connexion est expire ou deja utilise. Demandez un nouveau
+              lien depuis cette page.
+            </div>
+          )}
+
+          {loginError === "magic_required" && (
+            <div
+              style={{
+                marginTop: "18px",
+                padding: "16px",
+                borderRadius: "20px",
+                border: "1px solid rgba(251, 146, 60, 0.24)",
+                background: "rgba(251, 146, 60, 0.08)",
+                color: "#fdba74",
+                fontSize: "14px",
+                lineHeight: 1.75,
+              }}
+            >
+              La connexion directe par lien email sans jeton n&apos;est plus active.
+              Utilisez le bouton pour recevoir un lien securise.
             </div>
           )}
 

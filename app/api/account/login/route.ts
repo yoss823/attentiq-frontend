@@ -3,11 +3,12 @@ import {
   ACCOUNT_SESSION_COOKIE_NAME,
   normalizeAccountEmail,
 } from "@/lib/account-session";
-import { getSubscriberAccountByEmail } from "@/lib/subscriber-store";
+import { consumeMagicLoginToken, getSubscriberAccountByEmail } from "@/lib/subscriber-store";
 
 export const runtime = "nodejs";
 
-const COOKIE_MAX_AGE_SECONDS = 31 * 24 * 60 * 60;
+const COOKIE_MAX_AGE_SECONDS_DEFAULT = 31 * 24 * 60 * 60;
+const COOKIE_MAX_AGE_SECONDS_REMEMBER = 90 * 24 * 60 * 60;
 
 function resolveRequestOrigin(request: NextRequest) {
   const host =
@@ -44,29 +45,47 @@ function shouldUseSecureCookie(request: NextRequest) {
 
 export async function GET(request: NextRequest) {
   const origin = resolveRequestOrigin(request);
+  const token = request.nextUrl.searchParams.get("token")?.trim();
+  if (token) {
+    const consumed = await consumeMagicLoginToken(token);
+    if (!consumed) {
+      return NextResponse.redirect(new URL("/compte?loginError=magic_invalid", origin));
+    }
+
+    const { account } = await getSubscriberAccountByEmail(consumed.email);
+    if (!account) {
+      return NextResponse.redirect(
+        new URL(
+          `/compte?email=${encodeURIComponent(consumed.email)}&loginError=not_found`,
+          origin
+        )
+      );
+    }
+
+    const maxAge = consumed.remember
+      ? COOKIE_MAX_AGE_SECONDS_REMEMBER
+      : COOKIE_MAX_AGE_SECONDS_DEFAULT;
+    const response = NextResponse.redirect(
+      new URL(`/compte?email=${encodeURIComponent(consumed.email)}`, origin)
+    );
+    response.cookies.set({
+      name: ACCOUNT_SESSION_COOKIE_NAME,
+      value: consumed.email,
+      path: "/",
+      httpOnly: true,
+      secure: shouldUseSecureCookie(request),
+      sameSite: "lax",
+      maxAge,
+    });
+    return response;
+  }
+
   const email = normalizeAccountEmail(request.nextUrl.searchParams.get("email"));
   if (!email) {
     return NextResponse.redirect(new URL("/compte?loginError=missing_email", origin));
   }
 
-  const { account } = await getSubscriberAccountByEmail(email);
-  if (!account) {
-    return NextResponse.redirect(
-      new URL(`/compte?email=${encodeURIComponent(email)}&loginError=not_found`, origin)
-    );
-  }
-
-  const response = NextResponse.redirect(
-    new URL(`/compte?email=${encodeURIComponent(email)}`, origin)
+  return NextResponse.redirect(
+    new URL(`/compte?email=${encodeURIComponent(email)}&loginError=magic_required`, origin)
   );
-  response.cookies.set({
-    name: ACCOUNT_SESSION_COOKIE_NAME,
-    value: email,
-    path: "/",
-    httpOnly: true,
-    secure: shouldUseSecureCookie(request),
-    sameSite: "lax",
-    maxAge: COOKIE_MAX_AGE_SECONDS,
-  });
-  return response;
 }

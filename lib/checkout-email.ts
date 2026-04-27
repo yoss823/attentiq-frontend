@@ -40,7 +40,6 @@ export async function sendCheckoutThankYouEmail(params: {
   offerSlug: string;
   sessionId: string;
   appBaseUrl?: string | null;
-  accountLoginUrl?: string | null;
 }): Promise<CheckoutThankYouEmailResult> {
   const apiKey = process.env.RESEND_API_KEY?.trim();
   if (!apiKey) {
@@ -59,15 +58,19 @@ export async function sendCheckoutThankYouEmail(params: {
 
   const label = offerDisplayName(params.offerSlug);
   const subject = `Merci — paiement confirmé (${label})`;
-  const accountLoginUrl =
-    forceHttpForLocalhost(params.accountLoginUrl) ||
-    (base ? `${base}/api/account/login?email=${encodeURIComponent(params.to.trim())}` : "");
+  const compteUrl = base
+    ? `${base}/compte?email=${encodeURIComponent(params.to.trim())}`
+    : "";
   const html = `
     <p>Bonjour,</p>
     <p>Votre paiement Attentiq est bien enregistré pour : <strong>${escapeHtml(label)}</strong>.</p>
     <p>Vous pouvez reprendre votre analyse sur le site. Si vous étiez sur un diagnostic en cours, retournez sur la page d’analyse ou le résultat.</p>
     ${base ? `<p><a href="${escapeHtml(base)}">Ouvrir Attentiq</a></p>` : ""}
-    ${accountLoginUrl ? `<p><a href="${escapeHtml(accountLoginUrl)}">Ouvrir mon compte abonné</a></p>` : ""}
+    ${
+      compteUrl
+        ? `<p>Pour votre espace client (quota / historique), rendez-vous sur <a href="${escapeHtml(compteUrl)}">la page Compte</a> et demandez un lien de connexion securise.</p>`
+        : ""
+    }
     <p style="color:#666;font-size:13px;">Réf. session : ${escapeHtml(params.sessionId)}</p>
     <p>— L’équipe Attentiq</p>
   `.trim();

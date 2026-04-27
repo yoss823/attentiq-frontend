@@ -1,5 +1,6 @@
 import "server-only";
 
+import { createHash, randomBytes } from "crypto";
 import { Pool } from "pg";
 import type Stripe from "stripe";
 import {
@@ -170,6 +171,22 @@ async function ensureSchema() {
     await db.query(`
       create index if not exists subscriber_analysis_events_email_idx
       on subscriber_analysis_events (email, created_at desc);
+    `);
+
+    await db.query(`
+      create table if not exists account_magic_login_tokens (
+        token_hash text primary key,
+        email text not null,
+        remember boolean not null default false,
+        expires_at timestamptz not null,
+        consumed_at timestamptz,
+        created_at timestamptz not null default now()
+      );
+    `);
+
+    await db.query(`
+      create index if not exists account_magic_login_tokens_email_idx
+      on account_magic_login_tokens (email, created_at desc);
     `);
   })();
 
@@ -1060,4 +1077,122 @@ export async function getAdminOverviewSnapshot(): Promise<AdminOverviewSnapshot 
       receivedAt: row.received_at.toISOString(),
     })),
   };
+}
+
+function generateMagicLoginToken() {
+  return randomBytes(32).toString("base64url");
+}
+
+function hashMagicLoginToken(token: string) {
+  return createHash("sha256").update(token, "utf8").digest("hex");
+}
+
+export async function createMagicLoginTokenForSubscriberEmail(
+  email: string,
+  remember: boolean
+): Promise<{ token: string; tokenHash: string; email: string } | null> {
+  if (!process.env.DATABASE_URL) {
+    return null;
+  }
+
+  await ensureSchema();
+  const normalizedEmail = normalizeEmail(email);
+  const db = getPool();
+
+  const exists = await db.query<{ one: string }>(
+    `
+      select '1'::text as one
+      from subscriber_accounts
+      where email = $1
+        and access_status = 'active'
+      limit 1
+    `,
+    [normalizedEmail]
+  );
+  if (!exists.rows[0]) {
+    return null;
+  }
+
+  const token = generateMagicLoginToken();
+  const tokenHash = hashMagicLoginToken(token);
+  const ttlMs = 15 * 60 * 1000;
+  const expiresAt = new Date(Date.now() + ttlMs);
+
+  const client = await db.connect();
+  try {
+    await client.query("BEGIN");
+    await client.query(
+      `
+        delete from account_magic_login_tokens
+        where email = $1
+          and consumed_at is null
+          and expires_at > now()
+      `,
+      [normalizedEmail]
+    );
+    await client.query(
+      `
+        insert into account_magic_login_tokens (
+          token_hash,
+          email,
+          remember,
+          expires_at
+        ) values ($1, $2, $3, $4)
+      `,
+      [tokenHash, normalizedEmail, remember, expiresAt]
+    );
+    await client.query("COMMIT");
+  } catch (e) {
+    await client.query("ROLLBACK");
+    console.error("[subscriber-store] createMagicLoginTokenForSubscriberEmail", e);
+    return null;
+  } finally {
+    client.release();
+  }
+
+  return { token, tokenHash, email: normalizedEmail };
+}
+
+export async function consumeMagicLoginToken(
+  token: string
+): Promise<{ email: string; remember: boolean } | null> {
+  if (!process.env.DATABASE_URL) {
+    return null;
+  }
+
+  const trimmed = token.trim();
+  if (!trimmed) {
+    return null;
+  }
+
+  await ensureSchema();
+  const tokenHash = hashMagicLoginToken(trimmed);
+  const db = getPool();
+  const client = await db.connect();
+  try {
+    await client.query("BEGIN");
+    const result = await client.query<{ email: string; remember: boolean }>(
+      `
+        update account_magic_login_tokens
+        set consumed_at = now()
+        where token_hash = $1
+          and consumed_at is null
+          and expires_at > now()
+        returning email, remember
+      `,
+      [tokenHash]
+    );
+    await client.query("COMMIT");
+    const row = result.rows[0];
+    if (!row) {
+      return null;
+    }
+    return { email: row.email, remember: row.remember };
+  } catch (e) {
+    await client.query("ROLLBACK");
+    console.error("[subscriber-store] consumeMagicLoginToken", e);
+    return null;
+  } finally {
+    client.release();
+  }
 }
