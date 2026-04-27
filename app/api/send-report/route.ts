@@ -13,6 +13,7 @@ type SendReportBody = {
   subject?: string;
   body?: string;
   jobId?: string;
+  report?: unknown;
 };
 
 function normalizeText(value: unknown) {
@@ -66,6 +67,21 @@ function summarizeReport(result: Record<string, unknown>) {
     dropRule,
     actions,
   };
+}
+
+function summarizeFromClientReport(reportPayload: unknown) {
+  if (!reportPayload || typeof reportPayload !== "object") {
+    return null;
+  }
+  const candidate = reportPayload as Record<string, unknown>;
+  const data =
+    candidate.data && typeof candidate.data === "object"
+      ? (candidate.data as Record<string, unknown>)
+      : null;
+  if (!data) {
+    return null;
+  }
+  return summarizeReport({ data });
 }
 
 function splitTextLines(text: string, maxChars: number) {
@@ -168,7 +184,7 @@ export async function POST(request: Request) {
     return Response.json({ error: "Invalid JSON" }, { status: 400 });
   }
 
-  const { email, subject, body, jobId } = payload as SendReportBody;
+  const { email, subject, body, jobId, report } = payload as SendReportBody;
 
   if (!email || !isValidEmail(email)) {
     return Response.json({ error: "Invalid email address" }, { status: 400 });
@@ -197,14 +213,17 @@ export async function POST(request: Request) {
   let html = `<p>${manualBody.replace(/</g, "&lt;").replace(/>/g, "&gt;")}</p>`;
 
   if (normalizedJobId) {
-    const snapshot = await getRailwayJobSnapshot(normalizedJobId);
-    if (snapshot.status !== "success" || !snapshot.result) {
-      return Response.json(
-        { error: "Job not ready", userMessage: "Le diagnostic n'est pas encore disponible." },
-        { status: 409 }
-      );
+    let reportSummary = summarizeFromClientReport(report);
+    if (!reportSummary) {
+      const snapshot = await getRailwayJobSnapshot(normalizedJobId);
+      if (snapshot.status !== "success" || !snapshot.result) {
+        return Response.json(
+          { error: "Job not ready", userMessage: "Le diagnostic n'est pas encore disponible." },
+          { status: 409 }
+        );
+      }
+      reportSummary = summarizeReport(snapshot.result);
     }
-    const reportSummary = summarizeReport(snapshot.result);
     const pdfBuffer = await buildReportPdf({
       jobId: normalizedJobId,
       ...reportSummary,

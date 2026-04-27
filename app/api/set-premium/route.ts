@@ -95,7 +95,14 @@ export async function POST(req: NextRequest) {
     } else {
       const host =
         req.headers.get("x-forwarded-host") ?? req.headers.get("host");
-      const proto = req.headers.get("x-forwarded-proto") ?? "https";
+      const forwardedProto = req.headers.get("x-forwarded-proto");
+      const isLocalHost = Boolean(
+        host &&
+          (host.includes("localhost") ||
+            host.includes("127.0.0.1") ||
+            host.includes("0.0.0.0"))
+      );
+      const proto = forwardedProto ?? (isLocalHost ? "http" : "https");
       const appBaseUrl = host ? `${proto}://${host}` : null;
       const accountLoginUrl = appBaseUrl
         ? `${appBaseUrl}/api/account/login?email=${encodeURIComponent(

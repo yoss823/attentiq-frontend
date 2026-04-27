@@ -652,7 +652,14 @@ export default function ResultReport({
       return;
     }
 
-    const rawEmail = window.prompt("Email du client pour envoyer le PDF :");
+    const defaultEmail =
+      entitlement?.subscriberEmail && entitlement.subscriberEmail.includes("@")
+        ? entitlement.subscriberEmail
+        : "";
+    const rawEmail = window.prompt(
+      "Email pour recevoir votre rapport PDF :",
+      defaultEmail
+    );
     const email = rawEmail?.trim() ?? "";
     if (!email) {
       return;
@@ -669,6 +676,7 @@ export default function ResultReport({
         body: JSON.stringify({
           email,
           jobId: reportJobId,
+          report,
           subject: "Votre diagnostic Attentiq (PDF)",
           body: "Vous trouverez votre diagnostic en piece jointe.",
         }),
@@ -953,7 +961,7 @@ export default function ResultReport({
                 cursor: !reportJobId || isSendingPdf ? "not-allowed" : "pointer",
               }}
             >
-              {isSendingPdf ? "Envoi PDF..." : "Envoyer PDF client"}
+              {isSendingPdf ? "Envoi PDF..." : "Recevoir mon rapport PDF"}
             </button>
             <div
               style={{
@@ -1877,7 +1885,7 @@ export default function ResultReport({
             }}
           >
             <Link
-              href={nextFreeFormatHref}
+              href={isPremiumUnlocked ? analyzeHref : nextFreeFormatHref}
               style={{
                 display: "inline-flex",
                 alignItems: "center",
@@ -1892,7 +1900,9 @@ export default function ResultReport({
                 fontWeight: 900,
               }}
             >
-              Essayer un autre format gratuit
+              {isPremiumUnlocked
+                ? "Analyser un autre contenu"
+                : "Essayer un autre format gratuit"}
             </Link>
             <Link
               href={guideHref}
