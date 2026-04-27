@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import { cookies } from "next/headers";
 import Link from "next/link";
+import AccountLoginForm from "@/components/account-login-form";
 import { getOfferBySlug } from "@/lib/offer-config";
 import { getSubscriberAccountByEmail } from "@/lib/subscriber-store";
 import { ACCOUNT_SESSION_COOKIE_NAME, normalizeAccountEmail } from "@/lib/account-session";
@@ -182,49 +183,7 @@ export default async function SubscriberAccountPage({
             votre quota et l&apos;historique de vos rapports.
           </p>
 
-          <form
-            action="/api/account/login"
-            method="get"
-            style={{
-              marginTop: "24px",
-              display: "grid",
-              gap: "14px",
-              gridTemplateColumns: "minmax(0, 1fr) auto",
-            }}
-          >
-            <input
-              type="email"
-              name="email"
-              defaultValue={email}
-              placeholder="votre email de paiement Stripe"
-              style={{
-                minHeight: "54px",
-                borderRadius: "18px",
-                border: "1px solid var(--border)",
-                background: "rgba(5, 9, 14, 0.78)",
-                color: "var(--text-primary)",
-                fontSize: "15px",
-                padding: "0 16px",
-                outline: "none",
-              }}
-            />
-            <button
-              type="submit"
-              style={{
-                minHeight: "54px",
-                borderRadius: "999px",
-                border: "none",
-                padding: "0 18px",
-                background: "linear-gradient(135deg, var(--accent), #79e7ff)",
-                color: "#041017",
-                fontSize: "14px",
-                fontWeight: 900,
-                cursor: "pointer",
-              }}
-            >
-              Se connecter
-            </button>
-          </form>
+          <AccountLoginForm initialEmail={email} sessionEmail={sessionEmail} />
 
           {sessionEmail && (
             <div
@@ -284,6 +243,23 @@ export default async function SubscriberAccountPage({
               }}
             >
               Aucun compte actif pour cet email. Verifiez l&apos;adresse de paiement.
+            </div>
+          )}
+
+          {loginError === "unknown" && (
+            <div
+              style={{
+                marginTop: "18px",
+                padding: "16px",
+                borderRadius: "20px",
+                border: "1px solid rgba(251, 146, 60, 0.24)",
+                background: "rgba(251, 146, 60, 0.08)",
+                color: "#fdba74",
+                fontSize: "14px",
+                lineHeight: 1.75,
+              }}
+            >
+              La connexion n&apos;a pas pu etre confirmee. Reessayez dans un instant.
             </div>
           )}
 
