@@ -119,7 +119,7 @@ export default function ImagesPage() {
                 textDecoration: "none",
               }}
             >
-              Comment ca marche
+              Comment ça marche
             </Link>
             <Link
               href="/transparence"
@@ -276,7 +276,7 @@ export default function ImagesPage() {
                 fontWeight: 700,
               }}
             >
-              Comment ca marche
+              Comment ça marche
             </Link>
           </div>
 
@@ -705,7 +705,7 @@ export default function ImagesPage() {
           </p>
           <nav style={{ display: "flex", gap: "16px", flexWrap: "wrap" }}>
             {[
-              { href: "/guide?format=image", label: "Comment ca marche" },
+              { href: "/guide?format=image", label: "Comment ça marche" },
               { href: "/transparence", label: "Transparence" },
               { href: "/videos", label: "Vidéos" },
               { href: "/text", label: "Textes" },

@@ -505,7 +505,7 @@ export default function GuidePageClient() {
           </p>
           <nav style={{ display: "flex", gap: "16px", flexWrap: "wrap" }}>
             {[
-              { href: `/guide?format=${format}`, label: "Comment ca marche" },
+              { href: `/guide?format=${format}`, label: "Comment ça marche" },
               { href: "/transparence", label: "Transparence" },
               { href: "/analyze", label: "Analyser (video)" },
               { href: "/text", label: "Texte" },

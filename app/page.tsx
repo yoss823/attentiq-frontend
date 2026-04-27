@@ -106,7 +106,7 @@ export default function HomePage() {
                 textDecoration: "none",
               }}
             >
-              Comment ca marche
+              Comment ça marche
             </Link>
             <Link
               href="/transparence"
@@ -682,7 +682,7 @@ export default function HomePage() {
           </p>
           <nav style={{ display: "flex", gap: "16px", flexWrap: "wrap" }}>
             {[
-              { href: "/guide?format=video", label: "Comment ca marche" },
+              { href: "/guide?format=video", label: "Comment ça marche" },
               { href: "/transparence", label: "Transparence" },
               { href: "/videos", label: "Videos" },
               { href: "/images", label: "Images" },

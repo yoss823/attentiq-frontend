@@ -8,8 +8,22 @@ const dmSans = DM_Sans({
   weight: ["300", "400", "500", "600", "700"],
 });
 
+function getMetadataBase(): URL | undefined {
+  const raw = process.env.NEXT_PUBLIC_SITE_URL?.trim();
+  if (!raw) {
+    return undefined;
+  }
+  try {
+    return new URL(raw);
+  } catch {
+    return undefined;
+  }
+}
+
+const metadataBase = getMetadataBase();
+
 export const metadata: Metadata = {
-  metadataBase: new URL("https://attentiq.com"),
+  ...(metadataBase ? { metadataBase } : {}),
   title: {
     default: "Attentiq — Où l'attention chute, et quoi corriger",
     template: "%s — Attentiq",

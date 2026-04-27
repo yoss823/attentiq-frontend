@@ -119,7 +119,7 @@ export default function TextPage() {
                 textDecoration: "none",
               }}
             >
-              Comment ca marche
+              Comment ça marche
             </Link>
             <Link
               href="/transparence"
@@ -276,7 +276,7 @@ export default function TextPage() {
                 fontWeight: 700,
               }}
             >
-              Comment ca marche
+              Comment ça marche
             </Link>
           </div>
 
@@ -705,7 +705,7 @@ export default function TextPage() {
           </p>
           <nav style={{ display: "flex", gap: "16px", flexWrap: "wrap" }}>
             {[
-              { href: "/guide?format=text", label: "Comment ca marche" },
+              { href: "/guide?format=text", label: "Comment ça marche" },
               { href: "/transparence", label: "Transparence" },
               { href: "/videos", label: "Vidéos" },
               { href: "/text", label: "Textes" },

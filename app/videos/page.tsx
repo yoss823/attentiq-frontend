@@ -123,7 +123,7 @@ export default function VideosPage() {
                 textDecoration: "none",
               }}
             >
-              Comment ca marche
+              Comment ça marche
             </Link>
             <Link
               href="/transparence"
@@ -313,7 +313,7 @@ export default function VideosPage() {
                 fontWeight: 700,
               }}
             >
-              Comment ca marche
+              Comment ça marche
             </Link>
           </div>
         </section>
@@ -727,7 +727,7 @@ export default function VideosPage() {
           </p>
           <nav style={{ display: "flex", gap: "16px", flexWrap: "wrap" }}>
             {[
-              { href: "/guide?format=video", label: "Comment ca marche" },
+              { href: "/guide?format=video", label: "Comment ça marche" },
               { href: "/transparence", label: "Transparence" },
               { href: "/videos", label: "Vidéos" },
               { href: "/text", label: "Textes" },
