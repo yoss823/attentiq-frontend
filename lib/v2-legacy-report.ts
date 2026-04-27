@@ -5,6 +5,23 @@ import type {
 } from "@/lib/railway-client";
 import type { V2AnalysisResult } from "@/lib/v2-types";
 
+export function isV2AnalysisResult(value: unknown): value is V2AnalysisResult {
+  if (!value || typeof value !== "object") {
+    return false;
+  }
+
+  const candidate = value as Partial<V2AnalysisResult>;
+  return (
+    typeof candidate.id === "string" &&
+    typeof candidate.analysedAt === "string" &&
+    typeof candidate.status === "string" &&
+    typeof candidate.pipelineVersion === "string" &&
+    Boolean(candidate.diagnostic && typeof candidate.diagnostic === "object") &&
+    Array.isArray(candidate.dashboard) &&
+    Array.isArray(candidate.actions)
+  );
+}
+
 const DROP_SEVERITIES = new Set<AttentionDrop["severity"]>([
   "low",
   "medium",

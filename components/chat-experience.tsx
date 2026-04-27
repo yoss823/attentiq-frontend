@@ -1,9 +1,12 @@
 "use client";
 
 import Link from "next/link";
-import { useEffect, useEffectEvent, useRef, useState } from "react";
+import { useCallback, useEffect, useEffectEvent, useRef, useState } from "react";
+import { useSearchParams } from "next/navigation";
+import { readAnalyzeResult } from "@/lib/analyze-session";
 import {
   CHAT_SESSION_STORAGE_KEY,
+  buildChatDiagnosticContext,
   buildOfflineChatReply,
   buildWelcomeMessage,
   getDemoChatDiagnosticContext,
@@ -12,6 +15,11 @@ import {
   type ChatDiagnosticContext,
   type ChatTurn,
 } from "@/lib/chat-context";
+import type { AttentiqReport } from "@/lib/railway-client";
+import {
+  buildLegacyReportFromV2,
+  isV2AnalysisResult,
+} from "@/lib/v2-legacy-report";
 
 type ChatMessage = ChatTurn & {
   id: string;
@@ -40,58 +48,197 @@ function createMessage(
   };
 }
 
-function resolveInitialState(): {
-  diagnosticContext: ChatDiagnosticContext;
-  contextSource: "session" | "demo";
-  notice: string | null;
-} {
-  const sessionPayload = sessionStorage.getItem(CHAT_SESSION_STORAGE_KEY);
+function readJobIdFromWindow(): string | null {
+  if (typeof window === "undefined") {
+    return null;
+  }
+  return new URLSearchParams(window.location.search).get("jobId")?.trim() || null;
+}
 
+type ChatContextSource = "session" | "url_job" | "stored_result" | "demo";
+
+type ChatLoadState =
+  | { kind: "loading" }
+  | { kind: "loading_job"; jobId: string }
+  | {
+      kind: "ready";
+      diagnosticContext: ChatDiagnosticContext;
+      contextSource: ChatContextSource;
+      notice: string | null;
+    }
+  | { kind: "error"; message: string };
+
+function resolveChatLoadStateSync(jobIdFromUrl: string | null): ChatLoadState {
+  if (typeof window === "undefined") {
+    return { kind: "loading" };
+  }
+
+  const sessionPayload = sessionStorage.getItem(CHAT_SESSION_STORAGE_KEY);
   if (sessionPayload) {
     try {
-      return {
-        diagnosticContext: JSON.parse(sessionPayload) as ChatDiagnosticContext,
-        contextSource: "session",
-        notice: null,
-      };
+      const diagnosticContext = JSON.parse(
+        sessionPayload
+      ) as ChatDiagnosticContext;
+      if (diagnosticContext?.requestId) {
+        return {
+          kind: "ready",
+          diagnosticContext,
+          contextSource: "session",
+          notice: null,
+        };
+      }
     } catch {
       sessionStorage.removeItem(CHAT_SESSION_STORAGE_KEY);
     }
   }
 
+  if (jobIdFromUrl) {
+    const stored = readAnalyzeResult();
+    if (stored?.jobId === jobIdFromUrl && stored.report?.data?.request_id) {
+      const diagnosticContext = buildChatDiagnosticContext(stored.report);
+      try {
+        sessionStorage.setItem(
+          CHAT_SESSION_STORAGE_KEY,
+          JSON.stringify(diagnosticContext)
+        );
+      } catch {
+        /* ignore quota */
+      }
+      return {
+        kind: "ready",
+        diagnosticContext,
+        contextSource: "stored_result",
+        notice: null,
+      };
+    }
+    return { kind: "loading_job", jobId: jobIdFromUrl };
+  }
+
+  const stored = readAnalyzeResult();
+  if (stored?.report?.data?.request_id) {
+    return {
+      kind: "ready",
+      diagnosticContext: buildChatDiagnosticContext(stored.report),
+      contextSource: "stored_result",
+      notice: null,
+    };
+  }
+
   return {
+    kind: "ready",
     diagnosticContext: getDemoChatDiagnosticContext(),
     contextSource: "demo",
-    notice: "Diagnostic de session introuvable. Exemple de démonstration chargé.",
+    notice:
+      "Diagnostic de session introuvable. Exemple de démonstration chargé.",
   };
 }
 
+async function fetchJobAsReport(jobId: string): Promise<AttentiqReport | null> {
+  const maxAttempts = 20;
+  for (let attempt = 0; attempt < maxAttempts; attempt += 1) {
+    const res = await fetch(`/api/analyze/${encodeURIComponent(jobId)}`, {
+      cache: "no-store",
+    });
+    const data = (await res.json().catch(() => null)) as {
+      status?: string;
+      result?: unknown;
+      userMessage?: string;
+    } | null;
+
+    if (!res.ok) {
+      return null;
+    }
+
+    if (data?.status === "success" && data.result) {
+      return isV2AnalysisResult(data.result)
+        ? buildLegacyReportFromV2(data.result)
+        : (data.result as AttentiqReport);
+    }
+
+    if (data?.status === "error") {
+      return null;
+    }
+
+    await new Promise((r) => setTimeout(r, 2000));
+  }
+  return null;
+}
+
 export default function ChatExperience() {
-  const initialState = resolveInitialState();
-  const [diagnosticContext] = useState<ChatDiagnosticContext>(
-    initialState.diagnosticContext
+  const searchParams = useSearchParams();
+  const jobIdFromUrl = searchParams.get("jobId")?.trim() || null;
+
+  const [loadState, setLoadState] = useState<ChatLoadState>(() =>
+    resolveChatLoadStateSync(readJobIdFromWindow())
   );
-  const [contextSource] = useState<"session" | "demo">(
-    initialState.contextSource
-  );
+
+  useEffect(() => {
+    setLoadState(resolveChatLoadStateSync(jobIdFromUrl));
+  }, [jobIdFromUrl]);
+
+  useEffect(() => {
+    if (loadState.kind !== "loading_job") {
+      return;
+    }
+    const { jobId } = loadState;
+    let cancelled = false;
+
+    void (async () => {
+      const report = await fetchJobAsReport(jobId);
+      if (cancelled) {
+        return;
+      }
+      if (!report) {
+        setLoadState({
+          kind: "error",
+          message:
+            "Impossible de charger ce diagnostic. Verifiez le lien, reconnectez-vous, ou relancez une analyse.",
+        });
+        return;
+      }
+      const diagnosticContext = buildChatDiagnosticContext(report);
+      try {
+        sessionStorage.setItem(
+          CHAT_SESSION_STORAGE_KEY,
+          JSON.stringify(diagnosticContext)
+        );
+      } catch {
+        /* ignore */
+      }
+      setLoadState({
+        kind: "ready",
+        diagnosticContext,
+        contextSource: "url_job",
+        notice: null,
+      });
+    })();
+
+    return () => {
+      cancelled = true;
+    };
+  }, [loadState]);
+
   const [messages, setMessages] = useState<ChatMessage[]>([]);
   const [input, setInput] = useState("");
   const [isSending, setIsSending] = useState(false);
-  const [notice, setNotice] = useState<string | null>(initialState.notice);
-  const welcomeSeededRef = useRef(false);
+  const [runtimeNotice, setRuntimeNotice] = useState<string | null>(null);
+  const lastWelcomedRequestIdRef = useRef<string | null>(null);
   const feedRef = useRef<HTMLDivElement>(null);
-  const resultHref = diagnosticContext.metadata?.url
-    ? `/result?url=${encodeURIComponent(diagnosticContext.metadata.url)}`
-    : "/analyze";
 
   useEffect(() => {
-    if (welcomeSeededRef.current) {
+    if (loadState.kind !== "ready") {
       return;
     }
-
-    setMessages([createMessage("assistant", buildWelcomeMessage(diagnosticContext))]);
-    welcomeSeededRef.current = true;
-  }, [diagnosticContext]);
+    const id = loadState.diagnosticContext.requestId;
+    if (lastWelcomedRequestIdRef.current === id) {
+      return;
+    }
+    lastWelcomedRequestIdRef.current = id;
+    setMessages([
+      createMessage("assistant", buildWelcomeMessage(loadState.diagnosticContext)),
+    ]);
+    setRuntimeNotice(null);
+  }, [loadState]);
 
   const scrollToBottom = useEffectEvent(() => {
     const feed = feedRef.current;
@@ -107,81 +254,170 @@ export default function ChatExperience() {
     scrollToBottom();
   }, [messages.length, isSending]);
 
-  async function submitPrompt(rawPrompt: string) {
-    const prompt = rawPrompt.trim();
-    if (!prompt || isSending || !diagnosticContext) {
-      return;
-    }
-
-    const nextUserMessage = createMessage("user", prompt);
-    const optimisticMessages = [...messages, nextUserMessage];
-
-    setMessages(optimisticMessages);
-    setInput("");
-    setIsSending(true);
-    setNotice(null);
-
-    try {
-      const response = await fetch("/api/chat", {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify({
-          message: prompt,
-          history: optimisticMessages.map(({ role, content }) => ({
-            role,
-            content,
-          })),
-          diagnostic: diagnosticContext,
-        }),
-      });
-
-      const payload = (await response.json()) as {
-        reply?: string;
-        provider?: "openai" | "groq" | "fallback";
-        userMessage?: string;
-      };
-
-      if (!response.ok || !payload.reply) {
-        throw new Error(
-          payload.userMessage ||
-            "Réponse indisponible pour le moment. Je reste sur le diagnostic actuel."
-        );
+  const submitPrompt = useCallback(
+    async (rawPrompt: string) => {
+      if (loadState.kind !== "ready") {
+        return;
+      }
+      const diagnosticContext = loadState.diagnosticContext;
+      const prompt = rawPrompt.trim();
+      if (!prompt || isSending) {
+        return;
       }
 
-      const reply = payload.reply;
+      const nextUserMessage = createMessage("user", prompt);
+      const optimisticMessages = [...messages, nextUserMessage];
 
-      setMessages((current) => [
-        ...current,
-        createMessage(
-          "assistant",
-          reply,
-          payload.provider === "fallback" ? "muted" : "default"
-        ),
-      ]);
+      setMessages(optimisticMessages);
+      setInput("");
+      setIsSending(true);
+      setRuntimeNotice(null);
 
-      if (payload.provider === "fallback") {
-        setNotice(
-          "Réponses de secours (règles locales). Pour un dialogue adapté à chaque question, ajoutez une clé d'API d'assistant dans les variables d'environnement du service sur Railway."
+      try {
+        const response = await fetch("/api/chat", {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify({
+            message: prompt,
+            history: optimisticMessages.map(({ role, content }) => ({
+              role,
+              content,
+            })),
+            diagnostic: diagnosticContext,
+          }),
+        });
+
+        const payload = (await response.json()) as {
+          reply?: string;
+          provider?: "openai" | "groq" | "fallback";
+          userMessage?: string;
+        };
+
+        if (!response.ok || !payload.reply) {
+          throw new Error(
+            payload.userMessage ||
+              "Réponse indisponible pour le moment. Je reste sur le diagnostic actuel."
+          );
+        }
+
+        const reply = payload.reply;
+
+        setMessages((current) => [
+          ...current,
+          createMessage(
+            "assistant",
+            reply,
+            payload.provider === "fallback" ? "muted" : "default"
+          ),
+        ]);
+
+        if (payload.provider === "fallback") {
+          setRuntimeNotice(
+            "Réponses de secours (règles locales). Pour un dialogue adapté à chaque question, ajoutez une clé d'API d'assistant dans les variables d'environnement du service sur Railway."
+          );
+        }
+      } catch {
+        setMessages((current) => [
+          ...current,
+          createMessage(
+            "assistant",
+            buildOfflineChatReply(prompt, diagnosticContext),
+            "muted"
+          ),
+        ]);
+        setRuntimeNotice(
+          "L'assistant modèle est indisponible. Réponse locale basée uniquement sur le diagnostic."
         );
+      } finally {
+        setIsSending(false);
       }
-    } catch {
-      setMessages((current) => [
-        ...current,
-        createMessage(
-          "assistant",
-          buildOfflineChatReply(prompt, diagnosticContext),
-          "muted"
-        ),
-      ]);
-      setNotice(
-        "L'assistant modèle est indisponible. Réponse locale basée uniquement sur le diagnostic."
-      );
-    } finally {
-      setIsSending(false);
-    }
+    },
+    [loadState, messages, isSending]
+  );
+
+  if (loadState.kind === "loading" || loadState.kind === "loading_job") {
+    return (
+      <main
+        style={{
+          minHeight: "100vh",
+          display: "flex",
+          alignItems: "center",
+          justifyContent: "center",
+          padding: "24px 16px",
+          background:
+            "radial-gradient(circle at top, rgba(0,212,255,0.14), transparent 32%), #060a0f",
+          color: "var(--text-secondary)",
+        }}
+      >
+        <p style={{ fontSize: "15px", textAlign: "center", maxWidth: "360px" }}>
+          Chargement du diagnostic
+          {loadState.kind === "loading_job" ? "…" : ""}
+        </p>
+      </main>
+    );
   }
+
+  if (loadState.kind === "error") {
+    return (
+      <main
+        style={{
+          minHeight: "100vh",
+          display: "flex",
+          alignItems: "center",
+          justifyContent: "center",
+          padding: "24px 16px",
+          background:
+            "radial-gradient(circle at top, rgba(251,146,60,0.12), transparent 32%), #060a0f",
+        }}
+      >
+        <section
+          style={{
+            maxWidth: "480px",
+            textAlign: "center",
+            display: "grid",
+            gap: "16px",
+          }}
+        >
+          <p style={{ margin: 0, color: "#fb923c", fontSize: "15px" }}>
+            {loadState.message}
+          </p>
+          <Link
+            href="/analyze"
+            style={{
+              color: "var(--accent)",
+              fontWeight: 700,
+              textDecoration: "none",
+            }}
+          >
+            Lancer une analyse
+          </Link>
+          <Link
+            href="/compte"
+            style={{
+              color: "var(--text-secondary)",
+              fontSize: "14px",
+            }}
+          >
+            Espace compte
+          </Link>
+        </section>
+      </main>
+    );
+  }
+
+  const { diagnosticContext, contextSource, notice: baseNotice } = loadState;
+  const noticeBanner = runtimeNotice ?? baseNotice;
+
+  const jidForResult = jobIdFromUrl ?? diagnosticContext.requestId;
+  const vidForResult = diagnosticContext.metadata?.url?.trim();
+  const resultHref =
+    jidForResult && vidForResult
+      ? `/analyze/result?jobId=${encodeURIComponent(jidForResult)}&videoUrl=${encodeURIComponent(vidForResult)}`
+      : jidForResult
+        ? `/analyze/result?jobId=${encodeURIComponent(jidForResult)}`
+        : "/analyze";
 
   const diagnostic = diagnosticContext.diagnostic;
   const hasUserMessages = messages.some((message) => message.role === "user");
@@ -430,7 +666,7 @@ export default function ChatExperience() {
               >
                 {contextSource === "demo"
                   ? "Contexte de démonstration"
-                  : "Contexte de session"}
+                  : "Contexte du rapport"}
               </span>
             </div>
 
@@ -449,7 +685,7 @@ export default function ChatExperience() {
             </p>
           </div>
 
-          {notice && (
+          {noticeBanner && (
             <div
               style={{
                 padding: "12px 14px",
@@ -461,7 +697,7 @@ export default function ChatExperience() {
                 lineHeight: 1.6,
               }}
             >
-              {notice}
+              {noticeBanner}
             </div>
           )}
         </section>

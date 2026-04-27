@@ -24,7 +24,10 @@ export default function OpenChatButton({
       CHAT_SESSION_STORAGE_KEY,
       JSON.stringify(diagnosticContext)
     );
-    router.push("/chat");
+    const q = diagnosticContext.requestId
+      ? `?jobId=${encodeURIComponent(diagnosticContext.requestId)}`
+      : "";
+    router.push(`/chat${q}`);
   }
 
   const styles =
