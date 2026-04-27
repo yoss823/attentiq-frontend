@@ -1,5 +1,5 @@
 import { cookies } from "next/headers";
-import { NextResponse } from "next/server";
+import { NextRequest, NextResponse } from "next/server";
 import {
   URL_PIPELINE_VERSION,
   UrlIntakeError,
@@ -10,6 +10,12 @@ import {
   PREMIUM_ENTITLEMENT_COOKIE_NAME,
   parsePremiumEntitlement,
 } from "@/lib/premium";
+import {
+  hasUsedFreeTrialForFormat,
+  isDevVideoTrialBypassEnabled,
+  setFreeTrialCookieOnResponse,
+  type FreeTrialFormat,
+} from "@/lib/free-trial";
 import {
   chargeSubscriptionReportQuotaIfNeeded,
   recordSubscriberAnalysisIfAbsent,
@@ -31,14 +37,36 @@ function detectContentType(result: Record<string, unknown>) {
   }
 
   const metadata = result.metadata;
-  if (metadata && typeof metadata === "object" && "url" in metadata) {
-    return "video";
+  if (metadata && typeof metadata === "object") {
+    const platform =
+      "platform" in metadata && typeof metadata.platform === "string"
+        ? metadata.platform.toLowerCase()
+        : "";
+    if (platform === "text" || platform === "image" || platform === "video") {
+      return platform;
+    }
+    if ("url" in metadata) {
+      return "video";
+    }
   }
+
+  const inputFormat = result.inputFormat;
+  if (inputFormat === "video" || inputFormat === "text" || inputFormat === "image") {
+    return inputFormat;
+  }
+
   return "unknown";
 }
 
+function toTrialFormat(value: string): FreeTrialFormat | null {
+  if (value === "video" || value === "text" || value === "image") {
+    return value;
+  }
+  return null;
+}
+
 export async function GET(
-  _request: Request,
+  request: NextRequest,
   context: RouteContext<"/api/analyze/[jobId]">
 ) {
   const { jobId } = await context.params;
@@ -49,6 +77,23 @@ export async function GET(
       const cookieStore = await cookies();
       const raw = cookieStore.get(PREMIUM_ENTITLEMENT_COOKIE_NAME)?.value;
       const entitlement = parsePremiumEntitlement(raw ?? null);
+      const hasPremium = Boolean(entitlement?.isPremium);
+      const detectedType = detectContentType(snapshot.result);
+      const trialFormat = toTrialFormat(detectedType);
+
+      const response = NextResponse.json(snapshot, {
+        headers: buildPipelineHeaders(),
+      });
+
+      if (
+        trialFormat &&
+        !hasPremium &&
+        !(isDevVideoTrialBypassEnabled() && trialFormat === "video") &&
+        !hasUsedFreeTrialForFormat(request, trialFormat)
+      ) {
+        setFreeTrialCookieOnResponse(response, trialFormat, false);
+      }
+
       const email = entitlement?.subscriberEmail?.trim();
       if (
         email &&
@@ -76,12 +121,14 @@ export async function GET(
         recordSubscriberAnalysisIfAbsent({
           email,
           jobId,
-          contentType: detectContentType(snapshot.result),
+          contentType: detectedType,
           sourceLabel,
         }).catch((err) =>
           console.error("[analyze/jobId] analysis history write failed:", err)
         );
       }
+
+      return response;
     }
 
     return NextResponse.json(snapshot, { headers: buildPipelineHeaders() });

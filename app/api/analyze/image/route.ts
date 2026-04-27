@@ -8,7 +8,6 @@ import {
   freeTrialExhaustedUserMessage,
   hasUsedFreeTrialForFormat,
   paywallPathForFormat,
-  setFreeTrialCookieOnResponse,
 } from "@/lib/free-trial";
 import { enforceSubscriptionQuotaGate } from "@/lib/subscription-quota-gate";
 
@@ -151,6 +150,5 @@ export async function POST(req: NextRequest) {
     { ...payload, pipelineVersion: URL_PIPELINE_VERSION },
     { headers: buildPipelineHeaders() }
   );
-  setFreeTrialCookieOnResponse(response, "image", hasPremium);
   return response;
 }

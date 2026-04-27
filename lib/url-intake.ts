@@ -12,7 +12,7 @@ const SUPPORTED_YOUTUBE_CORE = new Set([
   "youtube-nocookie.com",
 ]);
 
-const SUPPORTED_INSTAGRAM_CORE = new Set(["instagram.com"]);
+const SUPPORTED_INSTAGRAM_CORE = new Set(["instagram.com", "m.instagram.com"]);
 
 function hostCore(hostname: string) {
   const h = hostname.toLowerCase();
@@ -154,6 +154,7 @@ export function parseGenericVideoUrlInput(rawValue: string): GenericVideoUrlResu
     const u = new URL(parsed.toString());
     u.protocol = "https:";
     u.hostname = host;
+    u.search = "";
     u.hash = "";
     return { ok: true, normalizedUrl: u.toString() };
   }
@@ -162,6 +163,7 @@ export function parseGenericVideoUrlInput(rawValue: string): GenericVideoUrlResu
     const u = new URL(parsed.toString());
     u.protocol = "https:";
     u.hostname = host;
+    u.search = "";
     u.hash = "";
     return { ok: true, normalizedUrl: u.toString() };
   }

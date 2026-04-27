@@ -9,7 +9,6 @@ import {
   hasUsedFreeTrialForFormat,
   isDevVideoTrialBypassEnabled,
   paywallPathForFormat,
-  setFreeTrialCookieOnResponse,
 } from "@/lib/free-trial";
 import { enforceSubscriptionQuotaGate } from "@/lib/subscription-quota-gate";
 
@@ -154,11 +153,6 @@ export async function POST(req: NextRequest) {
       { ...payload, pipelineVersion: URL_PIPELINE_VERSION },
       { headers: buildPipelineHeaders() }
     );
-
-    if (!isDevVideoTrialBypassEnabled()) {
-      setFreeTrialCookieOnResponse(response, "video", hasPremium);
-    }
-
     return response;
   } catch (error) {
     if (error instanceof Error && error.name === "AbortError") {
