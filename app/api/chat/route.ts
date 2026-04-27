@@ -251,6 +251,16 @@ export async function POST(request: NextRequest) {
   const fallbackReply = buildOfflineChatReply(message, body.diagnostic);
   const openaiKey = process.env.OPENAI_API_KEY?.trim();
 
+  /** Groq d'abord (coût / latence) ; OpenAI en secours si Groq indisponible ou restreint. */
+  const groqReply = await tryGroqChat(message, history, body.diagnostic);
+  if (groqReply) {
+    return NextResponse.json({
+      reply: groqReply,
+      provider: "groq",
+      model: GROQ_CHAT_MODEL,
+    });
+  }
+
   if (openaiKey) {
     try {
       const response = await fetch(OPENAI_API_URL, {
@@ -285,15 +295,6 @@ export async function POST(request: NextRequest) {
     } catch (error) {
       console.error("[chat] openai unexpected error", error);
     }
-  }
-
-  const groqReply = await tryGroqChat(message, history, body.diagnostic);
-  if (groqReply) {
-    return NextResponse.json({
-      reply: groqReply,
-      provider: "groq",
-      model: GROQ_CHAT_MODEL,
-    });
   }
 
   return NextResponse.json({
