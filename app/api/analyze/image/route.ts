@@ -10,6 +10,7 @@ import {
   paywallPathForFormat,
   setFreeTrialCookieOnResponse,
 } from "@/lib/free-trial";
+import { enforceSubscriptionQuotaGate } from "@/lib/subscription-quota-gate";
 
 const ACCEPTED_MIME_TYPES = new Set(["image/jpeg", "image/png", "image/webp"]);
 const MAX_IMAGE_BYTES = 10 * 1024 * 1024;
@@ -19,6 +20,20 @@ export async function POST(req: NextRequest) {
     req.cookies.get(PREMIUM_ENTITLEMENT_COOKIE_NAME)?.value ?? null
   );
   const hasPremium = Boolean(entitlement?.isPremium);
+
+  const quotaGate = await enforceSubscriptionQuotaGate(req);
+  if (quotaGate.shouldBlock) {
+    return NextResponse.json(
+      {
+        error: "SUBSCRIPTION_QUOTA_BLOCKED",
+        reason: quotaGate.reason,
+        userMessage: quotaGate.userMessage,
+        paywallPath: "/compte",
+        pipelineVersion: URL_PIPELINE_VERSION,
+      },
+      { status: 402, headers: buildPipelineHeaders() }
+    );
+  }
 
   if (hasUsedFreeTrialForFormat(req, "image") && !hasPremium) {
     return NextResponse.json(

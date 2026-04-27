@@ -558,6 +558,125 @@ export async function upsertVerifiedCheckoutContext({
 }
 
 export type SubscriptionPlanForQuota = "5" | "pack15";
+export type SubscriptionQuotaGateResult =
+  | {
+      allowed: true;
+      monthlyQuota: number;
+      monthlyUsed: number;
+      remaining: number;
+    }
+  | {
+      allowed: false;
+      reason:
+        | "no_database"
+        | "no_subscriber_account"
+        | "quota_exhausted"
+        | "transaction_failed";
+      monthlyQuota?: number;
+      monthlyUsed?: number;
+      remaining?: number;
+    };
+
+/**
+ * Vérifie si une nouvelle analyse peut démarrer pour un abonnement (5 / 15).
+ * Cette garde est fail-closed côté API pour éviter tout dépassement du quota.
+ */
+export async function canStartSubscriptionAnalysis(params: {
+  email: string;
+  plan: SubscriptionPlanForQuota;
+}): Promise<SubscriptionQuotaGateResult> {
+  if (!process.env.DATABASE_URL) {
+    return { allowed: false, reason: "no_database" };
+  }
+
+  await ensureSchema();
+
+  const email = normalizeEmail(params.email);
+  const pool = getPool();
+  const client = await pool.connect();
+
+  try {
+    await client.query("BEGIN");
+
+    const accountResult = await client.query<{
+      monthly_quota: number | null;
+      monthly_used: number;
+    }>(
+      `
+        select monthly_quota, monthly_used
+        from subscriber_accounts
+        where email = $1
+        for update
+      `,
+      [email]
+    );
+
+    const row = accountResult.rows[0];
+    if (!row || row.monthly_quota == null || row.monthly_quota < 1) {
+      await client.query("ROLLBACK");
+      return { allowed: false, reason: "no_subscriber_account" };
+    }
+
+    await client.query(
+      `
+        update subscriber_accounts
+        set
+          monthly_used = 0,
+          quota_period_started_at = date_trunc('month', now()),
+          updated_at = now()
+        where email = $1
+          and date_trunc('month', quota_period_started_at)
+            < date_trunc('month', now())
+      `,
+      [email]
+    );
+
+    const fresh = await client.query<{
+      monthly_quota: number;
+      monthly_used: number;
+    }>(
+      `
+        select monthly_quota, monthly_used
+        from subscriber_accounts
+        where email = $1
+        for update
+      `,
+      [email]
+    );
+
+    const current = fresh.rows[0];
+    if (!current) {
+      await client.query("ROLLBACK");
+      return { allowed: false, reason: "no_subscriber_account" };
+    }
+
+    const remaining = Math.max(current.monthly_quota - current.monthly_used, 0);
+    if (remaining < 1) {
+      await client.query("ROLLBACK");
+      return {
+        allowed: false,
+        reason: "quota_exhausted",
+        monthlyQuota: current.monthly_quota,
+        monthlyUsed: current.monthly_used,
+        remaining,
+      };
+    }
+
+    await client.query("COMMIT");
+    return {
+      allowed: true,
+      monthlyQuota: current.monthly_quota,
+      monthlyUsed: current.monthly_used,
+      remaining,
+    };
+  } catch (e) {
+    await client.query("ROLLBACK");
+    console.error("[subscriber-store] canStartSubscriptionAnalysis", e);
+    return { allowed: false, reason: "transaction_failed" };
+  } finally {
+    client.release();
+  }
+}
 
 /**
  * Une analyse terminée avec succès consomme 1 unité du quota mensuel

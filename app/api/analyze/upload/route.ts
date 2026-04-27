@@ -11,6 +11,7 @@ import {
   paywallPathForFormat,
   setFreeTrialCookieOnResponse,
 } from "@/lib/free-trial";
+import { enforceSubscriptionQuotaGate } from "@/lib/subscription-quota-gate";
 
 const ACCEPTED_MIME_TYPES = ["video/mp4", "video/quicktime", "video/webm"];
 const MAX_FILE_SIZE_BYTES = 500 * 1024 * 1024; // 500 MB
@@ -21,6 +22,20 @@ export async function POST(req: NextRequest) {
   );
   const hasUsedVideoTrial = hasUsedFreeTrialForFormat(req, "video");
   const hasPremium = Boolean(entitlement?.isPremium);
+
+  const quotaGate = await enforceSubscriptionQuotaGate(req);
+  if (quotaGate.shouldBlock) {
+    return NextResponse.json(
+      {
+        error: "SUBSCRIPTION_QUOTA_BLOCKED",
+        reason: quotaGate.reason,
+        userMessage: quotaGate.userMessage,
+        paywallPath: "/compte",
+        pipelineVersion: URL_PIPELINE_VERSION,
+      },
+      { status: 402, headers: buildPipelineHeaders() }
+    );
+  }
 
   if (!isDevVideoTrialBypassEnabled() && hasUsedVideoTrial && !hasPremium) {
     return NextResponse.json(
