@@ -27,6 +27,10 @@ export type AnalyzeJobSnapshot = {
   result?: Record<string, unknown>;
   error_code?: string;
   error_message?: string;
+  /** Backend job source: e.g. `video` for URL + upload pipelines */
+  format?: string;
+  /** TikTok, upload, etc. — `upload` means fichier importé, pas URL */
+  platform?: string;
 };
 
 type RailwayDebugRapidApiResponse = {
@@ -273,9 +277,14 @@ export async function startRailwayAnalyze(videoUrl: string) {
   return payload;
 }
 
+const UPLOAD_PIPELINE_FAILED_MESSAGE =
+  "L'analyse du fichier a echoue. Reessayez, ou testez un autre encodage (MP4 H.264, MOV, WebM).";
+
 function mapRailwayJobFailure(
   errorCode: string | undefined,
-  errorMessage: string | undefined
+  errorMessage: string | undefined,
+  jobPlatform?: string,
+  jobFormat?: string
 ) {
   const normalizedError = (errorMessage ?? "").toLowerCase();
   const isInstagramAuthBlocked =
@@ -307,6 +316,55 @@ function mapRailwayJobFailure(
       422,
       errorMessage ||
         "Cette video depasse 60 secondes. Utilisez un Short, Reel ou extrait, ou importez un fichier decoupe."
+    );
+  }
+
+  if (errorCode === "INTERNAL_ERROR") {
+    return new UrlIntakeError(
+      "INTERNAL_ERROR",
+      500,
+      (errorMessage && errorMessage.trim()) ||
+        "Une erreur technique est survenue pendant l'analyse. Reessayez dans quelques minutes.",
+      false
+    );
+  }
+
+  if (errorCode === "SERVICE_UNAVAILABLE") {
+    return new UrlIntakeError(
+      "SERVICE_UNAVAILABLE",
+      503,
+      errorMessage ||
+        "Le service d'analyse est momentanement indisponible. Reessayez plus tard.",
+      false
+    );
+  }
+
+  if ((jobFormat || "").toLowerCase() === "text") {
+    return new UrlIntakeError(
+      errorCode ?? "ANALYZE_FAILED",
+      422,
+      (errorMessage && errorMessage.trim()) || "L'analyse du texte a echoue. Reessayez.",
+      false
+    );
+  }
+
+  if ((jobFormat || "").toLowerCase() === "image") {
+    return new UrlIntakeError(
+      errorCode ?? "ANALYZE_FAILED",
+      422,
+      (errorMessage && errorMessage.trim()) || "L'analyse de l'image a echoue. Reessayez.",
+      false
+    );
+  }
+
+  const isFileUpload = (jobPlatform || "").toLowerCase() === "upload";
+
+  if (isFileUpload) {
+    return new UrlIntakeError(
+      errorCode ?? "ANALYZE_FAILED",
+      422,
+      (errorMessage && errorMessage.trim()) || UPLOAD_PIPELINE_FAILED_MESSAGE,
+      false
     );
   }
 
@@ -357,7 +415,12 @@ export async function getRailwayJobSnapshot(jobId: string) {
   }
 
   if (payload.status === "error") {
-    throw mapRailwayJobFailure(payload.error_code, payload.error_message);
+    throw mapRailwayJobFailure(
+      payload.error_code,
+      payload.error_message,
+      payload.platform,
+      payload.format
+    );
   }
 
   if (payload.status === "success" && payload.result) {
