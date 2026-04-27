@@ -231,6 +231,29 @@ export function buildOfflineChatReply(
   }
 
   if (
+    /id[eé]e|id[eé]es|suggestions?|brainstorm|cr[eé]atif|pistes?|opportunit|inspire|as[- ]tu d'autres|avez[- ]vous d'autres|d'autres angles|autres angles|que propose|un autre angle/i.test(
+      q
+    )
+  ) {
+    const thirdDrop = diagnostic?.attention_drops?.[2];
+    return formatLines([
+      "Oui — mais en mode secours je ne peux que déplier d'autres éléments **déjà dans le diagnostic**, pas en inventer de nouveaux.",
+      actions[1]
+        ? `Autre action déjà listée dans le rapport : ${actions[1]}`
+        : secondDrop?.cause
+          ? `Autre friction repérée vers ${secondDrop.timestamp_seconds}s : ${secondDrop.cause}`
+          : null,
+      thirdDrop?.cause
+        ? `Encore un point de chute (~${thirdDrop.timestamp_seconds}s) : ${thirdDrop.cause}`
+        : null,
+      diagnostic.drop_off_rule
+        ? `Règle de décrochage notée : ${diagnostic.drop_off_rule}`
+        : null,
+      "Pour des idées vraiment nouvelles à chaque question, ajoutez une clé d'API d'assistant sur le serveur (variables d'environnement du déploiement).",
+    ]);
+  }
+
+  if (
     /pas d'autres?\s*r[ée]ponses?|d'autres?\s*r[ée]ponses?|toujours\s+la\s+m[eê]me|tu\s+n['']as\s+pas|n['']as\s+pas\s+d'autres?|r[ée]p[èe]tes?|encore\s+la\s+m[eê]me|r[ée]pond\s+toujours|vari[ée]|autre\s+chose/i.test(
       q
     )
