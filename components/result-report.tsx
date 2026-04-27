@@ -212,6 +212,19 @@ function detectLikelyMusicOnly(report: AttentiqReport) {
   );
 }
 
+function clampTextForTeaser(text: string, maxLength: number) {
+  if (text.length <= maxLength) {
+    return text;
+  }
+  return `${text.slice(0, maxLength).trimEnd()}...`;
+}
+
+function buildTeaserDropHeadline(index: number) {
+  if (index === 0) return "Debut de la video";
+  if (index === 1) return "Milieu de la video";
+  return "Fin de la video";
+}
+
 function deriveCategories(
   text: string | null | undefined,
   isAudioOnly: boolean,
@@ -836,6 +849,12 @@ export default function ResultReport({
   const dropOffRuleDisplay = polishDiagnosticFrenchForDisplay(
     diagnostic?.drop_off_rule ?? ""
   );
+  const summaryForDisplay = isPremiumUnlocked
+    ? summary
+    : clampTextForTeaser(summary, 230);
+  const dropOffRuleForDisplay = isPremiumUnlocked
+    ? dropOffRuleDisplay
+    : clampTextForTeaser(dropOffRuleDisplay, 110);
   const teaserDropStatValue: ReactNode =
     isPremiumUnlocked || previewDrops.length > 0
       ? `${isPremiumUnlocked ? allDrops.length : previewDrops.length}`
@@ -1209,9 +1228,9 @@ export default function ResultReport({
               color: "rgba(237, 242, 247, 0.9)",
             }}
           >
-            {summary}
+            {summaryForDisplay}
           </p>
-          {dropOffRuleDisplay.trim() && (
+          {dropOffRuleForDisplay.trim() && (
             <div
               style={{
                 marginTop: "16px",
@@ -1241,7 +1260,7 @@ export default function ResultReport({
                   color: "rgba(237, 242, 247, 0.86)",
                 }}
               >
-                {dropOffRuleDisplay}
+                {dropOffRuleForDisplay}
               </p>
             </div>
           )}
@@ -1574,8 +1593,8 @@ export default function ResultReport({
           <>
             <Panel style={{ marginBottom: "14px" }}>
               <SectionHeader
-                eyebrow={isVideoContent ? "Preview chutes" : "Preview frictions"}
-                title="Ce que le gratuit montre deja"
+                eyebrow={isVideoContent ? "Apercu gratuit" : "Apercu gratuit"}
+                title="Ce que vous voyez en 20 secondes"
               />
 
               {allDrops.length > FREE_TEASER_LIMITS.drops && (
@@ -1591,9 +1610,9 @@ export default function ResultReport({
                     lineHeight: 1.65,
                   }}
                 >
-                  Aperçu gratuit : vous voyez les{" "}
-                  <strong>{FREE_TEASER_LIMITS.drops}</strong> premières chutes avec
-                  cause et niveau d&apos;impact. Le rapport complet ajoute les{" "}
+                  Aperçu gratuit : vous voyez{" "}
+                  <strong>{FREE_TEASER_LIMITS.drops}</strong> premiers signaux. Le
+                  rapport complet ajoute les{" "}
                   <strong>{allDrops.length - FREE_TEASER_LIMITS.drops}+</strong>{" "}
                   suivantes, la timeline entière, les liens entre chutes, le détail
                   {isLikelyMusicOnly
@@ -1607,6 +1626,12 @@ export default function ResultReport({
                 <div style={{ display: "grid", gap: "12px" }}>
                   {previewDrops.map((drop, index) => {
                     const severity = SEVERITY_CONFIG[drop.severity];
+                    const teaserCause = clampTextForTeaser(
+                      isLikelyMusicOnly
+                        ? "Signal de rythme detecte sur une piste majoritairement musicale. Le detail verbal exact est reserve au rapport complet."
+                        : drop.cause,
+                      120
+                    );
 
                     return (
                       <div
@@ -1640,7 +1665,7 @@ export default function ResultReport({
                               color: severity.text,
                             }}
                           >
-                            {formatTimestamp(drop.timestamp_seconds)}
+                            {`Zone ${index + 1}`}
                           </span>
                         </div>
 
@@ -1665,14 +1690,23 @@ export default function ResultReport({
                           <p
                             style={{
                               margin: "10px 0 0",
+                              fontSize: "12px",
+                              lineHeight: 1.6,
+                              color: "rgba(186, 230, 253, 0.86)",
+                              fontWeight: 700,
+                            }}
+                          >
+                            {buildTeaserDropHeadline(index)}
+                          </p>
+                          <p
+                            style={{
+                              margin: "8px 0 0",
                               fontSize: "14px",
                               lineHeight: 1.75,
                               color: "rgba(237, 242, 247, 0.88)",
                             }}
                           >
-                            {isLikelyMusicOnly
-                              ? "Piste majoritairement musicale: ce point doit etre lu comme signal de dynamique/rythme."
-                              : drop.cause}
+                            {teaserCause}
                           </p>
                         </div>
                       </div>
@@ -1712,6 +1746,25 @@ export default function ResultReport({
                     : `${hiddenDropsCount} point(s) supplementaire(s) restent masques dans le rapport gratuit.`
                   : "Le rapport complet ajoute surtout plus de contexte et une priorisation plus fine."}
               </div>
+
+              {!isPremiumUnlocked && (
+                <div
+                  style={{
+                    marginTop: "12px",
+                    padding: "14px 16px",
+                    borderRadius: "18px",
+                    border: "1px dashed rgba(52, 211, 153, 0.26)",
+                    background: "rgba(52, 211, 153, 0.08)",
+                    color: "rgba(220, 252, 231, 0.94)",
+                    fontSize: "13px",
+                    lineHeight: 1.7,
+                  }}
+                >
+                  Le rapport complet debloque : timestamps exacts des pertes
+                  d&apos;attention, causes detaillees par chute (verbal / rythme /
+                  visuel), lien entre les chutes et plan d&apos;action priorise.
+                </div>
+              )}
             </Panel>
 
             <Panel style={{ marginBottom: "14px" }}>

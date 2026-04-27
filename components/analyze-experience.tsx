@@ -438,8 +438,8 @@ export default function AnalyzeExperience({
             }}
           >
             {inputMode === "url"
-              ? "Collez une URL publique : TikTok, YouTube Shorts, Reel Instagram ou Snapchat Spotlight. La video doit durer moins de 60 secondes. En 60 a 90 secondes : aperçu gratuit limite (2 a 3 points max.) ; rapport complet avec une offre payante."
-              : "Importez votre fichier (MP4, MOV, WebM), moins de 60 secondes. En 60 a 90 secondes : aperçu gratuit limite (2 a 3 points max.) ; rapport complet avec une offre payante."}
+              ? "Collez une URL publique : TikTok, YouTube Shorts, Reel Instagram ou Snapchat Spotlight. La video doit durer moins de 60 secondes. Version gratuite : jusqu'a 3 analyses et un aperçu volontairement court (1 a 2 points cle)."
+              : "Importez votre fichier (MP4, MOV, WebM), moins de 60 secondes. Version gratuite : jusqu'a 3 analyses et un aperçu volontairement court (1 a 2 points cle)."}
           </p>
 
           {/* Mode toggle */}

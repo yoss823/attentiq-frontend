@@ -51,8 +51,8 @@ const STRIPE_PACK_15_URL =
   "https://buy.stripe.com/00w28s5PmeXl22m3WreP11u";
 
 export const FREE_TEASER_LIMITS = {
-  drops: 3,
-  actions: 2,
+  drops: 2,
+  actions: 1,
 } as const;
 
 export const ATTENTIQ_OFFERS: AttentiqOffer[] = [

@@ -275,8 +275,9 @@ export default function AnalyzeTextImageExperience({
         }}
       >
         Meme moteur que la video : en essai gratuit, aperçu limité (2 a 3
-        points max.). Un essai par format ; le rapport complet se debloque avec
-        une offre payante.
+        points max.). Version gratuite : jusqu&apos;a 3 analyses au total avec
+        profondeur reduite ; le rapport complet se debloque avec une offre
+        payante.
       </p>
 
       {mode === "text" ? (

@@ -176,12 +176,37 @@ async function buildReportPdf(params: {
   const margin = 48;
   let y = 790;
 
+  const drawHeaderBand = (title: string, subtitle: string) => {
+    page.drawRectangle({
+      x: 0,
+      y: 768,
+      width: pageSize[0],
+      height: 74,
+      color: rgb(0.03, 0.18, 0.22),
+    });
+    page.drawText(title, {
+      x: margin,
+      y: 812,
+      size: 18,
+      font: bold,
+      color: rgb(0.62, 0.95, 1),
+    });
+    page.drawText(subtitle, {
+      x: margin,
+      y: 792,
+      size: 10,
+      font,
+      color: rgb(0.83, 0.91, 0.95),
+    });
+    y = 748;
+  };
+
   const ensureSpace = (requiredHeight: number) => {
     if (y - requiredHeight >= margin) {
       return;
     }
     page = pdfDoc.addPage(pageSize);
-    y = 790;
+    drawHeaderBand("ATTENTIQ - Rapport complet", `Job ${params.jobId}`);
   };
 
   const draw = (text: string, size = 11, isBold = false, color = rgb(0.1, 0.12, 0.16)) => {
@@ -202,7 +227,19 @@ async function buildReportPdf(params: {
     }
   };
 
-  draw("ATTENTIQ - Diagnostic PDF", 16, true);
+  const drawSectionTitle = (text: string) => {
+    ensureSpace(28);
+    page.drawRectangle({
+      x: margin - 8,
+      y: y - 6,
+      width: pageSize[0] - margin * 2 + 16,
+      height: 22,
+      color: rgb(0.93, 0.97, 0.99),
+    });
+    draw(text, 12, true, rgb(0.05, 0.18, 0.24));
+  };
+
+  drawHeaderBand("ATTENTIQ - Rapport complet", "Diagnostic PDF premium");
   draw(`Job ID: ${params.jobId}`, 10);
   draw(`Genere le: ${new Date().toLocaleString("fr-FR")}`, 10);
   y -= 8;
@@ -221,23 +258,23 @@ async function buildReportPdf(params: {
   }
 
   y -= 8;
-  draw("Resume global", 12, true);
+  drawSectionTitle("Resume global");
   drawWrapped(params.summary, 10);
 
   y -= 8;
-  draw("Regle de decrochage", 12, true);
+  drawSectionTitle("Regle de decrochage");
   drawWrapped(params.dropRule, 10);
 
   y -= 8;
-  draw("Perception spectateur", 12, true);
+  drawSectionTitle("Perception spectateur");
   drawWrapped(params.creatorPerception, 10);
 
   y -= 8;
-  draw("Impact estime", 12, true);
+  drawSectionTitle("Impact estime");
   drawWrapped(params.audienceLossEstimate, 10);
 
   y -= 8;
-  draw("Points de chute", 12, true);
+  drawSectionTitle("Points de chute");
   if (params.drops.length === 0) {
     draw("- Aucune chute detaillee", 10);
   } else {
@@ -254,7 +291,7 @@ async function buildReportPdf(params: {
   }
 
   y -= 8;
-  draw("Actions prioritaires", 12, true);
+  drawSectionTitle("Actions prioritaires");
   if (params.actions.length === 0) {
     draw("- Aucune action disponible", 10);
   } else {

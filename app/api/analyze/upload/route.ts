@@ -5,6 +5,7 @@ import {
   PREMIUM_ENTITLEMENT_COOKIE_NAME,
 } from "@/lib/premium";
 import {
+  FREE_TRIAL_TOTAL_COUNT_COOKIE_NAME,
   freeTrialExhaustedUserMessage,
   hasUsedFreeTrialForFormat,
   isDevVideoTrialBypassEnabled,
@@ -22,6 +23,10 @@ export async function POST(req: NextRequest) {
   );
   const hasUsedVideoTrial = hasUsedFreeTrialForFormat(req, "video");
   const hasPremium = Boolean(entitlement?.isPremium);
+  const currentTrialCount = Number.parseInt(
+    req.cookies.get(FREE_TRIAL_TOTAL_COUNT_COOKIE_NAME)?.value ?? "0",
+    10
+  );
 
   const quotaGate = await enforceSubscriptionQuotaGate(req);
   if (quotaGate.shouldBlock) {
@@ -156,7 +161,12 @@ export async function POST(req: NextRequest) {
     );
 
     if (!isDevVideoTrialBypassEnabled()) {
-      setFreeTrialCookieOnResponse(response, "video", hasPremium);
+      setFreeTrialCookieOnResponse(
+        response,
+        "video",
+        hasPremium,
+        Number.isFinite(currentTrialCount) ? currentTrialCount : 0
+      );
     }
 
     return response;
