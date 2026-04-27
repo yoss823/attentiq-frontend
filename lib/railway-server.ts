@@ -339,6 +339,36 @@ function mapRailwayJobFailure(
     );
   }
 
+  if (errorCode === "PROVIDER_ACCOUNT_RESTRICTED") {
+    return new UrlIntakeError(
+      "PROVIDER_ACCOUNT_RESTRICTED",
+      503,
+      errorMessage ||
+        "Le compte API Groq associe a cette cle est restreint. Verifiez la console Groq ou contactez leur support.",
+      false
+    );
+  }
+
+  if (errorCode === "PROVIDER_QUOTA_EXCEEDED") {
+    return new UrlIntakeError(
+      "PROVIDER_QUOTA_EXCEEDED",
+      503,
+      errorMessage ||
+        "Quota API Groq insuffisant. Verifiez votre plan sur console.groq.com.",
+      false
+    );
+  }
+
+  if (errorCode === "PROVIDER_RATE_LIMIT") {
+    return new UrlIntakeError(
+      "PROVIDER_RATE_LIMIT",
+      503,
+      errorMessage ||
+        "Trop de requetes vers Groq. Reessayez dans quelques minutes.",
+      false
+    );
+  }
+
   if ((jobFormat || "").toLowerCase() === "text") {
     return new UrlIntakeError(
       errorCode ?? "ANALYZE_FAILED",
