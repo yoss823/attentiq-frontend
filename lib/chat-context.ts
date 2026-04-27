@@ -230,6 +230,24 @@ export function buildOfflineChatReply(
     ]);
   }
 
+  if (
+    /pas d'autres?\s*r[ée]ponses?|d'autres?\s*r[ée]ponses?|toujours\s+la\s+m[eê]me|tu\s+n['']as\s+pas|n['']as\s+pas\s+d'autres?|r[ée]p[èe]tes?|encore\s+la\s+m[eê]me|r[ée]pond\s+toujours|vari[ée]|autre\s+chose/i.test(
+      q
+    )
+  ) {
+    return formatLines([
+      "En mode secours (sans modèle conversationnel sur le serveur), je m'appuie sur un petit nombre de gabarits dérivés du diagnostic.",
+      "Votre question est surtout « méta » : je ne peux pas générer une variante infinie tant que l'API complète n'est pas activée côté hébergement.",
+      `Sur le fond, le diagnostic insiste sur : ${getPrimaryIssue(context)}`,
+      actions[1]
+        ? `Autre levier mentionné dans le rapport : ${actions[1]}`
+        : actions[0]
+          ? `Le rapport propose notamment : ${actions[0]}`
+          : null,
+      "Pour des réponses vraiment adaptées à chaque formulation, il faut configurer une clé d'API d'assistant sur le serveur (variables d'environnement du déploiement).",
+    ]);
+  }
+
   return formatLines([
     "Je reste strictement sur votre diagnostic actuel.",
     `Le point central que je retiens ici est : ${getPrimaryIssue(context)}`,

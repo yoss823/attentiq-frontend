@@ -139,7 +139,7 @@ export default function ChatExperience() {
 
       const payload = (await response.json()) as {
         reply?: string;
-        provider?: "openai" | "fallback";
+        provider?: "openai" | "groq" | "fallback";
         userMessage?: string;
       };
 
@@ -163,7 +163,7 @@ export default function ChatExperience() {
 
       if (payload.provider === "fallback") {
         setNotice(
-          "Réponse locale de secours utilisée. Configurez OPENAI_API_KEY pour activer GPT-4o-mini."
+          "Réponses de secours (règles locales). Pour un dialogue adapté à chaque question, ajoutez une clé d'API d'assistant dans les variables d'environnement du service sur Railway."
         );
       }
     } catch {

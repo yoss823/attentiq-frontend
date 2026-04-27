@@ -1,9 +1,12 @@
 import { NextRequest, NextResponse } from "next/server";
+import Groq from "groq-sdk";
 import {
   buildOfflineChatReply,
   type ChatDiagnosticContext,
   type ChatTurn,
 } from "@/lib/chat-context";
+
+export const runtime = "nodejs";
 
 type ChatRequestBody = {
   message?: unknown;
@@ -13,6 +16,8 @@ type ChatRequestBody = {
 
 const OPENAI_API_URL = "https://api.openai.com/v1/responses";
 const OPENAI_MODEL = process.env.OPENAI_CHAT_MODEL ?? "gpt-4o-mini";
+const GROQ_CHAT_MODEL =
+  process.env.GROQ_CHAT_MODEL?.trim() || "llama-3.1-8b-instant";
 const MAX_HISTORY_ITEMS = 8;
 
 const SYSTEM_PROMPT = `
@@ -131,6 +136,38 @@ function extractResponseText(payload: unknown): string | null {
   return chunks.length > 0 ? chunks.join("\n").trim() : null;
 }
 
+async function tryGroqChat(
+  message: string,
+  history: ChatTurn[],
+  diagnostic: ChatDiagnosticContext
+): Promise<string | null> {
+  const apiKey = process.env.GROQ_API_KEY?.trim();
+  if (!apiKey) {
+    return null;
+  }
+
+  try {
+    const groq = new Groq({ apiKey });
+    const completion = await groq.chat.completions.create({
+      model: GROQ_CHAT_MODEL,
+      messages: [
+        { role: "system", content: SYSTEM_PROMPT },
+        {
+          role: "user",
+          content: buildModelInput(message, history, diagnostic),
+        },
+      ],
+      max_tokens: 400,
+      temperature: 0.35,
+    });
+    const text = completion.choices[0]?.message?.content?.trim();
+    return text || null;
+  } catch (error) {
+    console.error("[chat] groq error", error);
+    return null;
+  }
+}
+
 export async function POST(request: NextRequest) {
   let body: ChatRequestBody;
 
@@ -166,60 +203,55 @@ export async function POST(request: NextRequest) {
 
   const history = sanitizeHistory(body.history);
   const fallbackReply = buildOfflineChatReply(message, body.diagnostic);
-  const apiKey = process.env.OPENAI_API_KEY;
+  const openaiKey = process.env.OPENAI_API_KEY?.trim();
 
-  if (!apiKey) {
+  if (openaiKey) {
+    try {
+      const response = await fetch(OPENAI_API_URL, {
+        method: "POST",
+        headers: {
+          Authorization: `Bearer ${openaiKey}`,
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+          model: OPENAI_MODEL,
+          store: false,
+          instructions: SYSTEM_PROMPT,
+          input: buildModelInput(message, history, body.diagnostic),
+          max_output_tokens: 320,
+        }),
+      });
+
+      const payload = (await response.json().catch(() => null)) as unknown;
+
+      if (response.ok) {
+        const reply = extractResponseText(payload);
+        if (reply) {
+          return NextResponse.json({
+            reply,
+            provider: "openai",
+            model: OPENAI_MODEL,
+          });
+        }
+      } else {
+        console.error("[chat] openai error", payload);
+      }
+    } catch (error) {
+      console.error("[chat] openai unexpected error", error);
+    }
+  }
+
+  const groqReply = await tryGroqChat(message, history, body.diagnostic);
+  if (groqReply) {
     return NextResponse.json({
-      reply: fallbackReply,
-      provider: "fallback",
+      reply: groqReply,
+      provider: "groq",
+      model: GROQ_CHAT_MODEL,
     });
   }
 
-  try {
-    const response = await fetch(OPENAI_API_URL, {
-      method: "POST",
-      headers: {
-        Authorization: `Bearer ${apiKey}`,
-        "Content-Type": "application/json",
-      },
-      body: JSON.stringify({
-        model: OPENAI_MODEL,
-        store: false,
-        instructions: SYSTEM_PROMPT,
-        input: buildModelInput(message, history, body.diagnostic),
-        max_output_tokens: 320,
-      }),
-    });
-
-    const payload = (await response.json().catch(() => null)) as unknown;
-
-    if (!response.ok) {
-      console.error("[chat] openai error", payload);
-      return NextResponse.json({
-        reply: fallbackReply,
-        provider: "fallback",
-      });
-    }
-
-    const reply = extractResponseText(payload);
-
-    if (!reply) {
-      return NextResponse.json({
-        reply: fallbackReply,
-        provider: "fallback",
-      });
-    }
-
-    return NextResponse.json({
-      reply,
-      provider: "openai",
-      model: OPENAI_MODEL,
-    });
-  } catch (error) {
-    console.error("[chat] unexpected error", error);
-    return NextResponse.json({
-      reply: fallbackReply,
-      provider: "fallback",
-    });
-  }
+  return NextResponse.json({
+    reply: fallbackReply,
+    provider: "fallback",
+  });
 }
