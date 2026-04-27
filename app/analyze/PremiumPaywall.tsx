@@ -36,8 +36,10 @@ export default function PremiumPaywall({
 
   return (
     <section
+      id="offres-premium"
       style={{
         marginBottom: "14px",
+        scrollMarginTop: "96px",
         borderRadius: "28px",
         border: "1px solid rgba(0, 212, 255, 0.2)",
         background:

@@ -408,7 +408,7 @@ export default function VideosPage() {
         </section>
 
         {/* Pricing */}
-        <section className="rise d4" style={{ marginBottom: "56px" }}>
+        <section id="tarifs" className="rise d4" style={{ marginBottom: "56px", scrollMarginTop: "96px" }}>
           <p
             style={{
               margin: "0 0 8px",

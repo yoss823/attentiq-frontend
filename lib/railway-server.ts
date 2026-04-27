@@ -274,6 +274,22 @@ function mapRailwayJobFailure(
   errorCode: string | undefined,
   errorMessage: string | undefined
 ) {
+  const normalizedError = (errorMessage ?? "").toLowerCase();
+  const isInstagramAuthBlocked =
+    normalizedError.includes("[instagram]") &&
+    (normalizedError.includes("login required") ||
+      normalizedError.includes("rate-limit") ||
+      normalizedError.includes("rate limit reached") ||
+      normalizedError.includes("requested content is not available"));
+
+  if (isInstagramAuthBlocked) {
+    return new UrlIntakeError(
+      "INSTAGRAM_LOGIN_REQUIRED",
+      422,
+      "Instagram bloque cette video en acces public (connexion requise ou limite temporaire). Reessayez avec un autre Reel public ou passez par l'upload video."
+    );
+  }
+
   if (errorCode === "VIDEO_UNAVAILABLE") {
     return new UrlIntakeError(
       "VIDEO_UNAVAILABLE",

@@ -187,6 +187,7 @@ export async function callRailwayAnalyze(
 
 function resolveErrorMessage(data: RailwayResponse): string {
   const code = data.error_code ?? "";
+  const rawError = (data.error_message ?? "").toLowerCase();
   if (code === "VIDEO_UNAVAILABLE") {
     return "Vidéo inaccessible ou supprimée. Vérifiez l'URL.";
   }
@@ -194,6 +195,15 @@ function resolveErrorMessage(data: RailwayResponse): string {
     const dur = data.metadata?.duration_seconds;
     const durStr = dur != null ? `${dur}s` : "inconnue";
     return `Vidéo trop longue (${durStr}). Maximum : 60 secondes.`;
+  }
+  if (
+    rawError.includes("[instagram]") &&
+    (rawError.includes("login required") ||
+      rawError.includes("rate-limit") ||
+      rawError.includes("rate limit reached") ||
+      rawError.includes("requested content is not available"))
+  ) {
+    return "Instagram bloque cette video en acces public (connexion requise ou limite temporaire). Essayez un autre Reel public ou l'upload video.";
   }
   return (
     data.error_message ??

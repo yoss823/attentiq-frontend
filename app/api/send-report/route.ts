@@ -20,6 +20,26 @@ function normalizeText(value: unknown) {
   return typeof value === "string" && value.trim() ? value.trim() : null;
 }
 
+function escapeHtml(value: string) {
+  return value
+    .replace(/&/g, "&amp;")
+    .replace(/</g, "&lt;")
+    .replace(/>/g, "&gt;")
+    .replace(/"/g, "&quot;");
+}
+
+function extractResendErrorMessage(error: unknown) {
+  if (
+    error &&
+    typeof error === "object" &&
+    "message" in error &&
+    typeof (error as { message?: unknown }).message === "string"
+  ) {
+    return (error as { message: string }).message;
+  }
+  return "unknown_resend_error";
+}
+
 type ReportDrop = {
   timestampSeconds: number | null;
   severity: string | null;
@@ -664,7 +684,7 @@ export async function POST(request: Request) {
   let attachment:
     | { filename: string; content: string; contentType: string }
     | undefined;
-  let html = `<p>${manualBody.replace(/</g, "&lt;").replace(/>/g, "&gt;")}</p>`;
+  let html = `<p>${escapeHtml(manualBody)}</p>`;
 
   if (normalizedJobId) {
     let reportSummary = summarizeFromClientReport(report);
@@ -693,37 +713,74 @@ export async function POST(request: Request) {
       <p>Bonjour,</p>
       <p>Votre diagnostic Attentiq est pret. Le PDF est en piece jointe.</p>
       <p><strong>Job ID:</strong> ${normalizedJobId}</p>
-      <p>${manualBody.replace(/</g, "&lt;").replace(/>/g, "&gt;")}</p>
+      <p>${escapeHtml(manualBody)}</p>
       <p>— L'equipe Attentiq</p>
     `.trim();
   }
 
   try {
-    const { data, error } = await resend.emails.send({
-      from,
-      to: email.trim(),
-      subject: finalSubject,
-      html,
-      attachments: attachment ? [attachment] : undefined,
-    });
-    if (error) {
-      const detailMessage =
-        typeof error === "object" &&
-        error &&
-        "message" in error &&
-        typeof (error as { message?: unknown }).message === "string"
-          ? (error as { message: string }).message
-          : "unknown_resend_error";
-      return Response.json(
-        {
-          error: "Resend send failed",
-          userMessage: "Echec envoi email (Resend). Verifiez la configuration expediteur.",
-          detail: detailMessage,
-        },
-        { status: 500 }
-      );
+    const to = email.trim();
+    const defaultFrom = "Attentiq <onboarding@resend.dev>";
+    const fromCandidates = from === defaultFrom ? [from] : [from, defaultFrom];
+    const attachmentCandidates = attachment
+      ? [
+          [attachment],
+          [
+            {
+              filename: attachment.filename,
+              content: Buffer.from(attachment.content, "base64"),
+            },
+          ],
+        ]
+      : [undefined];
+
+    let lastError = "unknown_resend_error";
+    for (const fromCandidate of fromCandidates) {
+      for (const attachments of attachmentCandidates) {
+        const { data, error } = await resend.emails.send({
+          from: fromCandidate,
+          to,
+          subject: finalSubject,
+          html,
+          attachments,
+        });
+        if (!error) {
+          return Response.json({
+            success: true,
+            id: data?.id ?? null,
+            delivery: {
+              from: fromCandidate,
+              attachmentMode:
+                attachment && attachments
+                  ? "with_attachment"
+                  : "without_attachment",
+            },
+          });
+        }
+        lastError = extractResendErrorMessage(error);
+        console.error("[send-report] resend attempt failed:", {
+          fromCandidate,
+          hasAttachment: Boolean(attachment),
+          attachmentType:
+            attachment && attachments
+              ? attachments[0] && "contentType" in attachments[0]
+                ? "base64+contentType"
+                : "buffer"
+              : "none",
+          error: lastError,
+        });
+      }
     }
-    return Response.json({ success: true, id: data?.id ?? null });
+
+    return Response.json(
+      {
+        error: "Resend send failed",
+        userMessage:
+          "Echec envoi email (Resend). Verifiez la configuration du domaine expéditeur Resend et la destination.",
+        detail: lastError,
+      },
+      { status: 500 }
+    );
   } catch (error) {
     return Response.json(
       { error: "Unexpected send error", detail: error instanceof Error ? error.message : String(error) },

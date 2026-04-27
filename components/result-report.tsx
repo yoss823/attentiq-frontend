@@ -1915,13 +1915,7 @@ export default function ResultReport({
               suggestedPrompts={assistantPrompts}
               footerNote="Assistant limite a ce teaser et a votre diagnostic actuel."
               maxAssistantReplies={1}
-              paywallHref={
-                contentKind === "video"
-                  ? "/videos#tarifs"
-                  : contentKind === "text"
-                    ? "/text#tarifs"
-                    : "/images#tarifs"
-              }
+              paywallHref="#offres-premium"
             />
 
             <Panel
