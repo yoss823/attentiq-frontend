@@ -836,6 +836,10 @@ export default function ResultReport({
       reportJobId,
       initialEntitlement: initialPremiumEntitlement,
     });
+  const accountHref =
+    entitlement?.subscriberEmail && entitlement.subscriberEmail.includes("@")
+      ? `/compte?email=${encodeURIComponent(entitlement.subscriberEmail)}`
+      : "/compte";
   const maxAssistantRepliesForReport = resolveMaxAssistantRepliesForReport(
     entitlement,
     isPremiumUnlocked
@@ -1002,29 +1006,48 @@ export default function ResultReport({
             >
               {isSendingPdf ? "Envoi PDF..." : "Recevoir mon rapport PDF"}
             </button>
-            <div
-              style={{
-                padding: "8px 12px",
-                borderRadius: "999px",
-                border: isPremiumUnlocked
-                  ? "1px solid rgba(52, 211, 153, 0.22)"
-                  : "1px solid rgba(0, 212, 255, 0.18)",
-                background: isPremiumUnlocked
-                  ? "rgba(52, 211, 153, 0.08)"
-                  : "rgba(0, 212, 255, 0.08)",
-                color: isPremiumUnlocked ? "#86efac" : "var(--accent)",
-                fontSize: "11px",
-                fontWeight: 800,
-                textTransform: "uppercase",
-                letterSpacing: "0.18em",
-              }}
-            >
-              {isPremiumUnlocked
-                ? isSubscriptionEntitlement
-                  ? "Acces abonne actif"
-                  : "Rapport complet debloque"
-                : "Rapport gratuit · teaser"}
-            </div>
+            {isPremiumUnlocked && isSubscriptionEntitlement ? (
+              <Link
+                href={accountHref}
+                style={{
+                  display: "inline-flex",
+                  alignItems: "center",
+                  justifyContent: "center",
+                  padding: "8px 12px",
+                  borderRadius: "999px",
+                  border: "1px solid rgba(52, 211, 153, 0.22)",
+                  background: "rgba(52, 211, 153, 0.08)",
+                  color: "#86efac",
+                  fontSize: "11px",
+                  fontWeight: 800,
+                  textTransform: "uppercase",
+                  letterSpacing: "0.18em",
+                  textDecoration: "none",
+                }}
+              >
+                Acces espace client
+              </Link>
+            ) : (
+              <div
+                style={{
+                  padding: "8px 12px",
+                  borderRadius: "999px",
+                  border: isPremiumUnlocked
+                    ? "1px solid rgba(52, 211, 153, 0.22)"
+                    : "1px solid rgba(0, 212, 255, 0.18)",
+                  background: isPremiumUnlocked
+                    ? "rgba(52, 211, 153, 0.08)"
+                    : "rgba(0, 212, 255, 0.08)",
+                  color: isPremiumUnlocked ? "#86efac" : "var(--accent)",
+                  fontSize: "11px",
+                  fontWeight: 800,
+                  textTransform: "uppercase",
+                  letterSpacing: "0.18em",
+                }}
+              >
+                {isPremiumUnlocked ? "Rapport complet debloque" : "Rapport gratuit · teaser"}
+              </div>
+            )}
           </div>
         </nav>
 

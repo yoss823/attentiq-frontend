@@ -893,3 +893,171 @@ export async function chargeSubscriptionReportQuotaIfNeeded(params: {
     client.release();
   }
 }
+
+export type AdminOverviewSnapshot = {
+  totals: {
+    subscriberAccounts: number;
+    activeSubscriberAccounts: number;
+    paymentEvents: number;
+    analysisEvents: number;
+    distinctAnalysisEmails: number;
+  };
+  recentSubscribers: Array<{
+    email: string;
+    offerSlug: string;
+    accessStatus: string;
+    monthlyQuota: number | null;
+    monthlyUsed: number;
+    createdAt: string;
+    updatedAt: string;
+  }>;
+  recentAnalyses: Array<{
+    email: string;
+    jobId: string;
+    contentType: SubscriberAnalysisContentType;
+    sourceLabel: string | null;
+    createdAt: string;
+  }>;
+  recentPayments: Array<{
+    stripeSessionId: string;
+    email: string | null;
+    offerSlug: string | null;
+    amountCents: number;
+    currency: string;
+    receivedAt: string;
+  }>;
+};
+
+function mapAnalysisContentType(value: string): SubscriberAnalysisContentType {
+  if (value === "video" || value === "text" || value === "image") {
+    return value;
+  }
+  return "unknown";
+}
+
+export async function getAdminOverviewSnapshot(): Promise<AdminOverviewSnapshot | null> {
+  if (!process.env.DATABASE_URL) {
+    return null;
+  }
+
+  await ensureSchema();
+  const db = getPool();
+
+  const [
+    subscriberAccounts,
+    activeSubscriberAccounts,
+    paymentEvents,
+    analysisEvents,
+    distinctAnalysisEmails,
+    recentSubscribers,
+    recentAnalyses,
+    recentPayments,
+  ] = await Promise.all([
+    db.query<{ count: string }>(`select count(*)::text as count from subscriber_accounts`),
+    db.query<{ count: string }>(
+      `select count(*)::text as count from subscriber_accounts where access_status = 'active'`
+    ),
+    db.query<{ count: string }>(`select count(*)::text as count from subscriber_payment_events`),
+    db.query<{ count: string }>(`select count(*)::text as count from subscriber_analysis_events`),
+    db.query<{ count: string }>(
+      `select count(distinct email)::text as count from subscriber_analysis_events`
+    ),
+    db.query<{
+      email: string;
+      offer_slug: string;
+      access_status: string;
+      monthly_quota: number | null;
+      monthly_used: number;
+      created_at: Date;
+      updated_at: Date;
+    }>(
+      `
+        select
+          email,
+          offer_slug,
+          access_status,
+          monthly_quota,
+          monthly_used,
+          created_at,
+          updated_at
+        from subscriber_accounts
+        order by updated_at desc
+        limit 25
+      `
+    ),
+    db.query<{
+      email: string;
+      job_id: string;
+      content_type: string;
+      source_label: string | null;
+      created_at: Date;
+    }>(
+      `
+        select
+          email,
+          job_id,
+          content_type,
+          source_label,
+          created_at
+        from subscriber_analysis_events
+        order by created_at desc
+        limit 50
+      `
+    ),
+    db.query<{
+      stripe_session_id: string;
+      email: string | null;
+      offer_slug: string | null;
+      amount_cents: number;
+      currency: string;
+      received_at: Date;
+    }>(
+      `
+        select
+          stripe_session_id,
+          email,
+          offer_slug,
+          amount_cents,
+          currency,
+          received_at
+        from subscriber_payment_events
+        order by received_at desc
+        limit 25
+      `
+    ),
+  ]);
+
+  return {
+    totals: {
+      subscriberAccounts: Number(subscriberAccounts.rows[0]?.count ?? 0),
+      activeSubscriberAccounts: Number(activeSubscriberAccounts.rows[0]?.count ?? 0),
+      paymentEvents: Number(paymentEvents.rows[0]?.count ?? 0),
+      analysisEvents: Number(analysisEvents.rows[0]?.count ?? 0),
+      distinctAnalysisEmails: Number(distinctAnalysisEmails.rows[0]?.count ?? 0),
+    },
+    recentSubscribers: recentSubscribers.rows.map((row) => ({
+      email: row.email,
+      offerSlug: row.offer_slug,
+      accessStatus: row.access_status,
+      monthlyQuota: row.monthly_quota,
+      monthlyUsed: row.monthly_used,
+      createdAt: row.created_at.toISOString(),
+      updatedAt: row.updated_at.toISOString(),
+    })),
+    recentAnalyses: recentAnalyses.rows.map((row) => ({
+      email: row.email,
+      jobId: row.job_id,
+      contentType: mapAnalysisContentType(row.content_type),
+      sourceLabel: row.source_label,
+      createdAt: row.created_at.toISOString(),
+    })),
+    recentPayments: recentPayments.rows.map((row) => ({
+      stripeSessionId: row.stripe_session_id,
+      email: row.email,
+      offerSlug: row.offer_slug,
+      amountCents: row.amount_cents,
+      currency: row.currency,
+      receivedAt: row.received_at.toISOString(),
+    })),
+  };
+}

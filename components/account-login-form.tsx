@@ -28,6 +28,15 @@ export default function AccountLoginForm({
 
     setIsSubmitting(true);
     try {
+      if (
+        normalizedSession &&
+        trimmed.toLowerCase() === normalizedSession
+      ) {
+        router.push(`/compte?email=${encodeURIComponent(trimmed)}`);
+        router.refresh();
+        return;
+      }
+
       const res = await fetch("/api/account/session", {
         method: "POST",
         headers: { "content-type": "application/json" },
@@ -56,6 +65,10 @@ export default function AccountLoginForm({
       setIsSubmitting(false);
     }
   }
+
+  const isSameSessionEmail =
+    Boolean(normalizedSession) &&
+    email.trim().toLowerCase() === normalizedSession;
 
   return (
     <form
@@ -100,24 +113,28 @@ export default function AccountLoginForm({
           opacity: isSubmitting ? 0.75 : 1,
         }}
       >
-        {isSubmitting ? "Connexion…" : "Se connecter"}
+        {isSubmitting
+          ? "Connexion…"
+          : isSameSessionEmail
+            ? "Ouvrir l&apos;espace client"
+            : "Se connecter"}
       </button>
 
-      {normalizedSession &&
-        email.trim().toLowerCase() === normalizedSession && (
-          <p
-            style={{
-              gridColumn: "1 / -1",
-              margin: 0,
-              fontSize: "12px",
-              lineHeight: 1.6,
-              color: "var(--text-secondary)",
-            }}
-          >
-            Vous etes deja connecte avec cet email. Changez l&apos;adresse
-            ci-dessus si vous voulez ouvrir un autre compte.
-          </p>
-        )}
+      {isSameSessionEmail && (
+        <p
+          style={{
+            gridColumn: "1 / -1",
+            margin: 0,
+            fontSize: "12px",
+            lineHeight: 1.6,
+            color: "var(--text-secondary)",
+          }}
+        >
+          Vous etes deja connecte avec cet email. Le tableau ci-dessous est
+          votre espace client : faites defiler la page pour voir quota et
+          historique.
+        </p>
+      )}
     </form>
   );
 }
