@@ -892,6 +892,9 @@ export default function ResultReport({
       : hiddenPreviewTotal === 0
         ? "Même sans détail masqué ici, le rapport complet ajoute timeline, niveaux d'impact par chute et plan priorisé."
         : "les parties detaillees restent reservees au rapport complet";
+  const analysisModeLabel = isAudioOnly
+    ? "Mode detecte: audio principalement (lecture visuelle limitee)"
+    : "Mode detecte: audio + visuel + texte a l'ecran (selon le signal disponible)";
 
   return (
     <main
@@ -1105,6 +1108,30 @@ export default function ResultReport({
           tone={`linear-gradient(160deg, ${scoreUI.glow} 0%, rgba(12, 17, 23, 0.96) 58%, rgba(6, 10, 15, 0.98) 100%)`}
           style={{ marginBottom: "14px" }}
         >
+          {isVideoContent && (
+            <div
+              style={{
+                marginBottom: "12px",
+                display: "inline-flex",
+                alignItems: "center",
+                padding: "6px 10px",
+                borderRadius: "999px",
+                border: isAudioOnly
+                  ? "1px solid rgba(251, 146, 60, 0.3)"
+                  : "1px solid rgba(52, 211, 153, 0.28)",
+                background: isAudioOnly
+                  ? "rgba(251, 146, 60, 0.12)"
+                  : "rgba(52, 211, 153, 0.12)",
+                color: isAudioOnly ? "#fdba74" : "#86efac",
+                fontSize: "11px",
+                fontWeight: 800,
+                letterSpacing: "0.08em",
+                textTransform: "uppercase",
+              }}
+            >
+              {analysisModeLabel}
+            </div>
+          )}
           <div
             style={{
               display: "flex",

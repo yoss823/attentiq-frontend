@@ -12,7 +12,7 @@ import {
 export const metadata: Metadata = {
   title: "Analysez vos photos — Attentiq",
   description:
-    "Analyse de rétention pour vos visuels : jusqu'à 3 analyses gratuites (aperçu court), puis rapport complet payant.",
+    "Analyse de rétention pour vos visuels : 1 analyse gratuite image (aperçu court), puis rapport complet payant.",
 };
 
 const features = [
@@ -233,7 +233,7 @@ export default function ImagesPage() {
             </strong>{" "}
             jusqu&apos;a{" "}
             <strong style={{ color: "rgba(237, 242, 247, 0.95)" }}>
-              3 analyses
+              1 analyse image
             </strong>{" "}
             avec un aperçu court (1 a 2 signaux).{" "}
             <strong style={{ color: "rgba(237, 242, 247, 0.95)" }}>
@@ -408,7 +408,7 @@ export default function ImagesPage() {
               maxWidth: "40rem",
             }}
           >
-            Gratuit : jusqu&apos;a 3 analyses avec aperçu court via le formulaire
+            Gratuit : 1 analyse image avec aperçu court via le formulaire
             ci-dessus — sans carte bancaire.
           </p>
 

@@ -10,7 +10,7 @@ import {
 export const metadata: Metadata = {
   title: "Analysez vos vidéos — Attentiq",
   description:
-    "Analyse vidéo pour Shorts, Reels et TikTok : jusqu'à 3 analyses gratuites (aperçu court), puis rapport complet payant.",
+    "Analyse vidéo pour Shorts, Reels et TikTok : 1 analyse gratuite video (aperçu court), puis rapport complet payant.",
 };
 
 const platforms = [
@@ -237,7 +237,7 @@ export default function VideosPage() {
             </strong>{" "}
             jusqu&apos;a{" "}
             <strong style={{ color: "rgba(237, 242, 247, 0.95)" }}>
-              3 analyses
+              1 analyse video
             </strong>{" "}
             avec un aperçu court (1 a 2 signaux).{" "}
             <strong style={{ color: "rgba(237, 242, 247, 0.95)" }}>
@@ -441,7 +441,7 @@ export default function VideosPage() {
               maxWidth: "40rem",
             }}
           >
-            Gratuit : jusqu&apos;a 3 analyses avec aperçu court via le bouton «
+            Gratuit : 1 analyse video avec aperçu court via le bouton «
             Analyser gratuitement » dans la bannière — sans carte bancaire.
           </p>
 

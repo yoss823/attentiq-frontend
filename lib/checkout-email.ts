@@ -6,6 +6,26 @@ function offerDisplayName(offerSlug: string) {
   return getOfferBySlug(offerSlug)?.name ?? offerSlug;
 }
 
+function forceHttpForLocalhost(urlValue: string | null | undefined) {
+  const raw = urlValue?.trim();
+  if (!raw) return "";
+  try {
+    const parsed = new URL(raw);
+    const host = parsed.hostname.toLowerCase();
+    if (
+      host.includes("localhost") ||
+      host === "127.0.0.1" ||
+      host === "0.0.0.0"
+    ) {
+      parsed.protocol = "http:";
+      return parsed.toString();
+    }
+    return parsed.toString();
+  } catch {
+    return raw;
+  }
+}
+
 /**
  * E-mail de remerciement après paiement Stripe (idempotence par session_id).
  * Configurez RESEND_API_KEY + RESEND_FROM_EMAIL sur Railway.
@@ -33,14 +53,14 @@ export async function sendCheckoutThankYouEmail(params: {
     "Attentiq <onboarding@resend.dev>";
 
   const base =
-    params.appBaseUrl?.replace(/\/+$/, "") ||
-    process.env.NEXT_PUBLIC_APP_URL?.replace(/\/+$/, "") ||
+    forceHttpForLocalhost(params.appBaseUrl)?.replace(/\/+$/, "") ||
+    forceHttpForLocalhost(process.env.NEXT_PUBLIC_APP_URL)?.replace(/\/+$/, "") ||
     "";
 
   const label = offerDisplayName(params.offerSlug);
   const subject = `Merci — paiement confirmé (${label})`;
   const accountLoginUrl =
-    params.accountLoginUrl ??
+    forceHttpForLocalhost(params.accountLoginUrl) ||
     (base ? `${base}/api/account/login?email=${encodeURIComponent(params.to.trim())}` : "");
   const html = `
     <p>Bonjour,</p>

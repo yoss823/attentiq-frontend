@@ -5,7 +5,6 @@ import {
   PREMIUM_ENTITLEMENT_COOKIE_NAME,
 } from "@/lib/premium";
 import {
-  FREE_TRIAL_TOTAL_COUNT_COOKIE_NAME,
   freeTrialExhaustedUserMessage,
   hasUsedFreeTrialForFormat,
   paywallPathForFormat,
@@ -21,10 +20,6 @@ export async function POST(req: NextRequest) {
     req.cookies.get(PREMIUM_ENTITLEMENT_COOKIE_NAME)?.value ?? null
   );
   const hasPremium = Boolean(entitlement?.isPremium);
-  const currentTrialCount = Number.parseInt(
-    req.cookies.get(FREE_TRIAL_TOTAL_COUNT_COOKIE_NAME)?.value ?? "0",
-    10
-  );
 
   const quotaGate = await enforceSubscriptionQuotaGate(req);
   if (quotaGate.shouldBlock) {
@@ -156,11 +151,6 @@ export async function POST(req: NextRequest) {
     { ...payload, pipelineVersion: URL_PIPELINE_VERSION },
     { headers: buildPipelineHeaders() }
   );
-  setFreeTrialCookieOnResponse(
-    response,
-    "image",
-    hasPremium,
-    Number.isFinite(currentTrialCount) ? currentTrialCount : 0
-  );
+  setFreeTrialCookieOnResponse(response, "image", hasPremium);
   return response;
 }

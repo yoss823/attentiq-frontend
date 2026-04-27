@@ -274,7 +274,7 @@ export default function AnalyzeTextImageExperience({
           color: "var(--text-secondary)",
         }}
       >
-        Meme moteur que la video : version gratuite = jusqu&apos;a 3 analyses,
+        Meme moteur que la video : version gratuite = 1 analyse par format,
         avec un aperçu volontairement court (1 a 2 signaux). Le rapport complet
         se debloque avec une offre payante.
       </p>

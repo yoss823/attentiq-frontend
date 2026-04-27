@@ -662,7 +662,7 @@ export async function POST(request: Request) {
   const resend = new Resend(apiKey);
 
   let attachment:
-    | { filename: string; content: Buffer; contentType: string }
+    | { filename: string; content: string; contentType: string }
     | undefined;
   let html = `<p>${manualBody.replace(/</g, "&lt;").replace(/>/g, "&gt;")}</p>`;
 
@@ -684,7 +684,8 @@ export async function POST(request: Request) {
     });
     attachment = {
       filename: `attentiq-diagnostic-${normalizedJobId}.pdf`,
-      content: pdfBuffer,
+      // Resend attachments are safest as base64 strings.
+      content: pdfBuffer.toString("base64"),
       contentType: "application/pdf",
     };
 
@@ -706,8 +707,19 @@ export async function POST(request: Request) {
       attachments: attachment ? [attachment] : undefined,
     });
     if (error) {
+      const detailMessage =
+        typeof error === "object" &&
+        error &&
+        "message" in error &&
+        typeof (error as { message?: unknown }).message === "string"
+          ? (error as { message: string }).message
+          : "unknown_resend_error";
       return Response.json(
-        { error: "Resend send failed", detail: error },
+        {
+          error: "Resend send failed",
+          userMessage: "Echec envoi email (Resend). Verifiez la configuration expediteur.",
+          detail: detailMessage,
+        },
         { status: 500 }
       );
     }

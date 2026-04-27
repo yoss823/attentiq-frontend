@@ -174,6 +174,12 @@ export async function resolveVideoUrl(rawUrl: string): Promise<string> {
 }
 
 export async function preflightRailwayUrl(videoUrl: string) {
+  const platform = detectVideoPlatformFromUrl(videoUrl);
+  // /debug/rapidapi is TikTok-specific; skip this gate for other platforms.
+  if (platform !== "tiktok") {
+    return;
+  }
+
   const railwayBaseUrl = getRailwayBaseUrl();
   const response = await fetchWithTimeout(
     `${railwayBaseUrl}/debug/rapidapi?url=${encodeURIComponent(videoUrl)}`,

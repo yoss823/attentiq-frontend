@@ -9,6 +9,22 @@ export const runtime = "nodejs";
 
 const COOKIE_MAX_AGE_SECONDS = 31 * 24 * 60 * 60;
 
+function resolveRequestOrigin(request: NextRequest) {
+  const host =
+    request.headers.get("x-forwarded-host") ?? request.headers.get("host") ?? "";
+  const isLocalHost =
+    host.includes("localhost") ||
+    host.includes("127.0.0.1") ||
+    host.includes("0.0.0.0");
+  const forwardedProto = request.headers.get("x-forwarded-proto");
+  const proto = isLocalHost
+    ? "http"
+    : forwardedProto
+      ? forwardedProto.split(",")[0].trim()
+      : request.nextUrl.protocol.replace(":", "");
+  return host ? `${proto}://${host}` : request.nextUrl.origin;
+}
+
 function shouldUseSecureCookie(request: NextRequest) {
   const host =
     request.headers.get("x-forwarded-host") ?? request.headers.get("host") ?? "";
@@ -27,18 +43,21 @@ function shouldUseSecureCookie(request: NextRequest) {
 }
 
 export async function GET(request: NextRequest) {
+  const origin = resolveRequestOrigin(request);
   const email = normalizeAccountEmail(request.nextUrl.searchParams.get("email"));
   if (!email) {
-    return NextResponse.redirect(new URL("/compte?loginError=missing_email", request.url));
+    return NextResponse.redirect(new URL("/compte?loginError=missing_email", origin));
   }
 
   const { account } = await getSubscriberAccountByEmail(email);
   if (!account) {
-    return NextResponse.redirect(new URL(`/compte?email=${encodeURIComponent(email)}&loginError=not_found`, request.url));
+    return NextResponse.redirect(
+      new URL(`/compte?email=${encodeURIComponent(email)}&loginError=not_found`, origin)
+    );
   }
 
   const response = NextResponse.redirect(
-    new URL(`/compte?email=${encodeURIComponent(email)}`, request.url)
+    new URL(`/compte?email=${encodeURIComponent(email)}`, origin)
   );
   response.cookies.set({
     name: ACCOUNT_SESSION_COOKIE_NAME,

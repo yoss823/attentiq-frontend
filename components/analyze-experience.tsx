@@ -441,8 +441,8 @@ export default function AnalyzeExperience({
             }}
           >
             {inputMode === "url"
-              ? "Collez une URL publique (TikTok, Shorts, Reel, Spotlight). Video max 60 s. Attentiq analyse l'audio, le visuel, le texte a l'ecran, le cadrage et le rythme quand le signal est disponible. Gratuit : jusqu'a 3 analyses, avec un aperçu court (1 a 2 signaux)."
-              : "Importez un fichier (MP4, MOV, WebM), video max 60 s. Attentiq analyse l'audio, le visuel, le texte a l'ecran, le cadrage et le rythme quand le signal est disponible. Gratuit : jusqu'a 3 analyses, avec un aperçu court (1 a 2 signaux)."}
+              ? "Collez une URL publique (TikTok, Shorts, Reel, Spotlight). Video max 60 s. Attentiq analyse l'audio, le visuel, le texte a l'ecran, le cadrage et le rythme quand le signal est disponible. Gratuit : 1 analyse video, avec un aperçu court (1 a 2 signaux)."
+              : "Importez un fichier (MP4, MOV, WebM), video max 60 s. Attentiq analyse l'audio, le visuel, le texte a l'ecran, le cadrage et le rythme quand le signal est disponible. Gratuit : 1 analyse video, avec un aperçu court (1 a 2 signaux)."}
           </p>
 
           {/* Mode toggle */}

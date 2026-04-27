@@ -371,7 +371,7 @@ export default function HomePage() {
                 maxWidth: "48rem",
               }}
             >
-              Lancez jusqu&apos;a <strong style={{ color: "rgba(237, 242, 247, 0.95)" }}>3 analyses gratuites</strong> : aperçu limité, clair et rapide — en général{" "}
+              Lancez <strong style={{ color: "rgba(237, 242, 247, 0.95)" }}>1 analyse gratuite par format</strong> : aperçu limité, clair et rapide — en général{" "}
               <strong style={{ color: "rgba(237, 242, 247, 0.95)" }}>
                 1 a 2 signaux cles
               </strong>{" "}
