@@ -3,7 +3,7 @@
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { useEffect, useState } from "react";
-import { buildAnalyzeHref } from "@/lib/checkout-context";
+import { buildAnalyzeHref, buildResultHref } from "@/lib/checkout-context";
 import { activatePremiumEntitlementFromSuccessfulCheckout } from "@/lib/premium";
 
 type MerciRedirectStateProps = {
@@ -138,12 +138,21 @@ export default function MerciRedirectState({
           subscriberEmail: setPremiumPayload.customerEmail,
         });
 
+        const hasReportContext = Boolean(
+          setPremiumPayload.jobId || setPremiumPayload.videoUrl
+        );
+
         router.replace(
-          buildAnalyzeHref({
-            jobId: setPremiumPayload.jobId,
-            videoUrl: setPremiumPayload.videoUrl,
-            paid: setPremiumPayload.paid,
-          })
+          hasReportContext
+            ? buildResultHref({
+                jobId: setPremiumPayload.jobId,
+                videoUrl: setPremiumPayload.videoUrl,
+              })
+            : buildAnalyzeHref({
+                jobId: setPremiumPayload.jobId,
+                videoUrl: setPremiumPayload.videoUrl,
+                paid: setPremiumPayload.paid,
+              })
         );
       } catch (error) {
         console.error("[merci] verify-session failed", error);

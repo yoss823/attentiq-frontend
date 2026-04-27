@@ -54,6 +54,9 @@ const RAPID_API_VIDEO_FIELDS = [
   "wmplay",
 ] as const;
 
+const URL_BLOCKED_UPLOAD_MESSAGE =
+  "Certaines plateformes bloquent parfois le media via URL. Pas d'inquietude: testez en upload, le resultat sera souvent meilleur.";
+
 export class UrlIntakeError extends Error {
   constructor(
     public readonly code: string,
@@ -286,7 +289,7 @@ function mapRailwayJobFailure(
     return new UrlIntakeError(
       "INSTAGRAM_LOGIN_REQUIRED",
       422,
-      "Instagram bloque cette video en acces public (connexion requise ou limite temporaire). Reessayez avec un autre Reel public ou passez par l'upload video."
+      URL_BLOCKED_UPLOAD_MESSAGE
     );
   }
 
@@ -310,8 +313,7 @@ function mapRailwayJobFailure(
   return new UrlIntakeError(
     errorCode ?? "ANALYZE_FAILED",
     422,
-    errorMessage ||
-      "Cette URL n'a pas produit un media exploitable. Importez la video directement."
+    URL_BLOCKED_UPLOAD_MESSAGE
   );
 }
 

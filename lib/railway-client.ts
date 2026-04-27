@@ -203,7 +203,7 @@ function resolveErrorMessage(data: RailwayResponse): string {
       rawError.includes("rate limit reached") ||
       rawError.includes("requested content is not available"))
   ) {
-    return "Instagram bloque cette video en acces public (connexion requise ou limite temporaire). Essayez un autre Reel public ou l'upload video.";
+    return "Certaines plateformes bloquent parfois le media via URL. Pas d'inquietude: testez en upload, le resultat sera souvent meilleur.";
   }
   return (
     data.error_message ??
