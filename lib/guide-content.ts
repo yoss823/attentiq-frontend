@@ -38,9 +38,9 @@ const VIDEO: GuideCopy = {
     },
     {
       number: "02",
-      title: "Attentiq transcrit et inspecte le signal disponible",
+      title: "Attentiq lit le texte et inspecte le signal disponible",
       description:
-        "Audio systématique ; visuel lorsque les images sont exploitables. Repérage des ruptures d'attention quand le signal le permet.",
+        "Texte a l'ecran et audio systematiques ; visuel lorsque les images sont exploitables. Reperage des ruptures d'attention quand le signal le permet.",
     },
     {
       number: "03",
@@ -79,9 +79,9 @@ const TEXT: GuideCopy = {
     },
     {
       number: "02",
-      title: "Attentiq lit clarté, promesse, preuve et appel à l'action",
+      title: "Attentiq lit votre texte: clarte, promesse, preuve, CTA",
       description:
-        "Densité, rythme de lecture, risques de confusion ou d'abandon avant la fin.",
+        "Densite, rythme de lecture, risques de confusion ou d'abandon avant la fin.",
     },
     {
       number: "03",
@@ -119,9 +119,9 @@ const IMAGE: GuideCopy = {
     },
     {
       number: "02",
-      title: "Attentiq analyse hiérarchie, lisibilité et intention",
+      title: "Attentiq lit le visuel et le texte present dans l'image",
       description:
-        "Point focal, surcharge, CTA visible ou non, cohérence avec la promesse.",
+        "Point focal, lisibilite, surcharge, CTA visible ou non, coherence avec la promesse.",
     },
     {
       number: "03",

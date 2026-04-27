@@ -278,9 +278,9 @@ export default function TransparencePage() {
               maxWidth: "44rem",
             }}
           >
-            Nous préférons être clairs sur les limites de cet outil plutôt que
-            de vous promettre des résultats que nous ne pouvons pas garantir —
-            sur la vidéo courte, le texte ou l&apos;image.
+            Une promesse simple : vous aider a comprendre vite ce qui fait
+            decrocher l&apos;attention, puis quoi corriger. Cette page precise
+            clairement ce que l&apos;outil couvre — et ce qu&apos;il ne pretend pas faire.
           </p>
           <div
             style={{
@@ -468,7 +468,7 @@ export default function TransparencePage() {
                   color: "var(--text-primary)",
                 }}
               >
-                Ce que l&apos;outil ne peut pas garantir
+                Ce que l&apos;outil ne promet pas
               </h2>
             </div>
             <p
@@ -479,7 +479,8 @@ export default function TransparencePage() {
                 color: "var(--text-secondary)",
               }}
             >
-              Pas de baguette magique : une lecture sérieuse du signal que vous lui donnez, avec des bornes claires (pas vos stats privées, pas la viralité).
+              Pas de baguette magique : Attentiq lit votre contenu pour vous aider
+              a decider mieux, plus vite, avec des bornes explicites.
             </p>
             <div style={{ display: "grid", gap: "10px" }}>
               {limits.map((item) => (
@@ -562,7 +563,7 @@ export default function TransparencePage() {
                 maxWidth: "52rem",
               }}
             >
-              Deux repères par format — sans refaire toute la page « Comment ça marche ».
+              Deux reperes par format pour voir tout de suite la valeur.
             </p>
             <div
               style={{
@@ -715,8 +716,8 @@ export default function TransparencePage() {
                 color: "var(--text-secondary)",
               }}
             >
-              Selon le format, certains contextes gardent une lecture utile mais
-              moins fine. Mieux vaut le savoir à l&apos;avance.
+              Selon le format, certains contextes reduisent la finesse. Le
+              diagnostic reste utile, simplement plus prudent.
             </p>
             <div
               style={{
@@ -887,7 +888,7 @@ export default function TransparencePage() {
                 color: "var(--text-secondary)",
               }}
             >
-              Quatre réponses courtes — cliquez pour déplier.
+              Reponses courtes, claires, sans jargon.
             </p>
             <div style={{ display: "grid", gap: "0" }}>
               {TRANSPARENCE_FAQ.map((item) => (
@@ -958,7 +959,7 @@ export default function TransparencePage() {
                 color: "var(--text-primary)",
               }}
             >
-              Un même cadre d&apos;honnêteté pour la vidéo, le texte et l&apos;image.
+              Un cadre clair pour mieux decider, sur video, texte et image.
             </h2>
             <p
               style={{
@@ -968,7 +969,8 @@ export default function TransparencePage() {
                 color: "rgba(237, 242, 247, 0.8)",
               }}
             >
-              Choisissez un format, lancez un aperçu gratuit en quelques secondes — sans carte bancaire sur les parcours publics.
+              Choisissez un format, lancez un apercu gratuit en quelques secondes,
+              puis decidez si le complet vaut le passage payant.
             </p>
             <div
               style={{
