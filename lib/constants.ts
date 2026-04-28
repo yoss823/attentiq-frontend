@@ -64,7 +64,9 @@ export const PRICING_PLANS: PricingPlan[] = [
 ];
 
 export const API_BASE_URL =
-  process.env.NEXT_PUBLIC_API_URL || "http://localhost:8000";
+  process.env.NEXT_PUBLIC_API_URL ||
+  process.env.NEXT_PUBLIC_BACKEND_URL ||
+  "http://localhost:8000";
 
 export const POLLING_INTERVAL_MS = 3000;
 export const POLLING_MAX_ATTEMPTS = 40; // 2 minutes max

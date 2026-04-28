@@ -16,6 +16,7 @@ import {
   type ChatTurn,
 } from "@/lib/chat-context";
 import type { AttentiqReport } from "@/lib/railway-client";
+import { RETENTION_SCORE_DISPLAY_MAX } from "@/lib/retention-score-display";
 import {
   buildLegacyReportFromV2,
   isV2AnalysisResult,
@@ -627,7 +628,8 @@ export default function ChatExperience() {
                         color: "var(--text-secondary)",
                       }}
                     >
-                      {score.toFixed(1)}/10 · {getScoreLabel(score)}
+                      {score.toFixed(1)}/{RETENTION_SCORE_DISPLAY_MAX} ·{" "}
+                      {getScoreLabel(score)}
                     </span>
                   )}
                   {diagnosticContext?.partial && (

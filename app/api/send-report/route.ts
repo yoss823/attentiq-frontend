@@ -1,5 +1,9 @@
 import { PDFDocument, StandardFonts, rgb } from "pdf-lib";
 import { Resend } from "resend";
+import {
+  clampRetentionScoreForDisplay,
+  RETENTION_SCORE_DISPLAY_MAX,
+} from "@/lib/retention-score-display";
 import { getRailwayJobSnapshot } from "@/lib/railway-server";
 
 export const runtime = "nodejs";
@@ -68,7 +72,9 @@ function normalizeV2Score(value: unknown) {
   const raw = toFiniteNumber(value);
   if (raw == null) return null;
   const on10 = raw <= 1 ? raw * 10 : raw;
-  return Math.max(0, Math.min(10, on10)).toFixed(1);
+  const bounded10 = Math.max(0, Math.min(10, on10));
+  const capped = clampRetentionScoreForDisplay(bounded10);
+  return capped == null ? null : capped.toFixed(1);
 }
 
 function humanizeV2Label(label: string | null) {
@@ -102,7 +108,7 @@ function summarizeV2Result(result: Record<string, unknown>): ReportSummary | nul
       ? "Diagnostic d'attention (texte)"
       : inputFormat === "image"
         ? "Diagnostic d'attention (image)"
-        : "Diagnostic d'attention (video)";
+        : "Diagnostic d'attention (vidéo)";
   const score = normalizeV2Score(diagnostic.score);
   const summary =
     normalizeText(diagnostic.explanation) ?? "Aucun resume fourni.";
@@ -133,7 +139,7 @@ function summarizeV2Result(result: Record<string, unknown>): ReportSummary | nul
 
   const audienceLossEstimate =
     score != null
-      ? `Score ${score}/10 : ce score mesure la tenue d'attention percue, pas une prediction de vues.`
+      ? `Score ${score}/${RETENTION_SCORE_DISPLAY_MAX} : ce score mesure la tenue d'attention perçue, pas une prédiction de vues.`
       : "Estimation d'impact non disponible.";
 
   const actions = Array.isArray(result.actions)
@@ -212,7 +218,8 @@ function summarizeReport(result: Record<string, unknown>) {
   const sourceUrl = normalizeText(metadata?.url);
   const score =
     typeof diagnostic?.retention_score === "number"
-      ? diagnostic.retention_score.toFixed(1)
+      ? (clampRetentionScoreForDisplay(diagnostic.retention_score)?.toFixed(1) ??
+        diagnostic.retention_score.toFixed(1))
       : null;
   const summary = normalizeText(diagnostic?.global_summary) ?? "Aucun resume fourni.";
   const dropRule = normalizeText(diagnostic?.drop_off_rule) ?? "Aucune regle formelle.";
@@ -536,13 +543,16 @@ async function buildReportPdf(params: {
     font: bold,
     color: rgb(0.72, 0.86, 0.93),
   });
-  page.drawText(params.score ? `${params.score}/10` : "N/A", {
-    x: scoreCardX + 10,
-    y: scoreCardTop - 53,
-    size: 26,
-    font: bold,
-    color: rgb(0.8, 0.95, 1),
-  });
+  page.drawText(
+    params.score ? `${params.score}/${RETENTION_SCORE_DISPLAY_MAX}` : "N/A",
+    {
+      x: scoreCardX + 10,
+      y: scoreCardTop - 53,
+      size: 26,
+      font: bold,
+      color: rgb(0.8, 0.95, 1),
+    }
+  );
 
   drawSectionCard("Resume global", params.summary, `Job ${params.jobId}`);
   drawSectionCard("Regle de decrochage", params.dropRule, `Job ${params.jobId}`);

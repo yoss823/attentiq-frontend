@@ -2,9 +2,9 @@ import type { Metadata } from "next";
 import Link from "next/link";
 
 export const metadata: Metadata = {
-  title: "Ce qu'Attentiq fait — et ce qu'il ne fait pas | Attentiq",
+  title: "Confiance & transparence",
   description:
-    "Transparence sur les capacités et limites d'Attentiq pour la vidéo courte, le texte et l'image : ce que l'outil fait, ce qu'il ne garantit pas, et vos données.",
+    "Ce qu'Attentiq vous apporte sur la vidéo courte, le texte et l'image : valeur concrète, cadre honnête, protection des données — sans surpromesse.",
 };
 
 const FORMAT_LINKS = [
@@ -14,44 +14,47 @@ const FORMAT_LINKS = [
 ] as const;
 
 const strengths = [
-  "Structurer ce qui aide ou freine l'attention : vidéo (rythme, accroche, ruptures), texte (promesse, clarté, preuve), image (hiérarchie, lisibilité, intention).",
-  "Donner des repères précis quand le signal le permet — timestamps sur une vidéo, passages ou zones à risque sur un texte, points de friction sur un visuel.",
-  "Traduire le diagnostic en actions concrètes pour votre prochaine publication, quel que soit le format.",
-  "Proposer un aperçu gratuit sans compte sur les parcours publics (selon la page d'analyse).",
+  "Mettre en évidence ce qui retient l'attention et ce qui la relâche — sur la vidéo (rythme, accroche, ruptures), le texte (promesse, clarté, preuve) ou l'image (hiérarchie, lisibilité, intention).",
+  "Livrer des repères exploitables quand le signal le permet : repères temporels sur une vidéo, passages à resserrer sur un texte, points de friction sur un visuel.",
+  "Transformer le diagnostic en actions prioritaires pour votre prochaine publication, sur chaque format.",
+  "Offrir un aperçu gratuit sans compte sur les parcours publics (selon la page d'analyse), pour décider sereinement avant d'aller au complet.",
+  "Afficher un score de rétention sur une échelle volontairement exigeante (plafond 6,5) : une bonne note reflète déjà un signal solide, sans « sur-scoring ».",
+  "Une même logique d'attention sur trois formats — vous gagnez du temps pour itérer plus vite.",
 ];
 
-const limits = [
-  "Ne prédit ni les vues, ni la viralité, ni la croissance de votre compte.",
-  "Ne s'appuie pas sur les statistiques privées de vos réseaux (analytics, rétention réelle du trafic).",
-  "Ne remplace pas votre jugement créatif ni la diversité du public réel.",
-  "Ne décrypte pas les règles internes des algorithmes des feeds — il lit votre contenu, pas le moteur de recommandation.",
-  "Les sorties sont des lectures automatisées du signal disponible : une aide à décider, pas une certitude.",
+/** Formulations positives : ce que le produit choisit de faire (honnêteté = confiance). */
+const readingCommitments = [
+  "Nous concentrons la lecture sur le contenu que vous partagez : ce qui est visible, audible ou lisible — pas sur vos tableaux de bord privés des plateformes.",
+  "Nous laissons la prédiction de vues et de viralité à vos outils analytics : ici, l'enjeu est la qualité perçue du message avant publication.",
+  "Nous complétons votre intuition créative : la machine structure, vous tranchez sur le ton, le risque et l'angle éditorial.",
+  "Nous restons transparents sur le signal disponible : une aide à décider rapide, avec des limites claires quand l'entrée est courte, silencieuse ou compressée.",
 ];
 
 const edgeCases = [
   {
     title: "Vidéo très courte (< 10 s)",
-    detail: "Peu de signal à analyser. Le diagnostic devient moins stable.",
+    detail:
+      "Beaucoup d'impact possible en peu de secondes : nous restons prudents et privilégions les signaux les plus nets.",
   },
   {
     title: "Audio manquant (vidéo)",
     detail:
-      "L'analyse reste possible, mais partielle — la dimension verbale et le rythme pèsent plus que le visuel.",
+      "L'analyse reste utile sur le rythme et ce qui passe à l'écran ; dès que l'audio revient, la lecture verbale redevient pleine.",
   },
   {
     title: "Contenu privé ou indisponible",
     detail:
-      "URL ou fichier inaccessible : l'outil ne peut pas analyser ce qu'il ne peut pas récupérer.",
+      "Dès que l'URL ou le fichier est joignable, l'analyse repart normalement — testez aussi l'upload si la plateforme bloque.",
   },
   {
     title: "Texte au-delà de la limite",
     detail:
-      "L'analyse porte sur un extrait ou un périmètre réduit ; la finesse peut diminuer.",
+      "Nous portons l'analyse sur un extrait représentatif : l'essentiel du diagnostic reste actionnable sur la partie lue.",
   },
   {
     title: "Image basse résolution ou surchargée",
     detail:
-      "Peu de signal exploitable : repères moins stables sur le message et la hiérarchie.",
+      "Nous signalons ce que le fichier permet encore de voir clairement, sans inventer de détails absents du fichier.",
   },
 ];
 
@@ -77,8 +80,8 @@ const FORMAT_COMPARE_COLUMNS: FormatCompareColumn[] = [
       "Repères temporels quand le signal le permet",
     ],
     notSeen: [
-      "Vos courbes de rétention analytics",
-      "Pourquoi le feed vous classe ou non",
+      "Les courbes analytics privées (à garder dans vos outils habituels)",
+      "Le classement interne des algorithmes (hors contenu visible)",
     ],
   },
   {
@@ -89,8 +92,8 @@ const FORMAT_COMPARE_COLUMNS: FormatCompareColumn[] = [
       "Passages lourds ou ambigus avant la fin",
     ],
     notSeen: [
-      "Le ton exact de chaque lecteur",
-      "La performance SEO ou les stats d'engagement",
+      "La sensibilité individuelle de chaque lecteur (infini de nuances)",
+      "Les métriques SEO ou d'engagement externes au texte collé",
     ],
   },
   {
@@ -101,8 +104,8 @@ const FORMAT_COMPARE_COLUMNS: FormatCompareColumn[] = [
       "Friction sur le regard (surcharge, CTA peu visible)",
     ],
     notSeen: [
-      "Les tests utilisateurs en conditions réelles",
-      "Le rendu sur tous les écrans et réglages d'accessibilité",
+      "Les tests utilisateurs en salle (autre discipline, complémentaire)",
+      "La simulation de tous les écrans et réglages d'accessibilité",
     ],
   },
 ];
@@ -110,11 +113,11 @@ const FORMAT_COMPARE_COLUMNS: FormatCompareColumn[] = [
 const TRANSPARENCE_FAQ = [
   {
     q: "Attentiq remplace un coach ou un monteur ?",
-    a: "Non : il structure un diagnostic à partir du contenu que vous fournissez. La décision et la création restent à vous.",
+    a: "C'est un copilote de lecture : il structure un diagnostic à partir de votre contenu. Vous gardez la main sur les choix créatifs et le montage final.",
   },
   {
     q: "Pourquoi trois formats différents ?",
-    a: "Parce que l'attention ne se lit pas pareil sur une timeline vidéo, un texte linéaire ou une image figée — mais la logique (signaux → risques → actions) est la même.",
+    a: "Parce que l'attention ne se lit pas pareil sur une timeline vidéo, un texte linéaire ou une image figée — mais la logique (signaux → risques → actions) reste la même, ce qui vous fait gagner du temps.",
   },
   {
     q: "L'aperçu gratuit montre quoi exactement ?",
@@ -123,6 +126,10 @@ const TRANSPARENCE_FAQ = [
   {
     q: "Mes données servent à entraîner des modèles ?",
     a: "Non : vos contenus d'analyse ne sont pas revendus et ne sont pas utilisés pour du ciblage publicitaire. Des cookies techniques peuvent limiter l'abus d'essai.",
+  },
+  {
+    q: "Pourquoi le score semble plafonné ?",
+    a: "L'échelle affichée va jusqu'à 6,5 volontairement : sans vos analytics natives, un « 9,5/10 » serait peu honnête. Un score élevé sur Attentiq signale déjà une très bonne tenue du signal.",
   },
 ];
 
@@ -267,7 +274,7 @@ export default function TransparencePage() {
               color: "var(--text-primary)",
             }}
           >
-            Ce qu&apos;Attentiq fait — et ce qu&apos;il ne fait pas
+            Confiance, transparence, exigence utile
           </h1>
           <p
             style={{
@@ -278,9 +285,10 @@ export default function TransparencePage() {
               maxWidth: "44rem",
             }}
           >
-            Une promesse simple : vous aider a comprendre vite ce qui fait
-            decrocher l&apos;attention, puis quoi corriger. Cette page precise
-            clairement ce que l&apos;outil couvre — et ce qu&apos;il ne pretend pas faire.
+            Attentiq vous aide à voir où votre contenu court retient ou relâche
+            l&apos;attention, puis quoi améliorer en priorité — avec un cadre honnête
+            sur ce que l&apos;outil apporte vraiment, pour la vidéo, le texte et
+            l&apos;image.
           </p>
           <div
             style={{
@@ -383,7 +391,10 @@ export default function TransparencePage() {
                 color: "var(--text-secondary)",
               }}
             >
-              Attentiq aide à voir <strong style={{ color: "rgba(237,242,247,0.95)" }}>où</strong> votre contenu court perd l&apos;attention — vidéo, texte ou image — à partir de signaux observables (rythme, promesse, hiérarchie…), pas à partir de promesses de performance.
+              Attentiq aide à voir où votre contenu court perd l&apos;attention
+              — vidéo, texte ou image — à partir de signaux observables (rythme,
+              promesse, hiérarchie…), pas à partir de promesses de performance
+              irréalistes.
             </p>
             <div style={{ display: "grid", gap: "10px" }}>
               {strengths.map((item) => (
@@ -468,7 +479,7 @@ export default function TransparencePage() {
                   color: "var(--text-primary)",
                 }}
               >
-                Ce que l&apos;outil ne promet pas
+                Notre cadre : clarté sans survente
               </h2>
             </div>
             <p
@@ -479,11 +490,12 @@ export default function TransparencePage() {
                 color: "var(--text-secondary)",
               }}
             >
-              Pas de baguette magique : Attentiq lit votre contenu pour vous aider
-              a decider mieux, plus vite, avec des bornes explicites.
+              La confiance vient aussi de ce que nous ne prétendons pas faire.
+              Voici comment nous cadrons la lecture pour rester utiles — et
+              crédibles — au quotidien.
             </p>
             <div style={{ display: "grid", gap: "10px" }}>
-              {limits.map((item) => (
+              {readingCommitments.map((item) => (
                 <div
                   key={item}
                   style={{
@@ -500,9 +512,9 @@ export default function TransparencePage() {
                       width: "18px",
                       height: "18px",
                       borderRadius: "50%",
-                      background: "rgba(248, 113, 113, 0.12)",
-                      border: "1px solid rgba(248, 113, 113, 0.2)",
-                      color: "#f87171",
+                      background: "rgba(52, 211, 153, 0.12)",
+                      border: "1px solid rgba(52, 211, 153, 0.22)",
+                      color: "#6ee7b7",
                       display: "inline-flex",
                       alignItems: "center",
                       justifyContent: "center",
@@ -512,7 +524,7 @@ export default function TransparencePage() {
                       marginTop: "2px",
                     }}
                   >
-                    ×
+                    ✓
                   </span>
                   {item}
                 </div>
@@ -563,7 +575,8 @@ export default function TransparencePage() {
                 maxWidth: "52rem",
               }}
             >
-              Deux reperes par format pour voir tout de suite la valeur.
+              Deux repères par format : la valeur livrée, puis ce qui relève
+              d&apos;autres outils — sans dramatiser.
             </p>
             <div
               style={{
@@ -634,10 +647,10 @@ export default function TransparencePage() {
                         fontWeight: 800,
                         letterSpacing: "0.14em",
                         textTransform: "uppercase",
-                        color: "rgba(248, 113, 113, 0.9)",
+                        color: "rgba(148, 163, 184, 0.95)",
                       }}
                     >
-                      Ce qu&apos;on ne voit pas
+                      Hors périmètre (normal)
                     </p>
                     <ul
                       style={{
@@ -705,7 +718,7 @@ export default function TransparencePage() {
                   color: "var(--text-primary)",
                 }}
               >
-                Cas ou le diagnostic est moins pertinent
+                Quand nous lisons avec plus de prudence
               </h2>
             </div>
             <p
@@ -716,8 +729,9 @@ export default function TransparencePage() {
                 color: "var(--text-secondary)",
               }}
             >
-              Selon le format, certains contextes reduisent la finesse. Le
-              diagnostic reste utile, simplement plus prudent.
+              Selon le format, certains contextes demandent plus de recul — le
+              diagnostic reste orienté action, avec des formulations plus
+              prudentes lorsque le signal est mince.
             </p>
             <div
               style={{
@@ -806,7 +820,7 @@ export default function TransparencePage() {
                   color: "var(--text-primary)",
                 }}
               >
-                Confidentialite des donnees
+                Confidentialité des données
               </h2>
             </div>
             <p
@@ -888,7 +902,7 @@ export default function TransparencePage() {
                 color: "var(--text-secondary)",
               }}
             >
-              Reponses courtes, claires, sans jargon.
+              Réponses courtes, claires, sans jargon.
             </p>
             <div style={{ display: "grid", gap: "0" }}>
               {TRANSPARENCE_FAQ.map((item) => (
@@ -969,8 +983,8 @@ export default function TransparencePage() {
                 color: "rgba(237, 242, 247, 0.8)",
               }}
             >
-              Choisissez un format, lancez un apercu gratuit en quelques secondes,
-              puis decidez si le complet vaut le passage payant.
+              Choisissez un format, lancez un aperçu gratuit en quelques secondes,
+              puis décidez si le complet vaut le passage payant.
             </p>
             <div
               style={{

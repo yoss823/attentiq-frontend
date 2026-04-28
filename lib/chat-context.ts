@@ -1,4 +1,5 @@
 import { polishDiagnosticFrenchForDisplay } from "@/lib/diagnostic-locale-fr";
+import { RETENTION_SCORE_DISPLAY_MAX } from "@/lib/retention-score-display";
 import {
   formatAttentiqReport,
   mockAttentiqDemoAnalyzeResponse,
@@ -58,8 +59,8 @@ export function getPrimaryIssue(context: ChatDiagnosticContext): string {
 
 export function getScoreLabel(score: number | null | undefined): string {
   if (score == null) return "Score indisponible";
-  if (score >= 7) return "Solide";
-  if (score >= 5) return "À reprendre";
+  if (score > 5.5) return "Solide";
+  if (score >= 3.75) return "À reprendre";
   return "Urgent";
 }
 
@@ -75,7 +76,7 @@ export function buildWelcomeMessage(
     "J'ai votre diagnostic actuel en contexte.",
     `Le point le plus sensible relevé ici est : ${getPrimaryIssue(context)}`,
     score != null
-      ? `Votre score de rétention est ${score.toFixed(1)}/10, donc la priorité est d'agir avant d'élargir le plan.`
+      ? `Votre score de rétention est ${score.toFixed(1)}/${RETENTION_SCORE_DISPLAY_MAX}, donc la priorité est d'agir avant d'élargir le plan.`
       : "Je vais rester strictement sur ce qui est présent dans le rapport.",
     actionFr
       ? `Première action déjà visible dans le rapport : ${actionFr}`
@@ -172,7 +173,7 @@ export function buildOfflineChatReply(
   if (/grave|normal/.test(q)) {
     return formatLines([
       score != null
-        ? `Avec un score de ${score.toFixed(1)}/10, la situation est ${scoreLabel.toLowerCase()}.`
+        ? `Avec un score de ${score.toFixed(1)}/${RETENTION_SCORE_DISPLAY_MAX}, la situation est ${scoreLabel.toLowerCase()}.`
         : "Le rapport ne donne pas de score exploitable, donc je reste sur les symptômes observés.",
       diagnostic.audience_loss_estimate
         ? `Le rapport estime : ${diagnostic.audience_loss_estimate}`

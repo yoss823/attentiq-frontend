@@ -10,6 +10,10 @@
 
 // Uses built-in crypto.randomUUID() — no external dependency needed
 
+import {
+  clampRetentionScoreForDisplay,
+  RETENTION_SCORE_DISPLAY_MAX,
+} from "@/lib/retention-score-display";
 import { detectVideoPlatformFromUrl } from "@/lib/url-intake";
 
 // ─── Outbound request ──────────────────────────────────────────────────────
@@ -232,7 +236,17 @@ export function formatAttentiqReport(data: RailwayResponse): AttentiqReport {
   const m = data.metadata!;
   const drops = d.attention_drops ?? [];
   const actions = d.corrective_actions ?? [];
-  const score = d.retention_score?.toFixed(1) ?? "N/A";
+  const scoreDisplay =
+    typeof d.retention_score === "number"
+      ? clampRetentionScoreForDisplay(d.retention_score)
+      : null;
+  const dPatched = {
+    ...d,
+    retention_score:
+      scoreDisplay != null ? scoreDisplay : d.retention_score,
+  };
+  const dataPatched: RailwayResponse = { ...data, diagnostic: dPatched };
+  const score = dPatched.retention_score?.toFixed(1) ?? "N/A";
   const audioOnlyWarning =
     d.warning?.trim() ||
     "Analyse audio uniquement — signaux visuels indisponibles";
@@ -266,7 +280,7 @@ export function formatAttentiqReport(data: RailwayResponse): AttentiqReport {
   const text = [
     "═══════════════════════════════════════",
     "ATTENTIQ — DIAGNOSTIC DE RÉTENTION",
-    `${m.author} · ${m.duration_seconds}s · Score : ${score}/10`,
+    `${m.author} · ${m.duration_seconds}s · Score : ${score}/${RETENTION_SCORE_DISPLAY_MAX}`,
     "═══════════════════════════════════════",
     "",
     "📊 ÉVALUATION GLOBALE",
@@ -291,7 +305,7 @@ export function formatAttentiqReport(data: RailwayResponse): AttentiqReport {
 
   return {
     text,
-    data,
+    data: dataPatched,
     partial: data.status === "partial",
   };
 }

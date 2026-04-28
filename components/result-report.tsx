@@ -21,6 +21,7 @@ import {
   polishDiagnosticFrenchForDisplay,
 } from "@/lib/diagnostic-locale-fr";
 import type { AttentiqReport, AttentionDrop } from "@/lib/railway-client";
+import { RETENTION_SCORE_DISPLAY_MAX } from "@/lib/retention-score-display";
 
 type ResultReportProps = {
   report: AttentiqReport;
@@ -100,7 +101,8 @@ function scoreAppearance(score: number | null | undefined) {
     };
   }
 
-  if (score > 7) {
+  /* Échelle affichée 0–6,5 (exigeante) : recaler les seuils par rapport à l’ancien /10 */
+  if (score > 5.5) {
     return {
       color: "#34d399",
       label: "Base solide",
@@ -109,7 +111,7 @@ function scoreAppearance(score: number | null | undefined) {
     };
   }
 
-  if (score >= 5) {
+  if (score >= 3.75) {
     return {
       color: "#fb923c",
       label: "Base à renforcer",
@@ -1235,7 +1237,7 @@ export default function ResultReport({
                   color: "var(--text-secondary)",
                 }}
               >
-                {isPremiumUnlocked ? "Score observe" : "Score visible"}
+                {isPremiumUnlocked ? "Score observé" : "Score visible"}
               </p>
               <p
                 style={{
@@ -1245,9 +1247,28 @@ export default function ResultReport({
                   letterSpacing: "-0.09em",
                   fontWeight: 800,
                   color: scoreUI.color,
+                  display: "flex",
+                  alignItems: "baseline",
+                  gap: "2px",
                 }}
               >
-                {score != null ? score.toFixed(1) : "—"}
+                {score != null ? (
+                  <>
+                    <span>{score.toFixed(1)}</span>
+                    <span
+                      style={{
+                        fontSize: "26px",
+                        fontWeight: 700,
+                        color: "rgba(237, 242, 247, 0.45)",
+                        letterSpacing: "-0.04em",
+                      }}
+                    >
+                      /{RETENTION_SCORE_DISPLAY_MAX}
+                    </span>
+                  </>
+                ) : (
+                  "—"
+                )}
               </p>
               <p
                 style={{

@@ -4,6 +4,10 @@ import type {
   RailwayResponse,
 } from "@/lib/railway-client";
 import type { V2AnalysisResult } from "@/lib/v2-types";
+import {
+  clampRetentionScoreForDisplay,
+  RETENTION_SCORE_DISPLAY_MAX,
+} from "@/lib/retention-score-display";
 
 export function isV2AnalysisResult(value: unknown): value is V2AnalysisResult {
   if (!value || typeof value !== "object") {
@@ -151,10 +155,10 @@ function buildCreatorPerception(
   return `Lecture rapide des leviers : ${parts.join(" · ")}.`;
 }
 
-function buildAudienceLossEstimate(score10: number): string {
-  return `Sans vos statistiques de vues : le score ${score10.toFixed(
+function buildAudienceLossEstimate(scoreDisplay: number): string {
+  return `Sans vos statistiques de vues : le score ${scoreDisplay.toFixed(
     1
-  )}/10 résume la cohérence perçue (accroche, promesse, clarté, CTA), pas une prédiction d'audience réelle.`;
+  )}/${RETENTION_SCORE_DISPLAY_MAX} résume la cohérence perçue (accroche, promesse, clarté, CTA), pas une prédiction d'audience réelle.`;
 }
 
 function inferContentKind(result: V2AnalysisResult): "video" | "text" | "image" {
@@ -166,7 +170,7 @@ function inferContentKind(result: V2AnalysisResult): "video" | "text" | "image" 
 function titleForContentKind(kind: "video" | "text" | "image"): string {
   if (kind === "text") return "Diagnostic d'attention (texte)";
   if (kind === "image") return "Diagnostic d'attention (image)";
-  return "Diagnostic d'attention (video)";
+  return "Diagnostic d'attention (vidéo)";
 }
 
 /**
@@ -183,10 +187,12 @@ export function buildLegacyReportFromV2(result: V2AnalysisResult): AttentiqRepor
     label.toLowerCase()
   );
 
-  const retentionScore = Math.max(
+  const rawOn10 = Math.max(
     0,
     Math.min(10, Number((score01 * 10).toFixed(1)))
   );
+  const retentionScore =
+    clampRetentionScoreForDisplay(rawOn10) ?? rawOn10;
 
   const actions = result.actions
     .map((action) => action.label?.trim())
@@ -219,10 +225,10 @@ export function buildLegacyReportFromV2(result: V2AnalysisResult): AttentiqRepor
           : contentKind === "text"
             ? `Sans analytics natives : le score ${retentionScore.toFixed(
                 1
-              )}/10 mesure surtout clarté, densité et intention d'action (clic/like/commentaire), pas la performance réelle.`
+              )}/${RETENTION_SCORE_DISPLAY_MAX} mesure surtout clarté, densité et intention d'action (clic/like/commentaire), pas la performance réelle.`
             : `Sans analytics natives : le score ${retentionScore.toFixed(
                 1
-              )}/10 mesure surtout lisibilité visuelle, hiérarchie et clarté du message, pas la performance réelle.`,
+              )}/${RETENTION_SCORE_DISPLAY_MAX} mesure surtout lisibilité visuelle, hiérarchie et clarté du message, pas la performance réelle.`,
       corrective_actions: actions.slice(0, 3),
       attention_drops: attentionDrops,
     },
