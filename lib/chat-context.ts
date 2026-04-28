@@ -1,5 +1,8 @@
 import { polishDiagnosticFrenchForDisplay } from "@/lib/diagnostic-locale-fr";
-import { RETENTION_SCORE_DISPLAY_MAX } from "@/lib/retention-score-display";
+import {
+  clampRetentionScoreForDisplay,
+  RETENTION_SCORE_DISPLAY_MAX,
+} from "@/lib/retention-score-display";
 import {
   formatAttentiqReport,
   mockAttentiqDemoAnalyzeResponse,
@@ -58,17 +61,28 @@ export function getPrimaryIssue(context: ChatDiagnosticContext): string {
 }
 
 export function getScoreLabel(score: number | null | undefined): string {
-  if (score == null) return "Score indisponible";
-  if (score > 5.5) return "Solide";
-  if (score >= 3.75) return "À reprendre";
+  const s = clampRetentionScoreForDisplay(score);
+  if (s == null) return "Score indisponible";
+  if (s > 5.5) return "Solide";
+  if (s >= 3.75) return "À reprendre";
   return "Urgent";
+}
+
+function formatAttentionInstant(seconds: number): string {
+  const rounded = Math.max(0, Math.round(seconds));
+  const minutes = Math.floor(rounded / 60);
+  const remainingSeconds = rounded % 60;
+  if (minutes === 0) {
+    return `${remainingSeconds}s`;
+  }
+  return `${minutes}:${remainingSeconds.toString().padStart(2, "0")}`;
 }
 
 export function buildWelcomeMessage(
   context: ChatDiagnosticContext
 ): string {
   const diagnostic = context.diagnostic;
-  const score = diagnostic?.retention_score;
+  const score = clampRetentionScoreForDisplay(diagnostic?.retention_score ?? null);
   const action = diagnostic?.corrective_actions?.[0];
 
   const actionFr = action ? polishDiagnosticFrenchForDisplay(action) : "";
@@ -109,7 +123,7 @@ export function buildOfflineChatReply(
   const secondDrop = diagnostic?.attention_drops?.[1];
   const actions = diagnostic?.corrective_actions ?? [];
   const intro = firstTranscriptLine(context.transcript);
-  const score = diagnostic?.retention_score;
+  const score = clampRetentionScoreForDisplay(diagnostic?.retention_score ?? null);
   const scoreLabel = getScoreLabel(score);
 
   if (!diagnostic) {
@@ -145,7 +159,7 @@ export function buildOfflineChatReply(
   if (/pourquoi|d[ée]croch|si vite|drop/.test(q)) {
     return formatLines([
       firstDrop
-        ? `Le décrochage le plus net apparaît vers ${firstDrop.timestamp_seconds}s.`
+        ? `Le décrochage le plus net est repéré à ${formatAttentionInstant(firstDrop.timestamp_seconds)}.`
         : "Le rapport signale surtout une perte d'attention rapide au début.",
       `La cause retenue dans le diagnostic est : ${getPrimaryIssue(context)}`,
       diagnostic.drop_off_rule
@@ -165,7 +179,7 @@ export function buildOfflineChatReply(
         ? `Première correction à exécuter : ${actions[0]}`
         : "Reprenez la première action corrective du rapport.",
       secondDrop
-        ? `Ne passez au deuxième sujet qu'après avoir traité la chute relevée vers ${secondDrop.timestamp_seconds}s.`
+        ? `Ne passez au deuxième sujet qu'après avoir traité la chute à ${formatAttentionInstant(secondDrop.timestamp_seconds)}.`
         : "N'ouvrez pas un deuxième chantier tant que ce premier point n'est pas corrigé.",
     ]);
   }
@@ -189,7 +203,7 @@ export function buildOfflineChatReply(
     return formatLines([
       `Votre problème principal, selon le diagnostic, est : ${getPrimaryIssue(context)}`,
       firstDrop
-        ? `C'est aussi le premier point de rupture repéré vers ${firstDrop.timestamp_seconds}s.`
+        ? `C'est aussi le premier point de rupture repéré à ${formatAttentionInstant(firstDrop.timestamp_seconds)}.`
         : null,
       diagnostic.global_summary
         ? `Le résumé global va dans le même sens : ${diagnostic.global_summary}`

@@ -21,7 +21,10 @@ import {
   polishDiagnosticFrenchForDisplay,
 } from "@/lib/diagnostic-locale-fr";
 import type { AttentiqReport, AttentionDrop } from "@/lib/railway-client";
-import { RETENTION_SCORE_DISPLAY_MAX } from "@/lib/retention-score-display";
+import {
+  clampRetentionScoreForDisplay,
+  RETENTION_SCORE_DISPLAY_MAX,
+} from "@/lib/retention-score-display";
 
 type ResultReportProps = {
   report: AttentiqReport;
@@ -101,7 +104,7 @@ function scoreAppearance(score: number | null | undefined) {
     };
   }
 
-  /* Échelle affichée 0–6,5 (exigeante) : recaler les seuils par rapport à l’ancien /10 */
+  /* Valeur déjà plafonnée à 6,5 pour une lecture x/10 ; seuils sur cette plage réelle */
   if (score > 5.5) {
     return {
       color: "#34d399",
@@ -221,10 +224,14 @@ function clampTextForTeaser(text: string, maxLength: number) {
   return `${text.slice(0, maxLength).trimEnd()}...`;
 }
 
-function buildTeaserDropHeadline(index: number) {
-  if (index === 0) return "Début de la vidéo";
-  if (index === 1) return "Milieu de la vidéo";
-  return "Fin de la vidéo";
+function teaserDropMomentLabel(
+  drop: AttentionDrop,
+  isVideoContent: boolean
+): string {
+  const t = formatTimestamp(drop.timestamp_seconds);
+  return isVideoContent
+    ? `Chute repérée à ${t}`
+    : `Repère à ${t} dans le parcours d’attention`;
 }
 
 function deriveCategories(
@@ -823,7 +830,7 @@ export default function ResultReport({
   const previewActions = getTeaserActions(allActions);
   const hiddenDropsCount = Math.max(0, allDrops.length - previewDrops.length);
   const hiddenActionsCount = Math.max(0, allActions.length - previewActions.length);
-  const score = diagnostic?.retention_score ?? null;
+  const score = clampRetentionScoreForDisplay(diagnostic?.retention_score ?? null);
   const scoreUI = scoreAppearance(score);
   const isLikelyMusicOnly = detectLikelyMusicOnly(report);
   const isAudioOnly =
@@ -1691,8 +1698,9 @@ export default function ResultReport({
                   }}
                 >
                   Aperçu gratuit : vous voyez{" "}
-                  <strong>{FREE_TEASER_LIMITS.drops}</strong> premiers signaux. Le
-                  rapport complet ajoute les{" "}
+                  <strong>{FREE_TEASER_LIMITS.drops}</strong> premiers signaux, avec
+                  le <strong>repère temporel exact</strong> de chaque chute. Le rapport
+                  complet ajoute les{" "}
                   <strong>{allDrops.length - FREE_TEASER_LIMITS.drops}+</strong>{" "}
                   suivantes, la timeline entière, les liens entre chutes, le détail
                   {isLikelyMusicOnly
@@ -1710,15 +1718,16 @@ export default function ResultReport({
                       isLikelyMusicOnly
                         ? "Signal de rythme détecté sur une piste majoritairement musicale. Le détail verbal exact est réservé au rapport complet."
                         : drop.cause,
-                      120
+                      150
                     );
+                    const momentStamp = formatTimestamp(drop.timestamp_seconds);
 
                     return (
                       <div
                         key={`${drop.timestamp_seconds}-${index}`}
                         style={{
                           display: "grid",
-                          gridTemplateColumns: "72px minmax(0, 1fr)",
+                          gridTemplateColumns: "96px minmax(0, 1fr)",
                           gap: "14px",
                           padding: "16px",
                           borderRadius: "20px",
@@ -1728,7 +1737,7 @@ export default function ResultReport({
                       >
                         <div
                           style={{
-                            minHeight: "60px",
+                            minHeight: "72px",
                             borderRadius: "16px",
                             display: "flex",
                             flexDirection: "column",
@@ -1736,16 +1745,30 @@ export default function ResultReport({
                             justifyContent: "center",
                             border: `1px solid ${severity.border}`,
                             background: "rgba(3, 8, 14, 0.38)",
+                            gap: "4px",
                           }}
                         >
                           <span
                             style={{
-                              fontSize: "18px",
+                              fontSize: "22px",
                               fontWeight: 800,
                               color: severity.text,
+                              fontVariantNumeric: "tabular-nums",
+                              letterSpacing: "-0.02em",
                             }}
                           >
-                            {`Zone ${index + 1}`}
+                            {momentStamp}
+                          </span>
+                          <span
+                            style={{
+                              fontSize: "9px",
+                              fontWeight: 800,
+                              textTransform: "uppercase",
+                              letterSpacing: "0.12em",
+                              color: "rgba(237, 242, 247, 0.45)",
+                            }}
+                          >
+                            {isVideoContent ? "Chrono" : "Repère"}
                           </span>
                         </div>
 
@@ -1776,7 +1799,7 @@ export default function ResultReport({
                               fontWeight: 700,
                             }}
                           >
-                            {buildTeaserDropHeadline(index)}
+                            {teaserDropMomentLabel(drop, isVideoContent)}
                           </p>
                           <p
                             style={{

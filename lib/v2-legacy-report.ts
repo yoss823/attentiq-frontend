@@ -6,6 +6,7 @@ import type {
 import type { V2AnalysisResult } from "@/lib/v2-types";
 import {
   clampRetentionScoreForDisplay,
+  RETENTION_SCORE_DISPLAY_CAP,
   RETENTION_SCORE_DISPLAY_MAX,
 } from "@/lib/retention-score-display";
 
@@ -57,17 +58,17 @@ const PRIMARY_RISK_FR: Record<string, string> = {
   hook_weak:
     "Le principal frein perçu : l'accroche ne fixe pas assez vite l'attention ou la promesse reste floue.",
   hook_strong:
-    "L'ouverture semble accrocher, mais ce n'est qu'un signal partiel : le score global tient compte de toute la vidéo (voir résumé).",
+    "L'ouverture semble accrocher, mais ce n'est qu'un signal partiel : le score global tient compte de toute la durée (voir résumé).",
   pacing_off:
     "Le principal frein perçu : le rythme ou les transitions fatiguent l'attention au milieu du contenu.",
   cta_missing:
-    "Le principal frein perçu : la prochaine étape (CTA) n'est pas assez claire pour transformer l'attention.",
+    "Le principal frein perçu : quand une suite est attendue, la prochaine étape n'est pas assez claire pour garder le spectateur engagé.",
   cta_present:
-    "Un appel à l'action est présent ; vérifiez qu'il arrive assez tôt et qu'il est compris sans effort.",
+    "Une intention de suite est visible ; vérifiez qu'elle arrive au bon moment et qu'elle ne noie pas le reste du message.",
   retention_high:
     "Les signaux globaux suggèrent une bonne tenue de l'attention sur ce qu'on a pu analyser ici.",
   retention_low:
-    "Les signaux globaux suggèrent une attention fragile sur ce qu'on a pu analyser ici.",
+    "Les signaux globaux suggèrent une attention fragile ou un risque que le spectateur lâche avant la fin.",
   audio_mismatch:
     "Décalage perçu entre ce que dit l'audio et ce que montre l'image (quand les deux sont disponibles).",
   format_optimal:
@@ -158,7 +159,7 @@ function buildCreatorPerception(
 function buildAudienceLossEstimate(scoreDisplay: number): string {
   return `Sans vos statistiques de vues : le score ${scoreDisplay.toFixed(
     1
-  )}/${RETENTION_SCORE_DISPLAY_MAX} résume la cohérence perçue (accroche, promesse, clarté, CTA), pas une prédiction d'audience réelle.`;
+  )}/${RETENTION_SCORE_DISPLAY_MAX} (plafonné à ${RETENTION_SCORE_DISPLAY_CAP}/${RETENTION_SCORE_DISPLAY_MAX}) résume surtout si le spectateur a des raisons de rester jusqu'au bout (rythme, clarté, friction visuelle ou verbale), pas une prédiction d'audience réelle.`;
 }
 
 function inferContentKind(result: V2AnalysisResult): "video" | "text" | "image" {
@@ -225,10 +226,10 @@ export function buildLegacyReportFromV2(result: V2AnalysisResult): AttentiqRepor
           : contentKind === "text"
             ? `Sans analytics natives : le score ${retentionScore.toFixed(
                 1
-              )}/${RETENTION_SCORE_DISPLAY_MAX} mesure surtout clarté, densité et intention d'action (clic/like/commentaire), pas la performance réelle.`
+              )}/${RETENTION_SCORE_DISPLAY_MAX} (plafonné à ${RETENTION_SCORE_DISPLAY_CAP}/${RETENTION_SCORE_DISPLAY_MAX}) reflète surtout tenue d'attention perçue, clarté du propos et risque que le lecteur lâche avant la fin — pas une mesure d'audience réelle.`
             : `Sans analytics natives : le score ${retentionScore.toFixed(
                 1
-              )}/${RETENTION_SCORE_DISPLAY_MAX} mesure surtout lisibilité visuelle, hiérarchie et clarté du message, pas la performance réelle.`,
+              )}/${RETENTION_SCORE_DISPLAY_MAX} (plafonné à ${RETENTION_SCORE_DISPLAY_CAP}/${RETENTION_SCORE_DISPLAY_MAX}) reflète surtout hiérarchie visuelle, parcours du regard et risque de décrocage — pas la performance réelle.`,
       corrective_actions: actions.slice(0, 3),
       attention_drops: attentionDrops,
     },

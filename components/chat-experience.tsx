@@ -16,7 +16,10 @@ import {
   type ChatTurn,
 } from "@/lib/chat-context";
 import type { AttentiqReport } from "@/lib/railway-client";
-import { RETENTION_SCORE_DISPLAY_MAX } from "@/lib/retention-score-display";
+import {
+  clampRetentionScoreForDisplay,
+  RETENTION_SCORE_DISPLAY_MAX,
+} from "@/lib/retention-score-display";
 import {
   buildLegacyReportFromV2,
   isV2AnalysisResult,
@@ -422,7 +425,7 @@ export default function ChatExperience() {
 
   const diagnostic = diagnosticContext.diagnostic;
   const hasUserMessages = messages.some((message) => message.role === "user");
-  const score = diagnostic?.retention_score;
+  const score = clampRetentionScoreForDisplay(diagnostic?.retention_score ?? null);
   const primaryIssue = getPrimaryIssue(diagnosticContext);
 
   return (
