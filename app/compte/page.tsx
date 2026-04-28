@@ -89,18 +89,12 @@ export default async function SubscriberAccountPage({
   return (
     <main
       style={{
-        minHeight: "100vh",
+        minHeight: "100dvh",
         background:
           "radial-gradient(circle at top, rgba(0, 212, 255, 0.14), transparent 28%), radial-gradient(circle at 82% 16%, rgba(52, 211, 153, 0.08), transparent 18%), var(--bg-base)",
       }}
     >
-      <div
-        style={{
-          maxWidth: "980px",
-          margin: "0 auto",
-          padding: "28px 16px 72px",
-        }}
-      >
+      <div className="attentiq-shell">
         {fromCheckout && (
           <div
             style={{

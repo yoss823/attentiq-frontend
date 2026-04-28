@@ -133,8 +133,8 @@ export default function InlineChatbot({
           onClick={() => setIsOpen(true)}
           style={{
             position: "fixed",
-            bottom: "22px",
-            right: "22px",
+            bottom: "calc(14px + env(safe-area-inset-bottom, 0px))",
+            right: "calc(14px + env(safe-area-inset-right, 0px))",
             zIndex: 70,
             display: "flex",
             alignItems: "center",
@@ -173,10 +173,11 @@ export default function InlineChatbot({
             ...(isFloating && isOpen
               ? {
                   position: "fixed",
-                  bottom: "22px",
-                  right: "22px",
-                  width: "min(400px, calc(100vw - 28px))",
-                  maxHeight: "min(560px, 82vh)",
+                  bottom: "calc(12px + env(safe-area-inset-bottom, 0px))",
+                  right: "calc(12px + env(safe-area-inset-right, 0px))",
+                  width:
+                    "min(28rem, calc(100dvw - 20px - env(safe-area-inset-left, 0px) - env(safe-area-inset-right, 0px)))",
+                  maxHeight: "min(35rem, 82dvh)",
                   zIndex: 65,
                   display: "flex",
                   flexDirection: "column",

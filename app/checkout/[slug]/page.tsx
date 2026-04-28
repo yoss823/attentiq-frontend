@@ -76,28 +76,13 @@ export default async function CheckoutOfferPage({
   return (
     <main
       style={{
-        minHeight: "100vh",
+        minHeight: "100dvh",
         background:
           "radial-gradient(circle at top, rgba(0, 212, 255, 0.16), transparent 28%), radial-gradient(circle at 82% 16%, rgba(251, 146, 60, 0.12), transparent 18%), var(--bg-base)",
       }}
     >
-      <div
-        style={{
-          maxWidth: "760px",
-          margin: "0 auto",
-          padding: "28px 16px 64px",
-        }}
-      >
-        <div
-          style={{
-            display: "flex",
-            alignItems: "center",
-            justifyContent: "space-between",
-            gap: "12px",
-            flexWrap: "wrap",
-            marginBottom: "28px",
-          }}
-        >
+      <div className="attentiq-shell attentiq-shell--narrow">
+        <div className="attentiq-nav" style={{ marginBottom: "1.75rem" }}>
           <Link
             href="/"
             style={{
@@ -148,11 +133,11 @@ export default async function CheckoutOfferPage({
 
         <section
           style={{
-            borderRadius: "30px",
+            borderRadius: "clamp(18px, 4vw, 30px)",
             border: "1px solid rgba(0, 212, 255, 0.2)",
             background:
               "linear-gradient(180deg, rgba(11, 16, 22, 0.98) 0%, rgba(7, 11, 16, 0.96) 100%)",
-            padding: "28px 22px",
+            padding: "clamp(1.1rem, 4vw, 1.75rem) clamp(0.9rem, 3.5vw, 1.4rem)",
             boxShadow: "0 32px 120px rgba(0, 0, 0, 0.34)",
           }}
         >
@@ -194,7 +179,7 @@ export default async function CheckoutOfferPage({
             style={{
               display: "grid",
               gap: "22px",
-              gridTemplateColumns: "repeat(auto-fit, minmax(280px, 1fr))",
+              gridTemplateColumns: "repeat(auto-fit, minmax(min(100%, 220px), 1fr))",
             }}
           >
             <div>

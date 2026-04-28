@@ -1218,7 +1218,7 @@ export default function ResultReport({
               <p
                 style={{
                   margin: "12px 0 0",
-                  fontSize: "58px",
+                  fontSize: "clamp(2.35rem, 11vw, 3.6rem)",
                   lineHeight: 0.9,
                   letterSpacing: "-0.09em",
                   fontWeight: 800,
@@ -1233,7 +1233,7 @@ export default function ResultReport({
                     <span>{score.toFixed(1)}</span>
                     <span
                       style={{
-                        fontSize: "26px",
+                        fontSize: "clamp(1.1rem, 4.5vw, 1.625rem)",
                         fontWeight: 700,
                         color: "rgba(237, 242, 247, 0.45)",
                         letterSpacing: "-0.04em",

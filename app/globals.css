@@ -66,6 +66,15 @@ body {
   padding-bottom: max(4.25rem, calc(var(--attentiq-safe-bottom) + 2.5rem));
 }
 
+/* Pages longues lecture (transparence, légal) */
+.attentiq-shell--article {
+  max-width: 56.25rem; /* 900px */
+}
+
+.attentiq-shell--xl {
+  max-width: 68.75rem; /* 1100px — admin / tableaux */
+}
+
 /* Navigation : zones tactiles confortables (44px mini) */
 .attentiq-nav {
   display: flex;

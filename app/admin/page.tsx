@@ -39,7 +39,14 @@ export default async function AdminPage({ searchParams }: AdminPageProps) {
   const snapshot = await getAdminOverviewSnapshot();
   if (!snapshot) {
     return (
-      <main style={{ minHeight: "100vh", padding: "28px 16px", background: "var(--bg-base)" }}>
+      <main
+        style={{
+          minHeight: "100dvh",
+          padding:
+            "max(1rem, env(safe-area-inset-top, 0px)) max(1rem, env(safe-area-inset-right, 0px)) max(1.25rem, env(safe-area-inset-bottom, 0px)) max(1rem, env(safe-area-inset-left, 0px))",
+          background: "var(--bg-base)",
+        }}
+      >
         <p style={{ margin: 0, color: "var(--text-secondary)" }}>
           Postgres non configure (<code>DATABASE_URL</code>).
         </p>
@@ -50,13 +57,13 @@ export default async function AdminPage({ searchParams }: AdminPageProps) {
   return (
     <main
       style={{
-        minHeight: "100vh",
-        padding: "28px 16px 80px",
+        minHeight: "100dvh",
+        paddingTop: "max(0.5rem, env(safe-area-inset-top, 0px))",
         background:
           "radial-gradient(circle at top, rgba(0, 212, 255, 0.12), transparent 28%), var(--bg-base)",
       }}
     >
-      <div style={{ maxWidth: "1100px", margin: "0 auto" }}>
+      <div className="attentiq-shell attentiq-shell--xl">
         <p
           style={{
             margin: 0,

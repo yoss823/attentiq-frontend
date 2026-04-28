@@ -29,7 +29,7 @@ export default function GuidePageClient() {
   return (
     <main
       style={{
-        minHeight: "100vh",
+        minHeight: "100dvh",
         background:
           "radial-gradient(circle at top, rgba(0, 212, 255, 0.14), transparent 28%), var(--bg-base)",
       }}
@@ -48,25 +48,8 @@ export default function GuidePageClient() {
         }}
       />
 
-      <div
-        style={{
-          position: "relative",
-          zIndex: 1,
-          maxWidth: "760px",
-          margin: "0 auto",
-          padding: "28px 16px 72px",
-        }}
-      >
-        <nav
-          style={{
-            display: "flex",
-            alignItems: "center",
-            justifyContent: "space-between",
-            gap: "12px",
-            marginBottom: "24px",
-            flexWrap: "wrap",
-          }}
-        >
+      <div className="attentiq-shell attentiq-shell--narrow">
+        <nav className="attentiq-nav" style={{ marginBottom: "1.5rem" }}>
           <Link
             href="/"
             style={{
@@ -74,6 +57,7 @@ export default function GuidePageClient() {
               alignItems: "center",
               gap: "10px",
               textDecoration: "none",
+              minHeight: 44,
             }}
           >
             <div
@@ -112,7 +96,8 @@ export default function GuidePageClient() {
               display: "inline-flex",
               alignItems: "center",
               justifyContent: "center",
-              padding: "10px 18px",
+              minHeight: 44,
+              padding: "0 18px",
               borderRadius: "999px",
               textDecoration: "none",
               background: "linear-gradient(135deg, var(--accent), #79e7ff)",
@@ -120,6 +105,7 @@ export default function GuidePageClient() {
               fontSize: "13px",
               fontWeight: 900,
               boxShadow: "0 12px 36px rgba(0, 212, 255, 0.18)",
+              WebkitTapHighlightColor: "transparent",
             }}
           >
             Lancer une analyse
