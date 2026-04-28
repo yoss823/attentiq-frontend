@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from "next/server";
 import Stripe from "stripe";
 import { sendCheckoutThankYouEmail } from "@/lib/checkout-email";
+import { buildResultHref } from "@/lib/checkout-context";
 import { getPlanFromOfferSlug } from "@/lib/premium";
 import {
   checkoutSessionCustomerEmail,
@@ -106,12 +107,20 @@ export async function POST(req: NextRequest) {
       // Force HTTP on localhost to avoid SSL browser errors from emailed links.
       const proto = isLocalHost ? "http" : forwardedProto ?? "https";
       const appBaseUrl = host ? `${proto}://${host}` : null;
+      const reportUrl =
+        appBaseUrl && (resolvedJobId || resolvedVideoUrl)
+          ? `${appBaseUrl}${buildResultHref({
+              jobId: resolvedJobId,
+              videoUrl: resolvedVideoUrl,
+            })}`
+          : null;
 
       const sendResult = await sendCheckoutThankYouEmail({
         to: customerEmail,
         offerSlug: resolvedOfferSlug,
         sessionId,
         appBaseUrl,
+        reportUrl,
       });
 
       if ("skipped" in sendResult && sendResult.skipped) {
@@ -150,6 +159,7 @@ export async function POST(req: NextRequest) {
               jobId: resolvedJobId,
               subject: "Votre diagnostic Attentiq (PDF)",
               body: "Vous trouverez votre diagnostic en pièce jointe.",
+              appBaseUrl,
             }),
           });
           if (!pdfResponse.ok) {

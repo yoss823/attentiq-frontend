@@ -4,6 +4,7 @@ import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { useEffect, useState } from "react";
 import { buildAnalyzeHref, buildResultHref } from "@/lib/checkout-context";
+import { clearPendingCheckout, readPendingCheckout } from "@/lib/access-state";
 import { activatePremiumEntitlementFromSuccessfulCheckout } from "@/lib/premium";
 
 type MerciRedirectStateProps = {
@@ -102,6 +103,10 @@ export default function MerciRedirectState({
           return;
         }
 
+        const pending = readPendingCheckout();
+        const fallbackJobId = pending?.jobId ?? null;
+        const fallbackVideoUrl = pending?.videoUrl ?? null;
+
         const setPremiumResponse = await fetch("/api/set-premium", {
           method: "POST",
           headers: {
@@ -110,8 +115,8 @@ export default function MerciRedirectState({
           credentials: "include",
           body: JSON.stringify({
             sessionId: initialSessionId,
-            jobId: payload.jobId,
-            videoUrl: payload.videoUrl,
+            jobId: payload.jobId ?? fallbackJobId,
+            videoUrl: payload.videoUrl ?? fallbackVideoUrl,
           }),
         });
 
@@ -138,32 +143,35 @@ export default function MerciRedirectState({
           subscriberEmail: setPremiumPayload.customerEmail,
         });
 
-        const hasReportContext = Boolean(
-          setPremiumPayload.jobId || setPremiumPayload.videoUrl
-        );
+        const finalJobId = setPremiumPayload.jobId ?? fallbackJobId;
+        const finalVideoUrl = setPremiumPayload.videoUrl ?? fallbackVideoUrl;
+        const hasReportContext = Boolean(finalJobId || finalVideoUrl);
         const plan = setPremiumPayload.plan;
         const isSubscription =
           plan === "5" || plan === "pack15";
 
         if (hasReportContext) {
+          clearPendingCheckout();
           router.replace(
             buildResultHref({
-              jobId: setPremiumPayload.jobId,
-              videoUrl: setPremiumPayload.videoUrl,
+              jobId: finalJobId,
+              videoUrl: finalVideoUrl,
             })
           );
           return;
         }
 
         if (isSubscription) {
+          clearPendingCheckout();
           router.replace("/compte?from=checkout");
           return;
         }
 
+        clearPendingCheckout();
         router.replace(
           buildAnalyzeHref({
-            jobId: setPremiumPayload.jobId,
-            videoUrl: setPremiumPayload.videoUrl,
+            jobId: finalJobId,
+            videoUrl: finalVideoUrl,
             paid: setPremiumPayload.paid,
           })
         );

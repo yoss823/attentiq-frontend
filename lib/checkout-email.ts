@@ -40,6 +40,7 @@ export async function sendCheckoutThankYouEmail(params: {
   offerSlug: string;
   sessionId: string;
   appBaseUrl?: string | null;
+  reportUrl?: string | null;
 }): Promise<CheckoutThankYouEmailResult> {
   const apiKey = process.env.RESEND_API_KEY?.trim();
   if (!apiKey) {
@@ -61,10 +62,16 @@ export async function sendCheckoutThankYouEmail(params: {
   const compteUrl = base
     ? `${base}/compte?email=${encodeURIComponent(params.to.trim())}`
     : "";
+  const reportUrl = forceHttpForLocalhost(params.reportUrl);
   const html = `
     <p>Bonjour,</p>
     <p>Votre paiement Attentiq est bien enregistré pour : <strong>${escapeHtml(label)}</strong>.</p>
-    <p>Vous pouvez reprendre votre analyse sur le site. Si vous étiez sur un diagnostic en cours, retournez sur la page d’analyse ou le résultat.</p>
+    <p>Vous pouvez reprendre votre analyse sur le site.</p>
+    ${
+      reportUrl
+        ? `<p><a href="${escapeHtml(reportUrl)}">Ouvrir mon rapport</a></p>`
+        : `<p>Si vous étiez sur un diagnostic en cours, retournez sur la page d’analyse ou le résultat.</p>`
+    }
     ${base ? `<p><a href="${escapeHtml(base)}">Ouvrir Attentiq</a></p>` : ""}
     ${
       compteUrl

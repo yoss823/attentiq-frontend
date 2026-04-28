@@ -5,6 +5,7 @@ import {
   RETENTION_SCORE_DISPLAY_MAX,
 } from "@/lib/retention-score-display";
 import { getRailwayJobSnapshot } from "@/lib/railway-server";
+import { buildResultHref } from "@/lib/checkout-context";
 
 export const runtime = "nodejs";
 
@@ -18,6 +19,7 @@ type SendReportBody = {
   body?: string;
   jobId?: string;
   report?: unknown;
+  appBaseUrl?: string;
 };
 
 function normalizeText(value: unknown) {
@@ -30,6 +32,26 @@ function escapeHtml(value: string) {
     .replace(/</g, "&lt;")
     .replace(/>/g, "&gt;")
     .replace(/"/g, "&quot;");
+}
+
+function forceHttpForLocalhost(urlValue: string | null | undefined) {
+  const raw = urlValue?.trim();
+  if (!raw) return "";
+  try {
+    const parsed = new URL(raw);
+    const host = parsed.hostname.toLowerCase();
+    if (
+      host.includes("localhost") ||
+      host === "127.0.0.1" ||
+      host === "0.0.0.0"
+    ) {
+      parsed.protocol = "http:";
+      return parsed.toString();
+    }
+    return parsed.toString();
+  } catch {
+    return raw;
+  }
 }
 
 function extractResendErrorMessage(error: unknown) {
@@ -668,7 +690,7 @@ export async function POST(request: Request) {
     return Response.json({ error: "Invalid JSON" }, { status: 400 });
   }
 
-  const { email, subject, body, jobId, report } = payload as SendReportBody;
+  const { email, subject, body, jobId, report, appBaseUrl } = payload as SendReportBody;
 
   if (!email || !isValidEmail(email)) {
     return Response.json({ error: "Invalid email address" }, { status: 400 });
@@ -695,6 +717,13 @@ export async function POST(request: Request) {
     | { filename: string; content: string; contentType: string }
     | undefined;
   let html = `<p>${escapeHtml(manualBody)}</p>`;
+  const baseAppUrl =
+    forceHttpForLocalhost(appBaseUrl)?.replace(/\/+$/, "") ||
+    forceHttpForLocalhost(process.env.NEXT_PUBLIC_APP_URL)?.replace(/\/+$/, "") ||
+    "";
+  const compteUrl = baseAppUrl
+    ? `${baseAppUrl}/compte?email=${encodeURIComponent(email.trim())}`
+    : "";
 
   if (normalizedJobId) {
     let reportSummary = summarizeFromClientReport(report);
@@ -719,10 +748,24 @@ export async function POST(request: Request) {
       contentType: "application/pdf",
     };
 
+    const reportUrl = baseAppUrl
+      ? `${baseAppUrl}${buildResultHref({ jobId: normalizedJobId })}`
+      : "";
+
     html = `
       <p>Bonjour,</p>
       <p>Votre diagnostic Attentiq est pret. Le PDF est en piece jointe.</p>
       <p><strong>Job ID:</strong> ${normalizedJobId}</p>
+      ${
+        reportUrl
+          ? `<p><a href="${escapeHtml(reportUrl)}">Ouvrir le rapport sur Attentiq</a></p>`
+          : ""
+      }
+      ${
+        compteUrl
+          ? `<p><a href="${escapeHtml(compteUrl)}">Ouvrir mon compte (quota / historique)</a></p>`
+          : ""
+      }
       <p>${escapeHtml(manualBody)}</p>
       <p>— L'equipe Attentiq</p>
     `.trim();
