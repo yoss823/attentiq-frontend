@@ -17,7 +17,7 @@ type ChatRequestBody = {
 const OPENAI_API_URL = "https://api.openai.com/v1/responses";
 const OPENAI_MODEL = process.env.OPENAI_CHAT_MODEL ?? "gpt-4o-mini";
 const GROQ_CHAT_MODEL =
-  process.env.GROQ_CHAT_MODEL?.trim() || "llama-3.1-8b-instant";
+  process.env.GROQ_CHAT_MODEL?.trim() || "llama-3.3-70b-versatile";
 const MAX_HISTORY_ITEMS = 8;
 
 const SYSTEM_APPENDIX = (process.env.ATTENTIQ_CHAT_SYSTEM_APPENDIX ?? "").trim();
@@ -31,6 +31,8 @@ Règles obligatoires :
 - Réponds en français, 5 à 7 lignes maximum ; chaque ligne = une idée exploitable (pas de remplissage).
 - Uniquement à partir du diagnostic fourni ; tu ne refais jamais une analyse ni n'inventes de timestamps ou scores absents du rapport.
 - Si une information manque dans le diagnostic, dis-le en une courte phrase — ne complète pas par supposition.
+- Ne signale un manque d'information QUE s'il bloque réellement la réponse à la question posée.
+- N'évoque jamais l'absence d'historique, de contexte ou de sections non demandées si la question peut être traitée avec le diagnostic présent.
 - Vidéo : relie hook, rythme, chutes d'attention et intention de suite (si le rapport en parle) aux éléments explicitement présents.
 - Texte / image : relie hiérarchie, promesse, friction de lecture ou de regard aux éléments du rapport.
 - Actions concrètes et ordonnables (quoi ajuster, où dans le contenu), jamais de listes de platitudes (« sois authentique », « reste naturel »).

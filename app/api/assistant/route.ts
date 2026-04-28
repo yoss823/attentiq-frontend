@@ -6,7 +6,7 @@ export const maxDuration = 25;
 
 const OPENAI_CHAT_COMPLETIONS_URL = 'https://api.openai.com/v1/chat/completions';
 const GROQ_ASSISTANT_MODEL =
-  process.env.GROQ_CHAT_MODEL?.trim() || 'llama-3.1-8b-instant';
+  process.env.GROQ_CHAT_MODEL?.trim() || 'llama-3.3-70b-versatile';
 const OPENAI_ASSISTANT_MODEL =
   process.env.OPENAI_ASSISTANT_MODEL?.trim() ||
   process.env.OPENAI_CHAT_MODEL?.trim() ||
@@ -26,10 +26,68 @@ const intentMap: Record<string, string> = {
   explain:
     "Explique pourquoi l'attention chute aux timestamps ou étapes cités ; relie parole, image, texte à l'écran et rythme quand c'est dans le rapport (pas seulement CTA).",
   expand:
-    "Transforme chaque action prioritaire en micro-plan (quoi changer, où, en une phrase) — exemples ancrés dans ce contenu ; le créateur doit avoir envie d'exécuter la 1re action demain.",
+    "Transforme les actions présentes dans le diagnostic en micro-plan (quoi changer, où, en une phrase) — exemples ancrés dans ce contenu ; ne crée pas d'action supplémentaire.",
   prioritize:
-    "Classe les 3 actions par impact/effort (1 = à faire en premier) ; une phrase de justification chacune, tirée du rapport ; termine par une phrase qui invite à analyser un prochain média une fois celui-ci corrigé.",
+    "Classe exactement les 3 actions du diagnostic par impact/effort (1 = à faire en premier) ; une phrase de justification chacune, tirée du rapport ; n'ajoute pas de 4e action.",
 };
+
+function extractActionLabelsFromContext(context: string): string[] {
+  try {
+    const parsed = JSON.parse(context) as {
+      actions?: Array<{ label?: string } | string>;
+      diagnostic?: { corrective_actions?: string[] };
+    };
+    const fromActions = Array.isArray(parsed.actions)
+      ? parsed.actions
+          .map((a) =>
+            typeof a === 'string'
+              ? a.trim()
+              : typeof a?.label === 'string'
+                ? a.label.trim()
+                : ''
+          )
+          .filter(Boolean)
+      : [];
+    const fromCorrective = Array.isArray(parsed.diagnostic?.corrective_actions)
+      ? parsed.diagnostic!.corrective_actions
+          .map((a) => (typeof a === 'string' ? a.trim() : ''))
+          .filter(Boolean)
+      : [];
+    return (fromActions.length > 0 ? fromActions : fromCorrective).slice(0, 3);
+  } catch {
+    return [];
+  }
+}
+
+function enforceIntentResponseShape(
+  intent: string,
+  context: string,
+  llmText: string
+): string {
+  const actions = extractActionLabelsFromContext(context);
+  if (actions.length === 0) {
+    return llmText;
+  }
+
+  if (intent === 'prioritize') {
+    return actions
+      .slice(0, 3)
+      .map((action, idx) => `${idx + 1}. ${action}`)
+      .join('\n');
+  }
+
+  if (intent === 'expand') {
+    return actions
+      .slice(0, 3)
+      .map(
+        (action, idx) =>
+          `${idx + 1}. ${action} — exécution: appliquez cette correction précisément au passage concerné du diagnostic.`
+      )
+      .join('\n');
+  }
+
+  return llmText;
+}
 
 async function tryOpenAiAssistant(
   systemPrompt: string,
@@ -92,7 +150,10 @@ Règles strictes :
 - Zéro généralité (« sois authentique », « améliore le hook » sans lien au diagnostic) ; cite implicitement ce que dit déjà le rapport (sans inventer de timestamps absents).
 - Vidéo / texte / image : relie hook, rythme ou hiérarchie, chutes d'attention, parcours du regard — intention de suite seulement si le diagnostic en parle.
 - Zéro jargon marketing, zéro promesse de vues ou de viralité ; si l'info manque dans le diagnostic, dis-le en une courte phrase.
-- Fidélisation : une phrase peut suggérer la prochaine analyse (autre format ou autre vidéo) une fois les corrections prioritaires faites — sans dévier du rapport actuel.
+- Ne crée jamais d'actions, de timestamps, d'exemples ou de priorités absents du diagnostic.
+- Si l'intent est "prioritize" : retourne exactement 3 priorités (1, 2, 3), pas plus.
+- Si l'intent est "expand" : développe uniquement les actions déjà présentes dans le diagnostic.
+- Fidélisation : n'évoque une prochaine analyse que si l'utilisateur le demande explicitement.
 - Hors périmètre (autre URL, autre contenu, avis médical/légal) : refus poli en 2 lignes.
 ${appendix ? `Consignes additionnelles :\n${appendix}\n` : ''}
 DIAGNOSTIC :
@@ -145,8 +206,10 @@ ${context}`;
       });
     }
 
+    const safeResponse = enforceIntentResponseShape(intent, String(context), responseText);
+
     return NextResponse.json({
-      response: responseText,
+      response: safeResponse,
       intent_used: intent,
       refused: false,
     });
