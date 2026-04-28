@@ -61,11 +61,13 @@ export const ATTENTIQ_OFFERS: AttentiqOffer[] = [
     legacySlugs: ["rapport-complet"],
     name: "Rapport complet",
     shortLabel: "One-shot",
-    kicker: "Pour débloquer une vidéo",
+    kicker: "Pour débloquer un diagnostic complet",
     priceCents: 900,
     priceLabel: "9€",
-    summary: "Débloquez le diagnostic complet d'une seule vidéo.",
-    audience: "Pour valider une vidéo précise avant de republier.",
+    summary:
+      "Débloquez le diagnostic complet d'une analyse (vidéo, texte ou image).",
+    audience:
+      "Pour valider un contenu précis (vidéo, texte ou image) avant publication.",
     ctaLabel: "Choisir 9€",
     featureList: [
       "1 rapport complet",
@@ -109,7 +111,7 @@ export const ATTENTIQ_OFFERS: AttentiqOffer[] = [
     legacySlugs: ["unlimited", "illimite-mois", "illimite"],
     name: "15 rapports / mois",
     shortLabel: "Volume",
-    kicker: "Pour une série de vidéos",
+    kicker: "Pour une série de contenus",
     priceCents: 8900,
     priceLabel: "89€",
     cadenceLabel: "/mois",

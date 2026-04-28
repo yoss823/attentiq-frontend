@@ -206,10 +206,8 @@ ${context}`;
       });
     }
 
-    const safeResponse = enforceIntentResponseShape(intent, String(context), responseText);
-
     return NextResponse.json({
-      response: safeResponse,
+      response: responseText,
       intent_used: intent,
       refused: false,
     });
