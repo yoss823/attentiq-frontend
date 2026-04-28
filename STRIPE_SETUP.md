@@ -17,7 +17,7 @@ Variables Railway / `.env` :
 | Offre | Montant | Type |
 |-------|---------|------|
 | Rapport complet | **9 €** | Paiement unique |
-| 5 rapports / mois | **29 €** | Abonnement mensuel |
+| 5 rapports / mois | **35 €** | Abonnement mensuel |
 | 15 rapports / mois | **89 €** | Abonnement mensuel |
 
 Crée **3 Prices** (ou 3 **Payment Links**) correspondants dans Stripe.
@@ -29,7 +29,7 @@ Pour chaque offre, crée un **Payment Link** et copie l’URL `https://buy.strip
 | Variable | Exemple |
 |----------|---------|
 | `NEXT_PUBLIC_STRIPE_LINK_SINGLE` | Lien **9 €** |
-| `NEXT_PUBLIC_STRIPE_LINK_MONTHLY5` | Lien **29 €/mois** |
+| `NEXT_PUBLIC_STRIPE_LINK_MONTHLY5` | Lien **35 €/mois** (legacy Stripe : **29 €** si l’ancien price est encore actif) |
 | `NEXT_PUBLIC_STRIPE_LINK_PACK_15` **ou** `NEXT_PUBLIC_STRIPE_LINK_UNLIMITED` | Lien **89 €/mois** |
 
 **URL de succès** de chaque lien :  
@@ -44,7 +44,7 @@ Utilisés notamment par `POST /api/checkout` (session Checkout programmatique) e
 | Variable |
 |----------|
 | `STRIPE_PRICE_SINGLE_REPORT` ou `STRIPE_PRICE_SINGLE_REPORT_9` |
-| `STRIPE_PRICE_MONTHLY_29` |
+| `STRIPE_PRICE_MONTHLY_35` (recommandé) ou `STRIPE_PRICE_MONTHLY_29` (legacy) |
 | `STRIPE_PRICE_PACK_15` ou `STRIPE_PRICE_MONTHLY_89` |
 
 ## 5. Base de données (recommandé en prod)

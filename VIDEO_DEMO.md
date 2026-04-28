@@ -19,8 +19,8 @@
 | 6 | 20-28s | "Le score sort en 90 secondes." | [Retour caméra, montrer le score à l'écran — ex : "5.2/10"] · [Décontracté, pas de superlative] |
 | 7 | 28-36s | "Tu vois exactement à quelle seconde l'attention chute — et pourquoi. Accroche floue ? Transition trop longue ? Tu le sais." | [Poser le téléphone — faire glisser les résultats visible derrière ou en split] · [Rythme normal, pas de précipitation] |
 | 8 | 36-42s | "Et tu reçois 3 actions concrètes pour ta prochaine vidéo." | [Direct, factuel — pas "incroyable", pas de hype] |
-| 9 | 42-50s | "Colle une URL TikTok sur attentiq.com." | [Pointer vers le bas ou le lien en bio] |
-| 10 | 50-55s | "Premier diagnostic : 29€. Sans compte." | [Calme, factuel — pas de "seulement" ou "incroyable"] |
+| 9 | 42-50s | "Colle une URL sur www.attentiq.io." | [Pointer vers le bas ou le lien en bio] |
+| 10 | 50-55s | "Aperçu gratuit, rapport complet à 9 €. Sans compte pour tester." | [Calme, factuel — pas de "seulement" ou "incroyable"] |
 
 **Durée totale estimée : 55 secondes**
 
@@ -39,8 +39,8 @@
 | 5 | 18-26s | Le rapport complet apparaît — score en gros (ex : "5.2/10"), badge "Rétention faible" | **"Score : 5.2/10"** |
 | 6 | 26-34s | Scroll sur les chutes d'attention : "⏱ 8s — Sévérité Critique — Accroche floue" | **"Chute à 8s · Cause : accroche floue"** |
 | 7 | 34-40s | Scroll vers les actions correctives numérotées | **"3 actions pour ta prochaine vidéo"** |
-| 8 | 40-48s | Retour à la page d'accueil — champ URL visible | **"attentiq.com"** |
-| 9 | 48-55s | Fond noir · texte centré | **"29€ · Sans compte · Résultat en 90s"** |
+| 8 | 40-48s | Retour à la page d'accueil — champ URL visible | **"www.attentiq.io"** |
+| 9 | 48-55s | Fond noir · texte centré | **"9 € rapport complet · Aperçu gratuit · ~90 s"** |
 
 **Durée totale estimée : 55 secondes**
 
@@ -63,7 +63,7 @@
 
 | | Détail |
 |--|--------|
-| **Visuel** | Screen recording plein écran (iPhone ou navigateur mobile). Montrer : 1) champ URL vide sur attentiq.nanocorp.app/analyze · 2) coller une vraie URL TikTok publique · 3) appui sur "Analyser" · 4) progression : textes "📥 Téléchargement de la vidéo…" → "🎙 Transcription de l'audio…" → "🔍 Analyse image par image…" → "🧠 Génération du diagnostic…" · 5) rapport qui apparaît — focus sur le score (ex: 5.2/10, badge rouge "Rétention faible"). |
+| **Visuel** | Screen recording plein écran (iPhone ou navigateur mobile). Montrer : 1) champ URL vide sur **www.attentiq.io** (page d’analyse) · 2) coller une vraie URL TikTok publique · 3) appui sur "Analyser" · 4) progression : textes "📥 Téléchargement de la vidéo…" → "🎙 Transcription de l'audio…" → "🔍 Analyse image par image…" → "🧠 Génération du diagnostic…" · 5) rapport qui apparaît — focus sur le score (ex: 5.2/10, badge rouge "Rétention faible"). |
 | **Audio** | Musique légère en fond (niveau -18dB) · silence ou voix off courte : *"Voilà ce que ça donne."* |
 | **Overlay** | Zoom léger sur le score au moment où il apparaît · flash subtil sur le badge "Chute à 8s". |
 | **Durée** | 15s |
@@ -93,9 +93,9 @@ Audience estimée perdue : ~35%
 
 | | Détail |
 |--|--------|
-| **Visuel** | Fond sombre · URL en gros au centre : **attentiq.com** OU retour sur la landing page avec le champ URL visible. |
-| **Audio** | *"Colle une URL TikTok sur attentiq.com. Premier diagnostic : 29€. Sans compte."* |
-| **Overlay** | **"attentiq.com"** en grand · sous-titre : *"29€ · Sans compte · Résultat en 90 secondes"* |
+| **Visuel** | Fond sombre · URL en gros au centre : **www.attentiq.io** OU retour sur la landing page avec le champ URL visible. |
+| **Audio** | *"Colle une URL sur www.attentiq.io. Aperçu gratuit, rapport complet à 9 euros si tu veux tout le détail."* |
+| **Overlay** | **"www.attentiq.io"** en grand · sous-titre : *"9 € rapport complet · Aperçu gratuit · ~90 secondes"* |
 | **Durée** | 15s |
 
 ---
@@ -173,7 +173,7 @@ Pour la Variante A : filmer chaque phrase séparément en plusieurs prises, puis
 ### Caption TikTok (< 150 caractères)
 
 ```
-Tu perds 40% de tes spectateurs à 8s. Attentiq te dit exactement où — et pourquoi. 29€ sans compte 👇
+Tu perds 40% de tes spectateurs à 8s. Attentiq te dit exactement où — et pourquoi. Aperçu gratuit, 9 € le rapport complet 👇
 
 #TikTokCreator #VideoTikTok #AnalyseVideo #CreateurDeContenu #Attentiq
 ```
@@ -193,9 +193,9 @@ En 90 secondes, vous obtenez le score de rétention, les points de chute avec le
 leur cause (accroche floue, transition longue, perte de rythme...) et 3 actions correctives
 pour votre prochaine vidéo.
 
-Pas de compte requis. Premier diagnostic à 29€.
+Pas de compte requis pour l’aperçu. Rapport complet à 9 €.
 
-attentiq.com
+https://www.attentiq.io
 ```
 
 ---

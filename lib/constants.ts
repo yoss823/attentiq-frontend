@@ -1,3 +1,5 @@
+import { DEFAULT_PUBLIC_BACKEND_URL } from "./backend-public-url";
+
 export interface PricingPlan {
   id: string;
   name: string;
@@ -63,10 +65,11 @@ export const PRICING_PLANS: PricingPlan[] = [
   },
 ];
 
+/** Base API (alias) — alignée sur le même défaut que `lib/api.ts`. Préférer `.env.local` en dev. */
 export const API_BASE_URL =
   process.env.NEXT_PUBLIC_API_URL ||
   process.env.NEXT_PUBLIC_BACKEND_URL ||
-  "http://localhost:8000";
+  DEFAULT_PUBLIC_BACKEND_URL;
 
 export const POLLING_INTERVAL_MS = 3000;
 export const POLLING_MAX_ATTEMPTS = 40; // 2 minutes max

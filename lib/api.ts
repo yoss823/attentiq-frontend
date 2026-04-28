@@ -3,8 +3,10 @@
  * (pas de routes Next.js, pas de 405)
  */
 
+import { DEFAULT_PUBLIC_BACKEND_URL } from "./backend-public-url";
+
 const BACKEND_BASE_URL =
-  process.env.NEXT_PUBLIC_BACKEND_URL || "https://attentiq-backend-prod-production.up.railway.app";
+  process.env.NEXT_PUBLIC_BACKEND_URL || DEFAULT_PUBLIC_BACKEND_URL;
 
 export type JobStatus = "queued" | "processing" | "done" | "error";
 
