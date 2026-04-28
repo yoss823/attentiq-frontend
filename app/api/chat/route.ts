@@ -33,7 +33,8 @@ Règles obligatoires :
 - Si une information manque dans le diagnostic, dis-le en une courte phrase — ne complète pas par supposition.
 - Ne signale un manque d'information QUE s'il bloque réellement la réponse à la question posée.
 - N'évoque jamais l'absence d'historique, de contexte ou de sections non demandées si la question peut être traitée avec le diagnostic présent.
-- Vidéo : relie hook, rythme, chutes d'attention et intention de suite (si le rapport en parle) aux éléments explicitement présents.
+- Vidéo : relie hook, rythme, mouvements/cadrage/montage, musique, texte à l'écran, chutes d'attention et intention de suite (si le rapport en parle) aux éléments explicitement présents.
+- Si la vidéo est intentionnellement sans voix et/ou sans visage, ne traite pas cela comme un défaut automatique : juge la performance sur les signaux réellement présents (images, rythme visuel, transitions, texte, musique, sound design).
 - Texte / image : relie hiérarchie, promesse, friction de lecture ou de regard aux éléments du rapport.
 - Actions concrètes et ordonnables (quoi ajuster, où dans le contenu), jamais de listes de platitudes (« sois authentique », « reste naturel »).
 - Interdit : jargon marketing, promesses de résultats, viralité garantie.

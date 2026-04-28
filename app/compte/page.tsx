@@ -463,15 +463,13 @@ export default async function SubscriberAccountPage({
                     color: "rgba(237, 242, 247, 0.85)",
                   }}
                 >
-                  Posez des questions sur votre rapport. Le contexte du diagnostic est
-                  pris en charge automatiquement lorsque vous ouvrez l&apos;assistant
-                  depuis la page d&apos;un rapport ; depuis le compte, vous pouvez
-                  tout de même ouvrir l&apos;assistant (exemple si aucun rapport en
-                  session).
+                  Choisissez d&apos;abord le rapport concerné, puis ouvrez
+                  l&apos;assistant sur ce rapport précis. La limite est de 5
+                  questions par rapport.
                 </p>
                 <div style={{ display: "flex", flexWrap: "wrap", gap: "12px" }}>
                   <Link
-                    href="/chat"
+                    href="#historique-rapports"
                     style={{
                       display: "inline-flex",
                       alignItems: "center",
@@ -485,7 +483,7 @@ export default async function SubscriberAccountPage({
                       color: "#041017",
                     }}
                   >
-                    Ouvrir l&apos;assistant
+                    Choisir un rapport pour l&apos;assistant
                   </Link>
                   <Link
                     href="/guide?format=video"
@@ -580,6 +578,7 @@ export default async function SubscriberAccountPage({
               </section>
 
               <section
+                id="historique-rapports"
                 style={{
                   borderRadius: "24px",
                   border: "1px solid rgba(255,255,255,0.08)",
@@ -648,7 +647,14 @@ export default async function SubscriberAccountPage({
                             Source: {analysis.sourceLabel}
                           </p>
                         )}
-                        <div style={{ marginTop: "10px" }}>
+                        <div
+                          style={{
+                            marginTop: "10px",
+                            display: "flex",
+                            flexWrap: "wrap",
+                            gap: "10px",
+                          }}
+                        >
                           <Link
                             href={buildResultHref({
                               jobId: analysis.jobId,
@@ -669,6 +675,24 @@ export default async function SubscriberAccountPage({
                             }}
                           >
                             Voir le rapport complet
+                          </Link>
+                          <Link
+                            href={`/chat?jobId=${encodeURIComponent(analysis.jobId)}`}
+                            style={{
+                              display: "inline-flex",
+                              alignItems: "center",
+                              justifyContent: "center",
+                              borderRadius: "999px",
+                              padding: "10px 16px",
+                              textDecoration: "none",
+                              fontSize: "13px",
+                              fontWeight: 800,
+                              background: "rgba(251, 146, 60, 0.16)",
+                              color: "#fdba74",
+                              border: "1px solid rgba(251, 146, 60, 0.35)",
+                            }}
+                          >
+                            Échanger sur ce rapport
                           </Link>
                         </div>
                       </div>

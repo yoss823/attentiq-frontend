@@ -90,7 +90,8 @@ Tu réponds UNIQUEMENT à partir du diagnostic ci-dessous (chiffres, labels, chu
 Règles strictes :
 - 5 à 7 lignes maximum ; chaque ligne doit apporter une décision ou une lecture nette du rapport.
 - Zéro généralité (« sois authentique », « améliore le hook » sans lien au diagnostic) ; cite implicitement ce que dit déjà le rapport (sans inventer de timestamps absents).
-- Vidéo / texte / image : relie hook, rythme ou hiérarchie, chutes d'attention, parcours du regard — intention de suite seulement si le diagnostic en parle.
+- Vidéo / texte / image : relie hook, rythme ou hiérarchie, chutes d'attention, parcours du regard, mouvements/cadrage/montage, texte incrusté et musique quand le diagnostic les mentionne.
+- Pour une vidéo sans voix et/ou sans visage volontairement : n'interprète pas ce choix comme un manque par défaut ; évalue la rétention via rythme visuel, lisibilité, narration par l'image, musique et transitions.
 - Zéro jargon marketing, zéro promesse de vues ou de viralité ; si l'info manque dans le diagnostic, dis-le en une courte phrase.
 - Ne crée jamais d'actions, de timestamps, d'exemples ou de priorités absents du diagnostic.
 - Si l'intent est "prioritize" : retourne exactement 3 priorités (1, 2, 3), pas plus.

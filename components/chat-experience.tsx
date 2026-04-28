@@ -30,6 +30,9 @@ type ChatMessage = ChatTurn & {
   tone?: "default" | "muted";
 };
 
+const MAX_CHAT_QUESTIONS_PER_REPORT = 5;
+const CHAT_QUESTION_COUNT_STORAGE_KEY = "attentiq.chat.question-count.by-report.v1";
+
 const SUGGESTED_PROMPTS = [
   "D'après ce rapport, où je perds l'attention en premier ?",
   "Quelle est la correction à plus fort impact pour le peu d'effort ?",
@@ -57,6 +60,33 @@ function readJobIdFromWindow(): string | null {
     return null;
   }
   return new URLSearchParams(window.location.search).get("jobId")?.trim() || null;
+}
+
+function readQuestionCountByReport(): Record<string, number> {
+  if (typeof window === "undefined") return {};
+  try {
+    const raw = localStorage.getItem(CHAT_QUESTION_COUNT_STORAGE_KEY);
+    if (!raw) return {};
+    const parsed = JSON.parse(raw) as Record<string, unknown>;
+    const out: Record<string, number> = {};
+    for (const [key, value] of Object.entries(parsed)) {
+      if (typeof value === "number" && Number.isFinite(value) && value >= 0) {
+        out[key] = Math.floor(value);
+      }
+    }
+    return out;
+  } catch {
+    return {};
+  }
+}
+
+function writeQuestionCountByReport(map: Record<string, number>) {
+  if (typeof window === "undefined") return;
+  try {
+    localStorage.setItem(CHAT_QUESTION_COUNT_STORAGE_KEY, JSON.stringify(map));
+  } catch {
+    /* ignore storage errors */
+  }
 }
 
 type ChatContextSource = "session" | "url_job" | "stored_result" | "demo";
@@ -239,6 +269,9 @@ export default function ChatExperience() {
   const [input, setInput] = useState("");
   const [isSending, setIsSending] = useState(false);
   const [runtimeNotice, setRuntimeNotice] = useState<string | null>(null);
+  const [questionCountByReport, setQuestionCountByReport] = useState<
+    Record<string, number>
+  >(() => readQuestionCountByReport());
   const lastWelcomedRequestIdRef = useRef<string | null>(null);
   const feedRef = useRef<HTMLDivElement>(null);
 
@@ -277,8 +310,26 @@ export default function ChatExperience() {
         return;
       }
       const diagnosticContext = loadState.diagnosticContext;
+      const reportKey = diagnosticContext.requestId?.trim() || null;
+      const usedForReport = reportKey
+        ? questionCountByReport[reportKey] ?? 0
+        : messages.filter((m) => m.role === "user").length;
       const prompt = rawPrompt.trim();
       if (!prompt || isSending) {
+        return;
+      }
+      if (usedForReport >= MAX_CHAT_QUESTIONS_PER_REPORT) {
+        setRuntimeNotice(
+          `Limite atteinte : ${MAX_CHAT_QUESTIONS_PER_REPORT} questions maximum pour ce rapport. Choisissez un autre rapport depuis votre compte pour continuer.`
+        );
+        setMessages((current) => [
+          ...current,
+          createMessage(
+            "assistant",
+            `Vous avez déjà utilisé ${MAX_CHAT_QUESTIONS_PER_REPORT}/${MAX_CHAT_QUESTIONS_PER_REPORT} questions sur ce rapport. Ouvrez un autre rapport pour continuer.`,
+            "muted"
+          ),
+        ]);
         return;
       }
 
@@ -289,6 +340,19 @@ export default function ChatExperience() {
       setInput("");
       setIsSending(true);
       setRuntimeNotice(null);
+      if (reportKey) {
+        setQuestionCountByReport((prev) => {
+          const next = {
+            ...prev,
+            [reportKey]: Math.min(
+              MAX_CHAT_QUESTIONS_PER_REPORT,
+              (prev[reportKey] ?? 0) + 1
+            ),
+          };
+          writeQuestionCountByReport(next);
+          return next;
+        });
+      }
 
       try {
         const response = await fetch("/api/chat", {
@@ -351,7 +415,7 @@ export default function ChatExperience() {
         setIsSending(false);
       }
     },
-    [loadState, messages, isSending]
+    [loadState, messages, isSending, questionCountByReport]
   );
 
   if (loadState.kind === "loading" || loadState.kind === "loading_job") {
@@ -426,6 +490,10 @@ export default function ChatExperience() {
 
   const { diagnosticContext, contextSource, notice: baseNotice } = loadState;
   const noticeBanner = runtimeNotice ?? baseNotice;
+  const reportQuestionCount =
+    questionCountByReport[diagnosticContext.requestId] ?? 0;
+  const isQuestionLimitReached =
+    reportQuestionCount >= MAX_CHAT_QUESTIONS_PER_REPORT;
 
   const jidForResult = jobIdFromUrl ?? diagnosticContext.requestId;
   const vidForResult = diagnosticContext.metadata?.url?.trim();
@@ -760,21 +828,41 @@ export default function ChatExperience() {
                   color: "var(--text-secondary)",
                 }}
               >
-                Réponses courtes, actionnables, uniquement basées sur le rapport.
+                  Réponses courtes, actionnables, uniquement basées sur le rapport.
               </p>
             </div>
 
-            <span
-              style={{
-                minWidth: "10px",
-                minHeight: "10px",
-                borderRadius: "999px",
-                background: isSending ? "#f59e0b" : "var(--accent)",
-                boxShadow: isSending
-                  ? "0 0 20px rgba(245,158,11,0.4)"
-                  : "0 0 20px rgba(0,212,255,0.5)",
-              }}
-            />
+            <div style={{ display: "inline-flex", alignItems: "center", gap: "10px" }}>
+              <span
+                style={{
+                  padding: "5px 10px",
+                  borderRadius: "999px",
+                  border: isQuestionLimitReached
+                    ? "1px solid rgba(248,113,113,0.3)"
+                    : "1px solid rgba(0, 212, 255, 0.28)",
+                  background: isQuestionLimitReached
+                    ? "rgba(248,113,113,0.1)"
+                    : "rgba(0, 212, 255, 0.1)",
+                  color: isQuestionLimitReached ? "#fda4af" : "#67e8f9",
+                  fontSize: "11px",
+                  fontWeight: 800,
+                  letterSpacing: "0.08em",
+                }}
+              >
+                {reportQuestionCount}/{MAX_CHAT_QUESTIONS_PER_REPORT} questions
+              </span>
+              <span
+                style={{
+                  minWidth: "10px",
+                  minHeight: "10px",
+                  borderRadius: "999px",
+                  background: isSending ? "#f59e0b" : "var(--accent)",
+                  boxShadow: isSending
+                    ? "0 0 20px rgba(245,158,11,0.4)"
+                    : "0 0 20px rgba(0,212,255,0.5)",
+                }}
+              />
+            </div>
           </div>
 
           <div
@@ -875,7 +963,7 @@ export default function ChatExperience() {
                     <button
                       key={prompt}
                       type="button"
-                      disabled={isSending}
+                      disabled={isSending || isQuestionLimitReached}
                       onClick={() => submitPrompt(prompt)}
                       style={{
                         textAlign: "left",
@@ -886,8 +974,8 @@ export default function ChatExperience() {
                         color: "var(--text-primary)",
                         fontSize: "14px",
                         lineHeight: 1.5,
-                        cursor: isSending ? "not-allowed" : "pointer",
-                        opacity: isSending ? 0.55 : 1,
+                        cursor: isSending || isQuestionLimitReached ? "not-allowed" : "pointer",
+                        opacity: isSending || isQuestionLimitReached ? 0.55 : 1,
                       }}
                     >
                       {prompt}
@@ -955,6 +1043,7 @@ export default function ChatExperience() {
                 }}
                 rows={3}
                 placeholder="Posez une question sur ce diagnostic précis…"
+                disabled={isQuestionLimitReached}
                 style={{
                   width: "100%",
                   resize: "vertical",
@@ -986,11 +1075,13 @@ export default function ChatExperience() {
                     color: "var(--text-secondary)",
                   }}
                 >
-                  Réponses courtes, calmes, limitées au diagnostic chargé.
+                  {isQuestionLimitReached
+                    ? `Limite atteinte (${MAX_CHAT_QUESTIONS_PER_REPORT}/${MAX_CHAT_QUESTIONS_PER_REPORT}) pour ce rapport.`
+                    : `Réponses courtes, calmes, limitées au diagnostic chargé. (${reportQuestionCount}/${MAX_CHAT_QUESTIONS_PER_REPORT})`}
                 </p>
                 <button
                   type="submit"
-                  disabled={isSending || !input.trim()}
+                  disabled={isSending || !input.trim() || isQuestionLimitReached}
                   style={{
                     border: "none",
                     borderRadius: "14px",
