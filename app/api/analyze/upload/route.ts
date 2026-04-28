@@ -11,6 +11,7 @@ import {
   paywallPathForFormat,
 } from "@/lib/free-trial";
 import { enforceSubscriptionQuotaGate } from "@/lib/subscription-quota-gate";
+import { hasConsumedServerSideTrial } from "@/lib/trial-server-gate";
 
 const ACCEPTED_MIME_TYPES = ["video/mp4", "video/quicktime", "video/webm"];
 const MAX_FILE_SIZE_BYTES = 500 * 1024 * 1024; // 500 MB
@@ -21,6 +22,9 @@ export async function POST(req: NextRequest) {
   );
   const hasUsedVideoTrial = hasUsedFreeTrialForFormat(req, "video");
   const hasPremium = Boolean(entitlement?.isPremium);
+  const hasUsedServerVideoTrial = hasPremium
+    ? false
+    : await hasConsumedServerSideTrial(req, "video");
 
   const quotaGate = await enforceSubscriptionQuotaGate(req);
   if (quotaGate.shouldBlock) {
@@ -36,7 +40,11 @@ export async function POST(req: NextRequest) {
     );
   }
 
-  if (!isDevVideoTrialBypassEnabled() && hasUsedVideoTrial && !hasPremium) {
+  if (
+    !isDevVideoTrialBypassEnabled() &&
+    !hasPremium &&
+    (hasUsedVideoTrial || hasUsedServerVideoTrial)
+  ) {
     return NextResponse.json(
       {
         error: "FREE_TRIAL_EXHAUSTED",

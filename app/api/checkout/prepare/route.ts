@@ -62,7 +62,10 @@ export async function POST(request: NextRequest) {
     prefillFromBody ?? prefillFromEnv ?? undefined
   );
 
-  const cref = buildAttentiqPaymentClientReferenceId(normalizeString(body.jobId));
+  const cref = buildAttentiqPaymentClientReferenceId(
+    normalizeString(body.jobId),
+    normalizeString(body.videoUrl)
+  );
   if (cref) {
     try {
       const u = new URL(redirectUrl);

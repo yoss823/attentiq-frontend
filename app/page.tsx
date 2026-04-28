@@ -586,42 +586,216 @@ export default function HomePage() {
               gridTemplateColumns: "repeat(auto-fit, minmax(260px, 1fr))",
             }}
           >
-            {ATTENTIQ_OFFERS.map((offer) => (
-              <article
-                key={offer.slug}
-                style={{
-                  borderRadius: "24px",
-                  border: offer.featured
-                    ? "1px solid rgba(0, 212, 255, 0.24)"
-                    : "1px solid var(--border)",
-                  background: offer.featured
-                    ? "linear-gradient(180deg, rgba(0, 212, 255, 0.1) 0%, rgba(10, 14, 20, 0.96) 100%)"
-                    : "rgba(255,255,255,0.03)",
-                  padding: "22px 18px",
-                  position: "relative",
-                }}
-              >
-                {offer.featured && (
-                  <div
+            {[
+              ...ATTENTIQ_OFFERS.map((offer) => (
+                <article
+                  key={offer.slug}
+                  style={{
+                    borderRadius: "24px",
+                    border: offer.featured
+                      ? "1px solid rgba(0, 212, 255, 0.24)"
+                      : "1px solid var(--border)",
+                    background: offer.featured
+                      ? "linear-gradient(180deg, rgba(0, 212, 255, 0.1) 0%, rgba(10, 14, 20, 0.96) 100%)"
+                      : "rgba(255,255,255,0.03)",
+                    padding: "22px 18px",
+                    position: "relative",
+                  }}
+                >
+                  {offer.featured && (
+                    <div
+                      style={{
+                        position: "absolute",
+                        top: "-12px",
+                        left: "50%",
+                        transform: "translateX(-50%)",
+                        padding: "5px 12px",
+                        borderRadius: "999px",
+                        background: "linear-gradient(135deg, var(--accent), #79e7ff)",
+                        color: "#041017",
+                        fontSize: "10px",
+                        fontWeight: 900,
+                        textTransform: "uppercase",
+                        letterSpacing: "0.12em",
+                        whiteSpace: "nowrap",
+                      }}
+                    >
+                      Recommandé
+                    </div>
+                  )}
+
+                  <p
                     style={{
-                      position: "absolute",
-                      top: "-12px",
-                      left: "50%",
-                      transform: "translateX(-50%)",
-                      padding: "5px 12px",
+                      margin: "0 0 6px",
+                      fontSize: "11px",
+                      textTransform: "uppercase",
+                      letterSpacing: "0.16em",
+                      fontWeight: 800,
+                      color: offer.featured ? "var(--accent)" : "var(--text-secondary)",
+                    }}
+                  >
+                    {offer.kicker}
+                  </p>
+                  <span
+                    style={{
+                      display: "inline-flex",
+                      marginBottom: "8px",
+                      padding: "4px 9px",
                       borderRadius: "999px",
-                      background: "linear-gradient(135deg, var(--accent), #79e7ff)",
-                      color: "#041017",
+                      border: "1px solid rgba(16, 185, 129, 0.28)",
+                      background: "rgba(16, 185, 129, 0.12)",
+                      color: "#6ee7b7",
                       fontSize: "10px",
                       fontWeight: 900,
                       textTransform: "uppercase",
                       letterSpacing: "0.12em",
-                      whiteSpace: "nowrap",
                     }}
                   >
-                    Recommandé
+                    Offre de lancement -{LAUNCH_DISCOUNT_PERCENT}%
+                  </span>
+
+                  <div
+                    style={{
+                      display: "flex",
+                      alignItems: "baseline",
+                      gap: "5px",
+                      marginBottom: "10px",
+                    }}
+                  >
+                    <span
+                      style={{
+                        fontSize: "16px",
+                        fontWeight: 700,
+                        color: "var(--text-secondary)",
+                        textDecoration: "line-through",
+                      }}
+                    >
+                      {formatEuroCents(getLaunchListPriceCents(offer.priceCents))}
+                    </span>
+                    <span
+                      style={{
+                        fontSize: "38px",
+                        lineHeight: 0.95,
+                        letterSpacing: "-0.08em",
+                        fontWeight: 900,
+                        color: "var(--text-primary)",
+                      }}
+                    >
+                      {formatEuroCents(offer.priceCents)}
+                    </span>
+                    {offer.cadenceLabel && (
+                      <span
+                        style={{
+                          fontSize: "14px",
+                          fontWeight: 700,
+                          color: "var(--text-secondary)",
+                        }}
+                      >
+                        {offer.cadenceLabel}
+                      </span>
+                    )}
                   </div>
-                )}
+
+                  <p
+                    style={{
+                      margin: "0 0 16px",
+                      fontSize: "14px",
+                      lineHeight: 1.7,
+                      color: "var(--text-secondary)",
+                    }}
+                  >
+                    {offer.summary}
+                  </p>
+
+                  <div style={{ marginBottom: "16px", display: "grid", gap: "8px" }}>
+                    {offer.featureList.map((f) => (
+                      <div
+                        key={f}
+                        style={{
+                          display: "flex",
+                          alignItems: "center",
+                          gap: "10px",
+                          fontSize: "13px",
+                          color: "var(--text-primary)",
+                        }}
+                      >
+                        <span
+                          style={{
+                            width: "18px",
+                            height: "18px",
+                            borderRadius: "50%",
+                            background: "rgba(0, 212, 255, 0.12)",
+                            border: "1px solid rgba(0, 212, 255, 0.22)",
+                            color: "var(--accent)",
+                            display: "inline-flex",
+                            alignItems: "center",
+                            justifyContent: "center",
+                            fontWeight: 800,
+                            fontSize: "10px",
+                            flexShrink: 0,
+                          }}
+                        >
+                          ✓
+                        </span>
+                        {f}
+                      </div>
+                    ))}
+                  </div>
+
+                  <Link
+                    href={offer.checkoutPath}
+                    style={{
+                      display: "block",
+                      textAlign: "center",
+                      padding: "13px 18px",
+                      borderRadius: "999px",
+                      textDecoration: "none",
+                      background: offer.featured
+                        ? "linear-gradient(135deg, var(--accent), #79e7ff)"
+                        : "rgba(255,255,255,0.06)",
+                      border: offer.featured ? "none" : "1px solid rgba(255,255,255,0.1)",
+                      color: offer.featured ? "#041017" : "var(--text-primary)",
+                      fontSize: "14px",
+                      fontWeight: 900,
+                      boxShadow: offer.featured
+                        ? "0 18px 52px rgba(0, 212, 255, 0.18)"
+                        : "none",
+                    }}
+                  >
+                    {offer.ctaLabel}
+                  </Link>
+                </article>
+              )),
+              <article
+                key="enterprise"
+                style={{
+                  borderRadius: "24px",
+                  border: "1px solid rgba(192, 132, 252, 0.24)",
+                  background:
+                    "linear-gradient(180deg, rgba(192, 132, 252, 0.12) 0%, rgba(10, 14, 20, 0.96) 100%)",
+                  padding: "22px 18px",
+                  position: "relative",
+                }}
+              >
+                <div
+                  style={{
+                    position: "absolute",
+                    top: "-12px",
+                    left: "50%",
+                    transform: "translateX(-50%)",
+                    padding: "5px 12px",
+                    borderRadius: "999px",
+                    background: "linear-gradient(135deg, #c084fc, #e879f9)",
+                    color: "#190a22",
+                    fontSize: "10px",
+                    fontWeight: 900,
+                    textTransform: "uppercase",
+                    letterSpacing: "0.12em",
+                    whiteSpace: "nowrap",
+                  }}
+                >
+                  Entreprises
+                </div>
 
                 <p
                   style={{
@@ -630,28 +804,11 @@ export default function HomePage() {
                     textTransform: "uppercase",
                     letterSpacing: "0.16em",
                     fontWeight: 800,
-                    color: offer.featured ? "var(--accent)" : "var(--text-secondary)",
+                    color: "#e879f9",
                   }}
                 >
-                  {offer.kicker}
+                  Pour les équipes marketing et médias
                 </p>
-                <span
-                  style={{
-                    display: "inline-flex",
-                    marginBottom: "8px",
-                    padding: "4px 9px",
-                    borderRadius: "999px",
-                    border: "1px solid rgba(16, 185, 129, 0.28)",
-                    background: "rgba(16, 185, 129, 0.12)",
-                    color: "#6ee7b7",
-                    fontSize: "10px",
-                    fontWeight: 900,
-                    textTransform: "uppercase",
-                    letterSpacing: "0.12em",
-                  }}
-                >
-                  Offre de lancement -{LAUNCH_DISCOUNT_PERCENT}%
-                </span>
 
                 <div
                   style={{
@@ -663,36 +820,15 @@ export default function HomePage() {
                 >
                   <span
                     style={{
-                      fontSize: "16px",
-                      fontWeight: 700,
-                      color: "var(--text-secondary)",
-                      textDecoration: "line-through",
-                    }}
-                  >
-                    {formatEuroCents(getLaunchListPriceCents(offer.priceCents))}
-                  </span>
-                  <span
-                    style={{
-                      fontSize: "38px",
+                      fontSize: "34px",
                       lineHeight: 0.95,
                       letterSpacing: "-0.08em",
                       fontWeight: 900,
                       color: "var(--text-primary)",
                     }}
                   >
-                    {formatEuroCents(offer.priceCents)}
+                    Sur devis
                   </span>
-                  {offer.cadenceLabel && (
-                    <span
-                      style={{
-                        fontSize: "14px",
-                        fontWeight: 700,
-                        color: "var(--text-secondary)",
-                      }}
-                    >
-                      {offer.cadenceLabel}
-                    </span>
-                  )}
                 </div>
 
                 <p
@@ -703,11 +839,15 @@ export default function HomePage() {
                     color: "var(--text-secondary)",
                   }}
                 >
-                  {offer.summary}
+                  Audit multi-marques, gouvernance équipe, onboarding, process QA contenu et accompagnement éditorial sur mesure.
                 </p>
 
                 <div style={{ marginBottom: "16px", display: "grid", gap: "8px" }}>
-                  {offer.featureList.map((f) => (
+                  {[
+                    "Volume et workflow équipe",
+                    "Règles IA personnalisées (style maison)",
+                    "Support prioritaire + cadrage KPI",
+                  ].map((f) => (
                     <div
                       key={f}
                       style={{
@@ -742,29 +882,25 @@ export default function HomePage() {
                 </div>
 
                 <Link
-                  href={offer.checkoutPath}
+                  href="mailto:hello@attentiq.io?subject=Demande%20offre%20Entreprise%20Attentiq"
                   style={{
                     display: "block",
                     textAlign: "center",
                     padding: "13px 18px",
                     borderRadius: "999px",
                     textDecoration: "none",
-                    background: offer.featured
-                      ? "linear-gradient(135deg, var(--accent), #79e7ff)"
-                      : "rgba(255,255,255,0.06)",
-                    border: offer.featured ? "none" : "1px solid rgba(255,255,255,0.1)",
-                    color: offer.featured ? "#041017" : "var(--text-primary)",
+                    background: "linear-gradient(135deg, #c084fc, #e879f9)",
+                    border: "none",
+                    color: "#190a22",
                     fontSize: "14px",
                     fontWeight: 900,
-                    boxShadow: offer.featured
-                      ? "0 18px 52px rgba(0, 212, 255, 0.18)"
-                      : "none",
+                    boxShadow: "0 18px 52px rgba(192, 132, 252, 0.24)",
                   }}
                 >
-                  {offer.ctaLabel}
+                  Demander une proposition
                 </Link>
-              </article>
-            ))}
+              </article>,
+            ]}
           </div>
         </section>
 

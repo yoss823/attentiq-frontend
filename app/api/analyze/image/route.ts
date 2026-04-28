@@ -10,6 +10,7 @@ import {
   paywallPathForFormat,
 } from "@/lib/free-trial";
 import { enforceSubscriptionQuotaGate } from "@/lib/subscription-quota-gate";
+import { hasConsumedServerSideTrial } from "@/lib/trial-server-gate";
 
 const ACCEPTED_MIME_TYPES = new Set(["image/jpeg", "image/png", "image/webp"]);
 const MAX_IMAGE_BYTES = 10 * 1024 * 1024;
@@ -19,6 +20,9 @@ export async function POST(req: NextRequest) {
     req.cookies.get(PREMIUM_ENTITLEMENT_COOKIE_NAME)?.value ?? null
   );
   const hasPremium = Boolean(entitlement?.isPremium);
+  const hasUsedServerImageTrial = hasPremium
+    ? false
+    : await hasConsumedServerSideTrial(req, "image");
 
   const quotaGate = await enforceSubscriptionQuotaGate(req);
   if (quotaGate.shouldBlock) {
@@ -34,7 +38,10 @@ export async function POST(req: NextRequest) {
     );
   }
 
-  if (hasUsedFreeTrialForFormat(req, "image") && !hasPremium) {
+  if (
+    !hasPremium &&
+    (hasUsedFreeTrialForFormat(req, "image") || hasUsedServerImageTrial)
+  ) {
     return NextResponse.json(
       {
         error: "FREE_TRIAL_EXHAUSTED",

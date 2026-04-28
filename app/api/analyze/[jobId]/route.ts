@@ -16,6 +16,7 @@ import {
   setFreeTrialCookieOnResponse,
   type FreeTrialFormat,
 } from "@/lib/free-trial";
+import { markServerSideTrialConsumed } from "@/lib/trial-server-gate";
 import {
   chargeSubscriptionReportQuotaIfNeeded,
   getArchivedSubscriberReportByEmailAndJob,
@@ -112,6 +113,15 @@ export async function GET(
         !hasUsedFreeTrialForFormat(request, trialFormat)
       ) {
         setFreeTrialCookieOnResponse(response, trialFormat, false);
+      }
+      if (
+        trialFormat &&
+        !hasPremium &&
+        !(isDevVideoTrialBypassEnabled() && trialFormat === "video")
+      ) {
+        void markServerSideTrialConsumed(request, trialFormat).catch((err) =>
+          console.error("[analyze/jobId] server trial consume failed:", err)
+        );
       }
 
       const email = entitlement?.subscriberEmail?.trim();

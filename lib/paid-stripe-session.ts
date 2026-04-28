@@ -1,6 +1,6 @@
 import type Stripe from "stripe";
 import { getOfferByPriceCents, normalizeOfferSlug } from "@/lib/offer-config";
-import { parseJobIdFromAttentiqClientReferenceId } from "@/lib/stripe-client-reference";
+import { parseAttentiqClientReferenceContext } from "@/lib/stripe-client-reference";
 
 /** E-mail acheteur : détails checkout, champ session, ou client Stripe (session avec `expand: ['customer']`). */
 export function checkoutSessionCustomerEmail(
@@ -69,9 +69,9 @@ export function jobAndVideoFromStripeSession(
     typeof session.client_reference_id === "string"
       ? session.client_reference_id
       : null;
-  const jobFromRef = parseJobIdFromAttentiqClientReferenceId(cref);
-  if (jobFromRef) {
-    return { jobId: jobFromRef, videoUrl: null };
+  const fromRef = parseAttentiqClientReferenceContext(cref);
+  if (fromRef.jobId || fromRef.videoUrl) {
+    return { jobId: fromRef.jobId, videoUrl: fromRef.videoUrl };
   }
   return { jobId: null, videoUrl: null };
 }

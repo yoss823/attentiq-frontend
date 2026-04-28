@@ -10,6 +10,7 @@ import {
   paywallPathForFormat,
 } from "@/lib/free-trial";
 import { enforceSubscriptionQuotaGate } from "@/lib/subscription-quota-gate";
+import { hasConsumedServerSideTrial } from "@/lib/trial-server-gate";
 
 const MAX_TEXT_LEN = 20_000;
 const MAX_CONTEXT_LEN = 1_000;
@@ -19,6 +20,9 @@ export async function POST(req: NextRequest) {
     req.cookies.get(PREMIUM_ENTITLEMENT_COOKIE_NAME)?.value ?? null
   );
   const hasPremium = Boolean(entitlement?.isPremium);
+  const hasUsedServerTextTrial = hasPremium
+    ? false
+    : await hasConsumedServerSideTrial(req, "text");
 
   const quotaGate = await enforceSubscriptionQuotaGate(req);
   if (quotaGate.shouldBlock) {
@@ -34,7 +38,10 @@ export async function POST(req: NextRequest) {
     );
   }
 
-  if (hasUsedFreeTrialForFormat(req, "text") && !hasPremium) {
+  if (
+    !hasPremium &&
+    (hasUsedFreeTrialForFormat(req, "text") || hasUsedServerTextTrial)
+  ) {
     return NextResponse.json(
       {
         error: "FREE_TRIAL_EXHAUSTED",
