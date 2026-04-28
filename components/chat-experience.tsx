@@ -172,13 +172,20 @@ export default function ChatExperience() {
   const searchParams = useSearchParams();
   const jobIdFromUrl = searchParams.get("jobId")?.trim() || null;
 
-  const [loadState, setLoadState] = useState<ChatLoadState>(() =>
-    resolveChatLoadStateSync(readJobIdFromWindow())
-  );
-
-  useEffect(() => {
-    setLoadState(resolveChatLoadStateSync(jobIdFromUrl));
-  }, [jobIdFromUrl]);
+  const [jobScopedState, setJobScopedState] = useState<{
+    jobId: string | null;
+    state: ChatLoadState;
+  }>(() => {
+    const initialJobId = readJobIdFromWindow();
+    return {
+      jobId: initialJobId,
+      state: resolveChatLoadStateSync(initialJobId),
+    };
+  });
+  const loadState =
+    jobScopedState.jobId === jobIdFromUrl
+      ? jobScopedState.state
+      : resolveChatLoadStateSync(jobIdFromUrl);
 
   useEffect(() => {
     if (loadState.kind !== "loading_job") {
@@ -193,10 +200,13 @@ export default function ChatExperience() {
         return;
       }
       if (!report) {
-        setLoadState({
-          kind: "error",
-          message:
-            "Impossible de charger ce diagnostic. Verifiez le lien, reconnectez-vous, ou relancez une analyse.",
+        setJobScopedState({
+          jobId,
+          state: {
+            kind: "error",
+            message:
+              "Impossible de charger ce diagnostic. Verifiez le lien, reconnectez-vous, ou relancez une analyse.",
+          },
         });
         return;
       }
@@ -209,11 +219,14 @@ export default function ChatExperience() {
       } catch {
         /* ignore */
       }
-      setLoadState({
-        kind: "ready",
-        diagnosticContext,
-        contextSource: "url_job",
-        notice: null,
+      setJobScopedState({
+        jobId,
+        state: {
+          kind: "ready",
+          diagnosticContext,
+          contextSource: "url_job",
+          notice: null,
+        },
       });
     })();
 
