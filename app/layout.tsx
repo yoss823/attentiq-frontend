@@ -22,6 +22,10 @@ function getMetadataBase(): URL | undefined {
 
 const metadataBase = getMetadataBase();
 
+/** Beacon / analytics tiers : uniquement si tu définis l’URL (jamais de script externe par défaut). */
+const analyticsBeaconSrc =
+  process.env.NEXT_PUBLIC_ANALYTICS_BEACON_SRC?.trim() || "";
+
 export const metadata: Metadata = {
   ...(metadataBase ? { metadataBase } : {}),
   title: {
@@ -52,10 +56,9 @@ export default function RootLayout({
   return (
     <html lang="fr" className={dmSans.variable}>
       <head>
-        <script
-          src="https://phospho-nanocorp-prod--nanocorp-api-fastapi-app.modal.run/beacon/snippet.js?s=attentiq"
-          defer
-        />
+        {analyticsBeaconSrc ? (
+          <script src={analyticsBeaconSrc} defer />
+        ) : null}
       </head>
       <body className={`min-h-screen ${dmSans.className}`}>{children}</body>
     </html>

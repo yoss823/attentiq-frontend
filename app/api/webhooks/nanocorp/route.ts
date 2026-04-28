@@ -34,6 +34,21 @@ function isValidWebhookBody(body: WebhookBody): body is ValidWebhookBody {
 }
 
 export async function POST(request: NextRequest) {
+  const webhookSecret = process.env.NANOCORP_WEBHOOK_SECRET?.trim();
+  if (webhookSecret) {
+    const auth = request.headers.get("authorization");
+    const bearer =
+      auth?.startsWith("Bearer ") ? auth.slice(7).trim() : undefined;
+    const headerSecret = request.headers.get("x-webhook-secret")?.trim();
+    const token = bearer || headerSecret;
+    if (!token || token !== webhookSecret) {
+      return NextResponse.json(
+        { ok: false, error: "UNAUTHORIZED" },
+        { status: 401 }
+      );
+    }
+  }
+
   let body: WebhookBody;
 
   try {

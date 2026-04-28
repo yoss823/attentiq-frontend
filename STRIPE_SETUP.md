@@ -55,9 +55,11 @@ Utilisés notamment par `POST /api/checkout` (session Checkout programmatique) e
 
 Sans Postgres, le retour `/merci` fonctionne quand même grâce à la **vérification directe** de la session Stripe (`verify-session`).
 
-## 6. Webhook Nanocorp (optionnel)
+## 6. Webhook Nanocorp (optionnel, legacy)
 
 `POST /api/webhooks/nanocorp` — si un service externe notifie les paiements, il alimente la même table que la sync Stripe. Ce n’est **pas** obligatoire si la vérif session + Stripe suffit.
+
+En production, définis **`NANOCORP_WEBHOOK_SECRET`** : le handler exige alors `Authorization: Bearer <secret>` ou le header `X-Webhook-Secret` (sinon `401`). Sans secret, l’endpoint reste ouvert (à éviter si l’URL est publique).
 
 ## 7. Tests
 
