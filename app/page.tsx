@@ -839,14 +839,16 @@ export default function HomePage() {
                     color: "var(--text-secondary)",
                   }}
                 >
-                  Audit multi-marques, gouvernance équipe, onboarding, process QA contenu et accompagnement éditorial sur mesure.
+                  Analyse de sites web, pages LinkedIn, plaquettes commerciales,
+                  visuels et contenus éditoriaux pour renforcer la captation
+                  d&apos;attention sur tous vos supports.
                 </p>
 
                 <div style={{ marginBottom: "16px", display: "grid", gap: "8px" }}>
                   {[
-                    "Volume et workflow équipe",
-                    "Règles IA personnalisées (style maison)",
-                    "Support prioritaire + cadrage KPI",
+                    "Audit attention multi-supports (web, LinkedIn, sales)",
+                    "Priorisation des frictions + plan d'exécution",
+                    "Accompagnement équipe + cadrage KPI",
                   ].map((f) => (
                     <div
                       key={f}
@@ -882,7 +884,7 @@ export default function HomePage() {
                 </div>
 
                 <Link
-                  href="mailto:hello@attentiq.io?subject=Demande%20offre%20Entreprise%20Attentiq"
+                  href="/entreprise"
                   style={{
                     display: "block",
                     textAlign: "center",
@@ -897,7 +899,7 @@ export default function HomePage() {
                     boxShadow: "0 18px 52px rgba(192, 132, 252, 0.24)",
                   }}
                 >
-                  Demander une proposition
+                  Demander un devis
                 </Link>
               </article>,
             ]}

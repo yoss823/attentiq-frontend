@@ -31,64 +31,6 @@ const intentMap: Record<string, string> = {
     "Classe exactement les 3 actions du diagnostic par impact/effort (1 = à faire en premier) ; une phrase de justification chacune, tirée du rapport ; n'ajoute pas de 4e action.",
 };
 
-function extractActionLabelsFromContext(context: string): string[] {
-  try {
-    const parsed = JSON.parse(context) as {
-      actions?: Array<{ label?: string } | string>;
-      diagnostic?: { corrective_actions?: string[] };
-    };
-    const fromActions = Array.isArray(parsed.actions)
-      ? parsed.actions
-          .map((a) =>
-            typeof a === 'string'
-              ? a.trim()
-              : typeof a?.label === 'string'
-                ? a.label.trim()
-                : ''
-          )
-          .filter(Boolean)
-      : [];
-    const fromCorrective = Array.isArray(parsed.diagnostic?.corrective_actions)
-      ? parsed.diagnostic!.corrective_actions
-          .map((a) => (typeof a === 'string' ? a.trim() : ''))
-          .filter(Boolean)
-      : [];
-    return (fromActions.length > 0 ? fromActions : fromCorrective).slice(0, 3);
-  } catch {
-    return [];
-  }
-}
-
-function enforceIntentResponseShape(
-  intent: string,
-  context: string,
-  llmText: string
-): string {
-  const actions = extractActionLabelsFromContext(context);
-  if (actions.length === 0) {
-    return llmText;
-  }
-
-  if (intent === 'prioritize') {
-    return actions
-      .slice(0, 3)
-      .map((action, idx) => `${idx + 1}. ${action}`)
-      .join('\n');
-  }
-
-  if (intent === 'expand') {
-    return actions
-      .slice(0, 3)
-      .map(
-        (action, idx) =>
-          `${idx + 1}. ${action} — exécution: appliquez cette correction précisément au passage concerné du diagnostic.`
-      )
-      .join('\n');
-  }
-
-  return llmText;
-}
-
 async function tryOpenAiAssistant(
   systemPrompt: string,
   userMessage: string
