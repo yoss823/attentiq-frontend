@@ -1,4 +1,4 @@
-import type { Metadata } from "next";
+import type { Metadata, Viewport } from "next";
 import { DM_Sans } from "next/font/google";
 import "./globals.css";
 
@@ -25,6 +25,13 @@ const metadataBase = getMetadataBase();
 /** Beacon / analytics tiers : uniquement si tu définis l’URL (jamais de script externe par défaut). */
 const analyticsBeaconSrc =
   process.env.NEXT_PUBLIC_ANALYTICS_BEACON_SRC?.trim() || "";
+
+export const viewport: Viewport = {
+  width: "device-width",
+  initialScale: 1,
+  viewportFit: "cover",
+  themeColor: "#060a0f",
+};
 
 export const metadata: Metadata = {
   ...(metadataBase ? { metadataBase } : {}),
@@ -60,7 +67,11 @@ export default function RootLayout({
           <script src={analyticsBeaconSrc} defer />
         ) : null}
       </head>
-      <body className={`min-h-screen ${dmSans.className}`}>{children}</body>
+      <body
+        className={`min-h-screen min-h-[100dvh] ${dmSans.className}`}
+      >
+        {children}
+      </body>
     </html>
   );
 }

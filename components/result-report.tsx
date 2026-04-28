@@ -905,7 +905,7 @@ export default function ResultReport({
   return (
     <main
       style={{
-        minHeight: "100vh",
+        minHeight: "100dvh",
         background:
           "radial-gradient(circle at top, rgba(0, 212, 255, 0.16), transparent 24%), radial-gradient(circle at 85% 12%, rgba(251, 146, 60, 0.12), transparent 16%), var(--bg-base)",
       }}
@@ -924,25 +924,8 @@ export default function ResultReport({
         }}
       />
 
-      <div
-        style={{
-          position: "relative",
-          zIndex: 1,
-          maxWidth: "980px",
-          margin: "0 auto",
-          padding: "22px 16px 72px",
-        }}
-      >
-        <nav
-          style={{
-            display: "flex",
-            justifyContent: "space-between",
-            alignItems: "center",
-            gap: "12px",
-            marginBottom: "22px",
-            flexWrap: "wrap",
-          }}
-        >
+      <div className="attentiq-shell attentiq-shell--report">
+        <nav className="attentiq-nav" style={{ marginBottom: "1.25rem" }}>
           <Link
             href={analyzeHref}
             style={{
@@ -953,6 +936,7 @@ export default function ResultReport({
               color: "var(--text-secondary)",
               fontSize: "14px",
               fontWeight: 700,
+              minHeight: 44,
             }}
           >
             <span
@@ -1157,16 +1141,8 @@ export default function ResultReport({
               {analysisModeLabel}
             </div>
           )}
-          <div
-            style={{
-              display: "flex",
-              justifyContent: "space-between",
-              gap: "20px",
-              alignItems: "flex-start",
-              flexWrap: "wrap",
-            }}
-          >
-            <div>
+          <div className="attentiq-report-hero">
+            <div className="attentiq-report-hero__copy">
               <p
                 style={{
                   margin: 0,
@@ -1219,8 +1195,8 @@ export default function ResultReport({
             </div>
 
             <div
+              className="attentiq-report-hero__score"
               style={{
-                minWidth: "190px",
                 padding: "18px",
                 borderRadius: "24px",
                 border: `1px solid ${scoreUI.border}`,

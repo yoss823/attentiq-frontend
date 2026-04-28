@@ -240,11 +240,12 @@ export default function AnalyzeExperience({
     return (
       <main
         style={{
-          minHeight: "100vh",
+          minHeight: "100dvh",
           display: "flex",
           alignItems: "center",
           justifyContent: "center",
-          padding: "24px 16px",
+          padding:
+            "max(1rem, env(safe-area-inset-top, 0px)) max(1rem, env(safe-area-inset-right, 0px)) max(1.5rem, env(safe-area-inset-bottom, 0px)) max(1rem, env(safe-area-inset-left, 0px))",
           background:
             "radial-gradient(circle at top, rgba(0, 212, 255, 0.16), transparent 24%), var(--bg-base)",
         }}
@@ -268,7 +269,7 @@ export default function AnalyzeExperience({
   return (
     <main
       style={{
-        minHeight: "100vh",
+        minHeight: "100dvh",
         background:
           "radial-gradient(circle at top, rgba(0, 212, 255, 0.14), transparent 28%), radial-gradient(circle at 82% 16%, rgba(251, 146, 60, 0.08), transparent 18%), var(--bg-base)",
       }}
@@ -287,25 +288,8 @@ export default function AnalyzeExperience({
         }}
       />
 
-      <div
-        style={{
-          position: "relative",
-          zIndex: 1,
-          maxWidth: "760px",
-          margin: "0 auto",
-          padding: "28px 16px 64px",
-        }}
-      >
-        <nav
-          style={{
-            display: "flex",
-            alignItems: "center",
-            justifyContent: "space-between",
-            gap: "12px",
-            marginBottom: "32px",
-            flexWrap: "wrap",
-          }}
-        >
+      <div className="attentiq-shell attentiq-shell--narrow">
+        <nav className="attentiq-nav" style={{ marginBottom: "clamp(1.25rem, 4vw, 2rem)" }}>
           <Link
             href="/"
             style={{
@@ -313,6 +297,7 @@ export default function AnalyzeExperience({
               alignItems: "center",
               gap: "10px",
               textDecoration: "none",
+              minHeight: 44,
             }}
           >
             <div
@@ -345,15 +330,7 @@ export default function AnalyzeExperience({
             </span>
           </Link>
 
-          <Link
-            href="/guide?format=video"
-            style={{
-              fontSize: "13px",
-              fontWeight: 600,
-              color: "var(--text-secondary)",
-              textDecoration: "none",
-            }}
-          >
+          <Link href="/guide?format=video" className="attentiq-nav-link">
             Comment ça marche
           </Link>
         </nav>
@@ -388,11 +365,11 @@ export default function AnalyzeExperience({
 
         <section
           style={{
-            borderRadius: "30px",
+            borderRadius: "clamp(18px, 4vw, 30px)",
             border: "1px solid rgba(0, 212, 255, 0.2)",
             background:
               "linear-gradient(180deg, rgba(11, 16, 22, 0.98) 0%, rgba(7, 11, 16, 0.96) 100%)",
-            padding: "28px 22px",
+            padding: "clamp(1.1rem, 4vw, 1.75rem) clamp(0.9rem, 3.5vw, 1.4rem)",
             boxShadow: "0 32px 120px rgba(0, 0, 0, 0.34)",
           }}
         >
@@ -507,6 +484,7 @@ export default function AnalyzeExperience({
             <>
               <form onSubmit={handleSubmit}>
                 <div
+                  className="attentiq-form-two-col"
                   style={{
                     display: "grid",
                     gap: "12px",
@@ -521,11 +499,13 @@ export default function AnalyzeExperience({
                     required
                     style={{
                       minHeight: "54px",
+                      minWidth: 0,
+                      width: "100%",
                       borderRadius: "18px",
                       border: "1px solid var(--border)",
                       background: "rgba(5, 9, 14, 0.78)",
                       color: "var(--text-primary)",
-                      fontSize: "15px",
+                      fontSize: "16px",
                       padding: "0 16px",
                       outline: "none",
                     }}
@@ -572,6 +552,7 @@ export default function AnalyzeExperience({
                 Vidéo source max 60 s (Short, Reel, extrait).
               </p>
               <div
+                className="attentiq-break-anywhere"
                 style={{
                   marginTop: "8px",
                   padding: "10px 12px",
@@ -616,6 +597,7 @@ export default function AnalyzeExperience({
 
                 {/* Custom file picker row */}
                 <div
+                  className="attentiq-form-two-col"
                   style={{
                     display: "grid",
                     gap: "12px",

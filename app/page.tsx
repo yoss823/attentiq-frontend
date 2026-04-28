@@ -36,27 +36,9 @@ export default function HomePage() {
         }}
       />
 
-      <div
-        style={{
-          position: "relative",
-          zIndex: 1,
-          maxWidth: "980px",
-          margin: "0 auto",
-          padding: "28px 16px 80px",
-        }}
-      >
+      <div className="attentiq-shell">
         {/* Nav */}
-        <nav
-          className="rise d1"
-          style={{
-            display: "flex",
-            alignItems: "center",
-            justifyContent: "space-between",
-            gap: "12px",
-            marginBottom: "28px",
-            flexWrap: "wrap",
-          }}
-        >
+        <nav className="attentiq-nav rise d1">
           <Link
             href="/"
             style={{
@@ -64,6 +46,7 @@ export default function HomePage() {
               alignItems: "center",
               gap: "10px",
               textDecoration: "none",
+              minHeight: 44,
             }}
           >
             <div
@@ -96,28 +79,19 @@ export default function HomePage() {
             </span>
           </Link>
 
-          <div style={{ display: "flex", alignItems: "center", gap: "8px" }}>
-            <Link
-              href="/guide?format=video"
-              style={{
-                fontSize: "13px",
-                fontWeight: 600,
-                color: "var(--text-secondary)",
-                textDecoration: "none",
-              }}
-            >
+          <div
+            style={{
+              display: "flex",
+              alignItems: "center",
+              justifyContent: "flex-end",
+              gap: "4px",
+              flexWrap: "wrap",
+            }}
+          >
+            <Link href="/guide?format=video" className="attentiq-nav-link">
               Comment ça marche
             </Link>
-            <Link
-              href="/transparence"
-              style={{
-                fontSize: "13px",
-                fontWeight: 600,
-                color: "var(--text-secondary)",
-                textDecoration: "none",
-                marginLeft: "8px",
-              }}
-            >
+            <Link href="/transparence" className="attentiq-nav-link">
               Transparence
             </Link>
             <Link
@@ -126,15 +100,16 @@ export default function HomePage() {
                 display: "inline-flex",
                 alignItems: "center",
                 justifyContent: "center",
-                padding: "10px 18px",
+                minHeight: 44,
+                padding: "0 18px",
                 borderRadius: "999px",
                 textDecoration: "none",
                 background: "linear-gradient(135deg, var(--accent), #79e7ff)",
                 color: "#041017",
                 fontSize: "13px",
                 fontWeight: 900,
-                marginLeft: "8px",
                 boxShadow: "0 12px 36px rgba(0, 212, 255, 0.18)",
+                WebkitTapHighlightColor: "transparent",
               }}
             >
               Analyser
@@ -145,7 +120,10 @@ export default function HomePage() {
         {/* Hero */}
         <section
           className="rise d2"
-          style={{ paddingBottom: "56px", paddingTop: "48px" }}
+          style={{
+            paddingBottom: "clamp(2.5rem, 8vw, 3.5rem)",
+            paddingTop: "clamp(1.25rem, 5vw, 3rem)",
+          }}
         >
           <div
             style={{
@@ -188,7 +166,7 @@ export default function HomePage() {
               lineHeight: 0.94,
               letterSpacing: "-0.07em",
               color: "var(--text-primary)",
-              maxWidth: "14ch",
+              maxWidth: "min(14ch, 100%)",
             }}
           >
             Comprenez pourquoi votre contenu perd l&apos;attention.
@@ -197,7 +175,7 @@ export default function HomePage() {
           <p
             style={{
               margin: "0 0 28px",
-              fontSize: "17px",
+              fontSize: "clamp(1rem, 2.8vw, 1.0625rem)",
               lineHeight: 1.65,
               color: "rgba(237, 242, 247, 0.8)",
               maxWidth: "44rem",
