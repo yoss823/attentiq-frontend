@@ -123,7 +123,7 @@ export async function GET(request: NextRequest) {
     videoUrl = cookieContext!.videoUrl;
   }
 
-  if (plan === "single" && !jobId && !videoUrl) {
+  if (!jobId && !videoUrl) {
     if (!stripeSession) {
       stripeSession = await retrieveCheckoutSession(sessionId);
     }

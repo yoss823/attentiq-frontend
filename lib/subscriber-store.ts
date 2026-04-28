@@ -230,6 +230,8 @@ async function upsertSubscriberAccount(
         offer_slug = excluded.offer_slug,
         access_status = 'active',
         monthly_quota = excluded.monthly_quota,
+        monthly_used = 0,
+        quota_period_started_at = date_trunc('month', now()),
         updated_at = now(),
         last_payment_at = now(),
         last_payment_amount_cents = excluded.last_payment_amount_cents,
