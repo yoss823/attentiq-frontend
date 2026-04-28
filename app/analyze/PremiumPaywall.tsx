@@ -19,7 +19,7 @@ const COMPLETE_ITEMS = [
 ];
 
 const CHECKOUT_BUTTON_LABELS = {
-  idle: "Payer et débloquer",
+  idle: "Voir le plan d'action complet",
   loading: "Connexion à Stripe...",
 };
 
@@ -108,7 +108,7 @@ export default function PremiumPaywall({
             color: "var(--text-primary)",
           }}
         >
-          Le gratuit qualifie. Le complet sert a corriger.
+          Le gratuit qualifie. Le complet fait corriger.
         </h2>
         <p
           style={{
@@ -119,10 +119,9 @@ export default function PremiumPaywall({
             maxWidth: "48rem",
           }}
         >
-          Le rapport gratuit reste volontairement limité. Choisissez une offre
-          si vous voulez débloquer un vrai effet produit visible immédiatement,
-          ou passer en abonnement avec création de compte via l&apos;email
-          Stripe.
+          Le rapport gratuit confirme le problème. Le complet vous donne la
+          carte complète des chutes et l&apos;ordre d&apos;exécution pour améliorer
+          la rétention dès la prochaine version.
         </p>
 
         {!hasValidCheckoutContext && (

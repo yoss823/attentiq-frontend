@@ -18,8 +18,13 @@ import {
 } from "@/lib/free-trial";
 import {
   chargeSubscriptionReportQuotaIfNeeded,
+  getArchivedSubscriberReportByEmailAndJob,
   recordSubscriberAnalysisIfAbsent,
 } from "@/lib/subscriber-store";
+import {
+  ACCOUNT_SESSION_COOKIE_NAME,
+  normalizeAccountEmail,
+} from "@/lib/account-session";
 
 function detectContentType(result: Record<string, unknown>) {
   const candidateKeys = ["content_type", "format", "input_type", "source_type"];
@@ -63,6 +68,21 @@ function toTrialFormat(value: string): FreeTrialFormat | null {
     return value;
   }
   return null;
+}
+
+function extractReportRequestId(result: Record<string, unknown>): string | null {
+  const legacy =
+    "data" in result &&
+    result.data &&
+    typeof result.data === "object" &&
+    "request_id" in result.data &&
+    typeof result.data.request_id === "string"
+      ? result.data.request_id
+      : null;
+  if (legacy) {
+    return legacy;
+  }
+  return typeof result.id === "string" ? result.id : null;
 }
 
 export async function GET(
@@ -126,6 +146,8 @@ export async function GET(
             jobId,
             contentType: detectedType,
             sourceLabel,
+            reportRequestId: extractReportRequestId(snapshot.result),
+            reportPayload: snapshot.result,
           }).catch((err) =>
             console.error("[analyze/jobId] analysis history write failed:", err)
           );
@@ -137,6 +159,32 @@ export async function GET(
 
     return NextResponse.json(snapshot, { headers: buildPipelineHeaders() });
   } catch (error) {
+    const cookieStore = await cookies();
+    const entitlement = parsePremiumEntitlement(
+      cookieStore.get(PREMIUM_ENTITLEMENT_COOKIE_NAME)?.value ?? null
+    );
+    const accountEmail = normalizeAccountEmail(
+      cookieStore.get(ACCOUNT_SESSION_COOKIE_NAME)?.value ?? null
+    );
+    const archivedEmail = entitlement?.subscriberEmail?.trim() || accountEmail;
+    if (archivedEmail) {
+      const archived = await getArchivedSubscriberReportByEmailAndJob({
+        email: archivedEmail,
+        jobId,
+      }).catch(() => null);
+      if (archived) {
+        return NextResponse.json(
+          {
+            job_id: jobId,
+            status: "success",
+            source: "archive",
+            result: archived,
+          },
+          { headers: buildPipelineHeaders() }
+        );
+      }
+    }
+
     if (error instanceof UrlIntakeError) {
       return NextResponse.json(
         { error: error.code, userMessage: error.userMessage, needsUpload: error.needsUpload, pipelineVersion: URL_PIPELINE_VERSION },

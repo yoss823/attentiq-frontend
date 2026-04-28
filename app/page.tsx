@@ -169,7 +169,7 @@ export default function HomePage() {
               maxWidth: "min(14ch, 100%)",
             }}
           >
-            Comprenez pourquoi votre contenu perd l&apos;attention.
+            Repérez la seconde où l&apos;attention chute et quoi corriger en premier.
           </h1>
 
           <p
@@ -181,8 +181,8 @@ export default function HomePage() {
               maxWidth: "44rem",
             }}
           >
-            Voyez en quelques secondes ce qui fait décrocher, puis ce qu&apos;il
-            faut corriger en premier.
+            Analysez vos vidéos, textes et visuels pour localiser les chutes
+            d&apos;attention, comprendre la cause et agir dans le bon ordre.
           </p>
 
           <div style={{ display: "flex", gap: "12px", flexWrap: "wrap" }}>
@@ -338,7 +338,7 @@ export default function HomePage() {
                 color: "var(--text-primary)",
               }}
             >
-              Vous decidez vite
+              Vous voyez vite la valeur
             </h2>
             <p
               style={{
@@ -349,12 +349,7 @@ export default function HomePage() {
                 maxWidth: "48rem",
               }}
             >
-              Lancez <strong style={{ color: "rgba(237, 242, 247, 0.95)" }}>1 analyse gratuite par format</strong> : aperçu limité, clair et rapide — en général{" "}
-              <strong style={{ color: "rgba(237, 242, 247, 0.95)" }}>
-                1 à 2 signaux clés
-              </strong>{" "}
-              sans carte bancaire. Le complet débloque le détail (timestamps,
-              causes, plan priorisé).
+              Lancez <strong style={{ color: "rgba(237, 242, 247, 0.95)" }}>1 analyse gratuite par format</strong> : aperçu précis et limité, sans carte bancaire. Le complet débloque la timeline intégrale, les causes exactes et le plan d&apos;action exécutable.
             </p>
           </div>
         </section>

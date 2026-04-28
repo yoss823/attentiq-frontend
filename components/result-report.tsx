@@ -874,6 +874,14 @@ export default function ResultReport({
   const dropOffRuleForDisplay = isPremiumUnlocked
     ? dropOffRuleDisplay
     : clampTextForTeaser(dropOffRuleDisplay, 110);
+  const firstProofDrop = allDrops[0];
+  const proofHint = firstProofDrop
+    ? `Repère clé : ${
+        isVideoContent
+          ? `chute à ${formatTimestamp(firstProofDrop.timestamp_seconds)}`
+          : `friction à ${formatTimestamp(firstProofDrop.timestamp_seconds)}`
+      } — ${clampTextForTeaser(firstProofDrop.cause, 120)}`
+    : "Repère clé : le score et le résumé ci-dessus donnent déjà la première piste de correction.";
   const teaserDropStatValue: ReactNode =
     isPremiumUnlocked || previewDrops.length > 0
       ? `${isPremiumUnlocked ? allDrops.length : previewDrops.length}`
@@ -1262,6 +1270,16 @@ export default function ResultReport({
                 }}
               >
                 {scoreUI.label}
+              </p>
+              <p
+                style={{
+                  margin: "10px 0 0",
+                  fontSize: "12px",
+                  lineHeight: 1.6,
+                  color: "rgba(186, 230, 253, 0.84)",
+                }}
+              >
+                {proofHint}
               </p>
             </div>
           </div>

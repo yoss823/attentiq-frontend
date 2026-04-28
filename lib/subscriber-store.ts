@@ -51,6 +51,8 @@ export type SubscriberAnalysisEvent = {
   jobId: string;
   contentType: "video" | "text" | "image" | "unknown";
   sourceLabel: string | null;
+  reportRequestId: string | null;
+  hasArchivedReport: boolean;
   createdAt: string;
 };
 
@@ -163,9 +165,19 @@ async function ensureSchema() {
         job_id text not null,
         content_type text not null default 'unknown',
         source_label text,
+        report_request_id text,
+        report_payload jsonb,
         created_at timestamptz not null default now(),
         primary key (email, job_id)
       );
+    `);
+    await db.query(`
+      alter table subscriber_analysis_events
+      add column if not exists report_request_id text;
+    `);
+    await db.query(`
+      alter table subscriber_analysis_events
+      add column if not exists report_payload jsonb;
     `);
 
     await db.query(`
@@ -442,6 +454,8 @@ export async function getSubscriberAccountByEmail(email: string): Promise<{
     job_id: string;
     content_type: string;
     source_label: string | null;
+    report_request_id: string | null;
+    report_payload: unknown | null;
     created_at: Date;
   }>(
     `
@@ -449,6 +463,8 @@ export async function getSubscriberAccountByEmail(email: string): Promise<{
         job_id,
         content_type,
         source_label,
+        report_request_id,
+        report_payload,
         created_at
       from subscriber_analysis_events
       where email = $1
@@ -492,6 +508,8 @@ export async function getSubscriberAccountByEmail(email: string): Promise<{
           ? row.content_type
           : "unknown",
       sourceLabel: row.source_label,
+      reportRequestId: row.report_request_id,
+      hasArchivedReport: Boolean(row.report_payload),
       createdAt: row.created_at.toISOString(),
     })),
   };
@@ -502,6 +520,8 @@ export async function recordSubscriberAnalysisIfAbsent(params: {
   jobId: string;
   contentType?: SubscriberAnalysisContentType;
   sourceLabel?: string | null;
+  reportRequestId?: string | null;
+  reportPayload?: unknown;
 }) {
   if (!process.env.DATABASE_URL) {
     return;
@@ -515,18 +535,54 @@ export async function recordSubscriberAnalysisIfAbsent(params: {
         email,
         job_id,
         content_type,
-        source_label
+        source_label,
+        report_request_id,
+        report_payload
       )
-      values ($1, $2, $3, $4)
-      on conflict (email, job_id) do nothing
+      values ($1, $2, $3, $4, $5, $6::jsonb)
+      on conflict (email, job_id) do update
+      set
+        content_type = excluded.content_type,
+        source_label = coalesce(excluded.source_label, subscriber_analysis_events.source_label),
+        report_request_id = coalesce(excluded.report_request_id, subscriber_analysis_events.report_request_id),
+        report_payload = coalesce(excluded.report_payload, subscriber_analysis_events.report_payload)
     `,
     [
       normalizeEmail(params.email),
       params.jobId,
       params.contentType ?? "unknown",
       params.sourceLabel?.trim() || null,
+      params.reportRequestId?.trim() || null,
+      params.reportPayload != null ? JSON.stringify(params.reportPayload) : null,
     ]
   );
+}
+
+export async function getArchivedSubscriberReportByEmailAndJob(params: {
+  email: string;
+  jobId: string;
+}): Promise<Record<string, unknown> | null> {
+  if (!process.env.DATABASE_URL) {
+    return null;
+  }
+
+  await ensureSchema();
+  const db = getPool();
+  const result = await db.query<{ report_payload: unknown | null }>(
+    `
+      select report_payload
+      from subscriber_analysis_events
+      where email = $1
+        and job_id = $2
+      limit 1
+    `,
+    [normalizeEmail(params.email), params.jobId]
+  );
+  const row = result.rows[0];
+  if (!row?.report_payload || typeof row.report_payload !== "object") {
+    return null;
+  }
+  return row.report_payload as Record<string, unknown>;
 }
 
 export async function getRecordedPaymentSession(
