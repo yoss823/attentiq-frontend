@@ -17,7 +17,9 @@ import ffmpegPath from "ffmpeg-static";
 const APP_URL = process.env.DEMO_APP_URL?.trim() || "http://127.0.0.1:3000";
 const OUT_DIR = resolve(process.cwd(), "public", "demo");
 const TMP_DIR = resolve(process.cwd(), ".tmp", "demo-video");
-const OUTPUT_VIDEO = resolve(OUT_DIR, "attentiq-demo.mp4");
+const VERSION = new Date().toISOString().replace(/[:.]/g, "-");
+const OUTPUT_VIDEO = resolve(OUT_DIR, `attentiq-demo-${VERSION}.mp4`);
+const OUTPUT_VIDEO_LATEST = resolve(OUT_DIR, "attentiq-demo-latest.mp4");
 
 function sleep(ms) {
   return new Promise((resolveSleep) => setTimeout(resolveSleep, ms));
@@ -128,6 +130,8 @@ async function buildVideo() {
     "veryfast",
     OUTPUT_VIDEO
   );
+
+  await ffmpeg("-y", "-i", OUTPUT_VIDEO, "-c", "copy", OUTPUT_VIDEO_LATEST);
 }
 
 async function main() {
