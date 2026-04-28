@@ -22,13 +22,13 @@ function getGroqClient(): Groq | null {
 
 const intentMap: Record<string, string> = {
   clarify:
-    "Synthétise le diagnostic en 5 lignes max : levier principal, score, ce qui tient déjà — sans répéter le JSON brut.",
+    "Synthétise en 5 lignes max : levier principal, score, ce qui tient déjà — sans répéter le JSON ; fais sentir ce que le complet apporte sans mentir sur ce qui manque.",
   explain:
-    "Explique pourquoi l'attention chute aux timestamps ou étapes cités dans le diagnostic ; relie parole, image et CTA quand c'est dans le rapport.",
+    "Explique pourquoi l'attention chute aux timestamps ou étapes cités ; relie parole, image, texte à l'écran et rythme quand c'est dans le rapport (pas seulement CTA).",
   expand:
-    "Transforme chaque action prioritaire en micro-plan (quoi changer, où, en une phrase) — exemples ancrés dans ce contenu, pas de conseils génériques.",
+    "Transforme chaque action prioritaire en micro-plan (quoi changer, où, en une phrase) — exemples ancrés dans ce contenu ; le créateur doit avoir envie d'exécuter la 1re action demain.",
   prioritize:
-    "Classe les 3 actions du diagnostic par impact effort (1 = à faire en premier) et justifie en une phrase chacune, toujours à partir du rapport.",
+    "Classe les 3 actions par impact/effort (1 = à faire en premier) ; une phrase de justification chacune, tirée du rapport ; termine par une phrase qui invite à analyser un prochain média une fois celui-ci corrigé.",
 };
 
 async function tryOpenAiAssistant(
@@ -83,14 +83,18 @@ export async function POST(req: NextRequest) {
       });
     }
 
+    const appendix = (process.env.ATTENTIQ_ASSISTANT_APPENDIX ?? '').trim();
+
     const systemPrompt = `Tu es l'assistant Attentiq : expert en attention pour formats courts, ton calme et chirurgical.
 Tu réponds UNIQUEMENT à partir du diagnostic ci-dessous (chiffres, labels, chutes d'attention, actions).
 Règles strictes :
 - 5 à 7 lignes maximum ; chaque ligne doit apporter une décision ou une lecture nette du rapport.
 - Zéro généralité (« sois authentique », « améliore le hook » sans lien au diagnostic) ; cite implicitement ce que dit déjà le rapport (sans inventer de timestamps absents).
-- Vidéo / texte / image : relie hook, rythme ou hiérarchie, chutes d'attention, CTA — comme un consultant qui a déjà vu le matériel.
+- Vidéo / texte / image : relie hook, rythme ou hiérarchie, chutes d'attention, parcours du regard — intention de suite seulement si le diagnostic en parle.
 - Zéro jargon marketing, zéro promesse de vues ou de viralité ; si l'info manque dans le diagnostic, dis-le en une courte phrase.
+- Fidélisation : une phrase peut suggérer la prochaine analyse (autre format ou autre vidéo) une fois les corrections prioritaires faites — sans dévier du rapport actuel.
 - Hors périmètre (autre URL, autre contenu, avis médical/légal) : refus poli en 2 lignes.
+${appendix ? `Consignes additionnelles :\n${appendix}\n` : ''}
 DIAGNOSTIC :
 ${context}`;
 
