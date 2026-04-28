@@ -5,6 +5,7 @@ import { useRouter } from "next/navigation";
 import { useEffect, useState } from "react";
 import { buildAnalyzeHref, buildResultHref } from "@/lib/checkout-context";
 import { clearPendingCheckout, readPendingCheckout } from "@/lib/access-state";
+import { readAnalyzeResult } from "@/lib/analyze-session";
 import { activatePremiumEntitlementFromSuccessfulCheckout } from "@/lib/premium";
 
 type MerciRedirectStateProps = {
@@ -162,6 +163,19 @@ export default function MerciRedirectState({
         }
 
         if (isSubscription) {
+          const stored = readAnalyzeResult();
+          const storedJobId = stored?.jobId ?? null;
+          const storedVideoUrl = stored?.url?.trim() ? stored.url : null;
+          if (storedJobId || storedVideoUrl) {
+            clearPendingCheckout();
+            router.replace(
+              buildResultHref({
+                jobId: storedJobId,
+                videoUrl: storedVideoUrl,
+              })
+            );
+            return;
+          }
           clearPendingCheckout();
           router.replace("/compte?from=checkout");
           return;
