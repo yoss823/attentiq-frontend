@@ -202,7 +202,7 @@ export default function HomePage() {
                 boxShadow: "0 18px 52px rgba(0, 212, 255, 0.2)",
               }}
             >
-              Analyser une video →
+              Analyser une vidéo →
             </Link>
             <Link
               href="/text"
@@ -252,7 +252,7 @@ export default function HomePage() {
             {[
               {
                 href: "/videos",
-                title: "Videos",
+                title: "Vidéos",
                 text: "TikTok, Reels et YouTube Shorts.",
               },
               {
@@ -344,12 +344,16 @@ export default function HomePage() {
               style={{
                 margin: 0,
                 fontSize: "15px",
-                lineHeight: 1.8,
+                lineHeight: 1.75,
                 color: "rgba(237, 242, 247, 0.8)",
-                maxWidth: "48rem",
+                maxWidth: "42rem",
               }}
             >
-              Lancez <strong style={{ color: "rgba(237, 242, 247, 0.95)" }}>1 analyse gratuite par format</strong> : aperçu précis et limité, sans carte bancaire. Le complet débloque la timeline intégrale, les causes exactes et le plan d&apos;action exécutable.
+              <strong style={{ color: "rgba(237, 242, 247, 0.95)" }}>
+                1 analyse gratuite par format
+              </strong>{" "}
+              : aperçu précis, sans carte bancaire. Le complet donne timeline,
+              causes et plan d&apos;action.
             </p>
           </div>
         </section>
@@ -590,7 +594,7 @@ export default function HomePage() {
                 color: "var(--text-primary)",
               }}
             >
-              Pret a comprendre ce qui fait decrocher ?
+              Prêt à comprendre ce qui fait décrocher ?
             </h2>
             <p
               style={{
@@ -600,7 +604,8 @@ export default function HomePage() {
                 color: "rgba(237, 242, 247, 0.8)",
               }}
             >
-              Choisissez votre format, puis lancez une analyse en quelques secondes.
+              Choisissez un format. Obtenez vos premiers signaux en quelques
+              secondes.
             </p>
             <Link
               href="/videos"
@@ -618,7 +623,7 @@ export default function HomePage() {
                 boxShadow: "0 18px 52px rgba(0, 212, 255, 0.2)",
               }}
             >
-              Commencer par les videos
+              Commencer par les vidéos
             </Link>
             <p
               style={{
@@ -627,7 +632,7 @@ export default function HomePage() {
                 color: "var(--text-secondary)",
               }}
             >
-              Aucune creation de compte requise.
+              Aucune création de compte requise.
             </p>
           </div>
         </section>
@@ -657,7 +662,7 @@ export default function HomePage() {
             {[
               { href: "/guide?format=video", label: "Comment ça marche" },
               { href: "/transparence", label: "Transparence" },
-              { href: "/videos", label: "Videos" },
+              { href: "/videos", label: "Vidéos" },
               { href: "/images", label: "Images" },
               { href: "/text", label: "Textes" },
             ].map((link) => (
