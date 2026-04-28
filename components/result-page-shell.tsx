@@ -57,11 +57,12 @@ function ResultState({
   return (
     <main
       style={{
-        minHeight: "100vh",
+        minHeight: "100dvh",
         display: "flex",
         alignItems: "center",
         justifyContent: "center",
-        padding: "24px 16px",
+        padding:
+          "max(1rem, env(safe-area-inset-top, 0px)) max(1rem, env(safe-area-inset-right, 0px)) max(1.25rem, env(safe-area-inset-bottom, 0px)) max(1rem, env(safe-area-inset-left, 0px))",
         background:
           "radial-gradient(circle at top, rgba(0, 212, 255, 0.12), transparent 28%), var(--bg-base)",
       }}
@@ -176,11 +177,12 @@ function ResultLoadingState() {
   return (
     <main
       style={{
-        minHeight: "100vh",
+        minHeight: "100dvh",
         display: "flex",
         alignItems: "center",
         justifyContent: "center",
-        padding: "24px 16px",
+        padding:
+          "max(1rem, env(safe-area-inset-top, 0px)) max(1rem, env(safe-area-inset-right, 0px)) max(1.25rem, env(safe-area-inset-bottom, 0px)) max(1rem, env(safe-area-inset-left, 0px))",
         background:
           "radial-gradient(circle at top, rgba(0, 212, 255, 0.16), transparent 26%), var(--bg-base)",
       }}

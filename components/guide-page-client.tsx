@@ -134,7 +134,8 @@ export default function GuidePageClient() {
                   router.replace(`/guide?format=${tab.key}`);
                 }}
                 style={{
-                  padding: "8px 14px",
+                  minHeight: 44,
+                  padding: "0 14px",
                   borderRadius: "999px",
                   border: active
                     ? "1px solid rgba(0, 212, 255, 0.45)"
@@ -146,6 +147,7 @@ export default function GuidePageClient() {
                   fontSize: "13px",
                   fontWeight: 800,
                   cursor: "pointer",
+                  WebkitTapHighlightColor: "transparent",
                 }}
               >
                 {tab.label}

@@ -17,7 +17,7 @@ export default function HomePage() {
   return (
     <main
       style={{
-        minHeight: "100vh",
+        minHeight: "100dvh",
         background:
           "radial-gradient(circle at top, rgba(0, 212, 255, 0.14), transparent 28%), radial-gradient(circle at 82% 16%, rgba(251, 146, 60, 0.08), transparent 18%), var(--bg-base)",
       }}

@@ -342,7 +342,7 @@ export default function ChatExperience() {
     return (
       <main
         style={{
-          minHeight: "100vh",
+          minHeight: "100dvh",
           display: "flex",
           alignItems: "center",
           justifyContent: "center",
@@ -364,7 +364,7 @@ export default function ChatExperience() {
     return (
       <main
         style={{
-          minHeight: "100vh",
+          minHeight: "100dvh",
           display: "flex",
           alignItems: "center",
           justifyContent: "center",
@@ -428,7 +428,7 @@ export default function ChatExperience() {
   return (
     <main
       style={{
-        minHeight: "100vh",
+        minHeight: "100dvh",
         background:
           "radial-gradient(circle at top, rgba(0,212,255,0.14), transparent 32%), linear-gradient(180deg, #05080d 0%, #060a0f 48%, #04070c 100%)",
       }}
