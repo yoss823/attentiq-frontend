@@ -169,7 +169,7 @@ export default function HomePage() {
               maxWidth: "min(14ch, 100%)",
             }}
           >
-            Repérez la seconde où l&apos;attention chute et quoi corriger en premier.
+            Repérez où l&apos;attention chute. Corrigez en premier.
           </h1>
 
           <p
@@ -242,6 +242,201 @@ export default function HomePage() {
         </section>
 
         <section className="rise d2" style={{ marginBottom: "42px" }}>
+          <div
+            style={{
+              borderRadius: "26px",
+              border: "1px solid rgba(0, 212, 255, 0.18)",
+              background:
+                "linear-gradient(180deg, rgba(11, 16, 22, 0.98) 0%, rgba(7, 11, 16, 0.96) 100%)",
+              padding: "18px",
+              marginBottom: "16px",
+            }}
+          >
+            <div
+              style={{
+                display: "flex",
+                alignItems: "center",
+                justifyContent: "space-between",
+                gap: "12px",
+                flexWrap: "wrap",
+                marginBottom: "12px",
+              }}
+            >
+              <p
+                style={{
+                  margin: 0,
+                  fontSize: "11px",
+                  textTransform: "uppercase",
+                  letterSpacing: "0.18em",
+                  fontWeight: 800,
+                  color: "var(--accent)",
+                }}
+              >
+                Aperçu rapport
+              </p>
+              <span
+                style={{
+                  padding: "4px 10px",
+                  borderRadius: "999px",
+                  border: "1px solid rgba(0, 212, 255, 0.22)",
+                  background: "rgba(0, 212, 255, 0.08)",
+                  color: "rgba(186, 230, 253, 0.9)",
+                  fontSize: "11px",
+                  fontWeight: 700,
+                }}
+              >
+                Gratuit : 2 signaux visibles
+              </span>
+            </div>
+
+            <div
+              style={{
+                display: "grid",
+                gap: "12px",
+                gridTemplateColumns: "116px minmax(0, 1fr)",
+                alignItems: "stretch",
+              }}
+            >
+              <div
+                style={{
+                  borderRadius: "18px",
+                  border: "1px solid rgba(251, 146, 60, 0.28)",
+                  background: "rgba(251, 146, 60, 0.08)",
+                  padding: "12px",
+                  display: "grid",
+                  alignContent: "start",
+                  gap: "6px",
+                }}
+              >
+                <p
+                  style={{
+                    margin: 0,
+                    fontSize: "10px",
+                    textTransform: "uppercase",
+                    letterSpacing: "0.14em",
+                    fontWeight: 800,
+                    color: "rgba(253, 186, 116, 0.9)",
+                  }}
+                >
+                  Score visible
+                </p>
+                <p
+                  style={{
+                    margin: 0,
+                    fontSize: "34px",
+                    lineHeight: 0.9,
+                    letterSpacing: "-0.08em",
+                    fontWeight: 900,
+                    color: "#fb923c",
+                  }}
+                >
+                  4.2
+                  <span
+                    style={{
+                      fontSize: "16px",
+                      fontWeight: 700,
+                      color: "rgba(237, 242, 247, 0.45)",
+                      marginLeft: "2px",
+                    }}
+                  >
+                    /10
+                  </span>
+                </p>
+                <p
+                  style={{
+                    margin: 0,
+                    fontSize: "12px",
+                    lineHeight: 1.5,
+                    color: "rgba(253, 186, 116, 0.94)",
+                    fontWeight: 700,
+                  }}
+                >
+                  Base à renforcer
+                </p>
+              </div>
+
+              <div style={{ display: "grid", gap: "8px" }}>
+                {[
+                  {
+                    t: "00:10",
+                    cause: "Promesse encore floue, bénéfice non lisible.",
+                    tone: "rgba(248, 113, 113, 0.16)",
+                    border: "rgba(248, 113, 113, 0.26)",
+                  },
+                  {
+                    t: "00:20",
+                    cause: "Rythme qui baisse, pas de nouvel élément.",
+                    tone: "rgba(251, 146, 60, 0.14)",
+                    border: "rgba(251, 146, 60, 0.24)",
+                  },
+                ].map((row) => (
+                  <div
+                    key={row.t}
+                    style={{
+                      borderRadius: "14px",
+                      border: `1px solid ${row.border}`,
+                      background: row.tone,
+                      padding: "10px 12px",
+                      display: "grid",
+                      gap: "4px",
+                    }}
+                  >
+                    <p
+                      style={{
+                        margin: 0,
+                        fontSize: "11px",
+                        fontWeight: 800,
+                        letterSpacing: "0.12em",
+                        color: "rgba(237, 242, 247, 0.82)",
+                      }}
+                    >
+                      CHUTE À {row.t}
+                    </p>
+                    <p
+                      style={{
+                        margin: 0,
+                        fontSize: "13px",
+                        lineHeight: 1.55,
+                        color: "rgba(237, 242, 247, 0.9)",
+                      }}
+                    >
+                      {row.cause}
+                    </p>
+                  </div>
+                ))}
+              </div>
+            </div>
+
+            <div
+              style={{
+                marginTop: "10px",
+                display: "grid",
+                gap: "8px",
+                gridTemplateColumns: "repeat(auto-fit, minmax(170px, 1fr))",
+              }}
+            >
+              {["Timeline complète", "Causes détaillées", "Plan d'action priorisé"].map(
+                (item) => (
+                  <div
+                    key={item}
+                    style={{
+                      borderRadius: "12px",
+                      border: "1px dashed rgba(0, 212, 255, 0.24)",
+                      background:
+                        "linear-gradient(180deg, rgba(0, 212, 255, 0.08) 0%, rgba(3, 8, 14, 0.4) 100%)",
+                      padding: "9px 10px",
+                      fontSize: "12px",
+                      fontWeight: 700,
+                      color: "rgba(186, 230, 253, 0.88)",
+                    }}
+                  >
+                    {item} · débloqué dans le complet
+                  </div>
+                )
+              )}
+            </div>
+          </div>
+
           <div
             style={{
               display: "grid",
