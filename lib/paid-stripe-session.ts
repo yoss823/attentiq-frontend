@@ -1,5 +1,6 @@
 import type Stripe from "stripe";
 import { getOfferByPriceCents, normalizeOfferSlug } from "@/lib/offer-config";
+import { parseJobIdFromAttentiqClientReferenceId } from "@/lib/stripe-client-reference";
 
 /** E-mail acheteur : détails checkout, champ session, ou client Stripe (session avec `expand: ['customer']`). */
 export function checkoutSessionCustomerEmail(
@@ -59,7 +60,18 @@ export function isPaidStripeCheckoutSession(
 export function jobAndVideoFromStripeSession(
   session: Stripe.Checkout.Session
 ): { jobId: string | null; videoUrl: string | null } {
-  const jobId = session.metadata?.jobId?.trim() || null;
-  const videoUrl = session.metadata?.videoUrl?.trim() || null;
-  return { jobId, videoUrl };
+  const jobIdMeta = session.metadata?.jobId?.trim() || null;
+  const videoUrlMeta = session.metadata?.videoUrl?.trim() || null;
+  if (jobIdMeta || videoUrlMeta) {
+    return { jobId: jobIdMeta, videoUrl: videoUrlMeta };
+  }
+  const cref =
+    typeof session.client_reference_id === "string"
+      ? session.client_reference_id
+      : null;
+  const jobFromRef = parseJobIdFromAttentiqClientReferenceId(cref);
+  if (jobFromRef) {
+    return { jobId: jobFromRef, videoUrl: null };
+  }
+  return { jobId: null, videoUrl: null };
 }

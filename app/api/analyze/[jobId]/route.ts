@@ -95,37 +95,41 @@ export async function GET(
       }
 
       const email = entitlement?.subscriberEmail?.trim();
-      if (
-        email &&
-        entitlement &&
-        (entitlement.plan === "5" || entitlement.plan === "pack15")
-      ) {
-        const plan = entitlement.plan === "pack15" ? "pack15" : "5";
-        chargeSubscriptionReportQuotaIfNeeded({
-          email,
-          jobId,
-          plan,
-        }).catch((err) =>
-          console.error("[analyze/jobId] quota charge failed:", err)
-        );
-        const sourceLabel =
-          snapshot.result &&
-          typeof snapshot.result === "object" &&
-          "metadata" in snapshot.result &&
-          snapshot.result.metadata &&
-          typeof snapshot.result.metadata === "object" &&
-          "url" in snapshot.result.metadata &&
-          typeof snapshot.result.metadata.url === "string"
-            ? snapshot.result.metadata.url
-            : null;
-        recordSubscriberAnalysisIfAbsent({
-          email,
-          jobId,
-          contentType: detectedType,
-          sourceLabel,
-        }).catch((err) =>
-          console.error("[analyze/jobId] analysis history write failed:", err)
-        );
+      if (email && entitlement) {
+        if (entitlement.plan === "5" || entitlement.plan === "pack15") {
+          const plan = entitlement.plan === "pack15" ? "pack15" : "5";
+          chargeSubscriptionReportQuotaIfNeeded({
+            email,
+            jobId,
+            plan,
+          }).catch((err) =>
+            console.error("[analyze/jobId] quota charge failed:", err)
+          );
+        }
+        if (
+          entitlement.plan === "5" ||
+          entitlement.plan === "pack15" ||
+          entitlement.plan === "single"
+        ) {
+          const sourceLabel =
+            snapshot.result &&
+            typeof snapshot.result === "object" &&
+            "metadata" in snapshot.result &&
+            snapshot.result.metadata &&
+            typeof snapshot.result.metadata === "object" &&
+            "url" in snapshot.result.metadata &&
+            typeof snapshot.result.metadata.url === "string"
+              ? snapshot.result.metadata.url
+              : null;
+          recordSubscriberAnalysisIfAbsent({
+            email,
+            jobId,
+            contentType: detectedType,
+            sourceLabel,
+          }).catch((err) =>
+            console.error("[analyze/jobId] analysis history write failed:", err)
+          );
+        }
       }
 
       return response;

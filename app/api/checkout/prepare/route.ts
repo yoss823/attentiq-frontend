@@ -5,6 +5,7 @@ import {
   getCheckoutContextCookieMaxAgeSeconds,
 } from "@/lib/checkout-session";
 import { getOfferBySlug } from "@/lib/offer-config";
+import { buildAttentiqPaymentClientReferenceId } from "@/lib/stripe-client-reference";
 import { withStripePrefilledEmail } from "@/lib/stripe-prefill-url";
 
 export const runtime = "nodejs";
@@ -56,10 +57,28 @@ export async function POST(request: NextRequest) {
     typeof process.env.STRIPE_CHECKOUT_PREFILL_EMAIL === "string"
       ? process.env.STRIPE_CHECKOUT_PREFILL_EMAIL.trim()
       : null;
-  const redirectUrl = withStripePrefilledEmail(
+  let redirectUrl = withStripePrefilledEmail(
     offer.stripeUrl,
     prefillFromBody ?? prefillFromEnv ?? undefined
   );
+
+  const cref = buildAttentiqPaymentClientReferenceId(normalizeString(body.jobId));
+  if (cref) {
+    try {
+      const u = new URL(redirectUrl);
+      const host = u.hostname.toLowerCase();
+      const isStripeCheckout =
+        host === "buy.stripe.com" ||
+        host === "checkout.stripe.com" ||
+        host.endsWith(".stripe.com");
+      if (isStripeCheckout) {
+        u.searchParams.set("client_reference_id", cref);
+        redirectUrl = u.toString();
+      }
+    } catch {
+      /* ignore invalid payment URL */
+    }
+  }
 
   const response = NextResponse.json({
     ok: true,

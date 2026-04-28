@@ -37,7 +37,7 @@ const SEVERITY_CONFIG: Record<
   { label: string; tone: string; border: string; text: string }
 > = {
   low: {
-    label: "Faible",
+    label: "Légère",
     tone: "rgba(250, 204, 21, 0.12)",
     border: "rgba(250, 204, 21, 0.24)",
     text: "#facc15",

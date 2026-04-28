@@ -8,6 +8,7 @@ import {
   jobAndVideoFromStripeSession,
   resolveOfferSlugFromPaidStripeSession,
 } from "@/lib/paid-stripe-session";
+import { recordSubscriberAnalysisIfAbsent } from "@/lib/subscriber-store";
 
 export const runtime = "nodejs";
 
@@ -172,6 +173,17 @@ export async function POST(req: NextRequest) {
           };
         }
       }
+    }
+
+    if (plan === "single" && resolvedJobId && customerEmail) {
+      void recordSubscriberAnalysisIfAbsent({
+        email: customerEmail,
+        jobId: resolvedJobId,
+        contentType: "unknown",
+        sourceLabel: resolvedVideoUrl,
+      }).catch((err) =>
+        console.error("[set-premium] analysis history write failed:", err)
+      );
     }
 
     return NextResponse.json({

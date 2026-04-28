@@ -149,6 +149,15 @@ export async function GET(request: NextRequest) {
     return response;
   }
 
+  if (jobId || videoUrl) {
+    await upsertVerifiedCheckoutContext({
+      stripeSessionId: sessionId,
+      offerSlug: paymentOfferSlug,
+      jobId,
+      videoUrl,
+    });
+  }
+
   const redirectTo = buildAnalyzeHref({
     jobId,
     videoUrl,

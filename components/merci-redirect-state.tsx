@@ -52,7 +52,7 @@ function buildErrorCopy(error: string) {
     case "SESSION_NOT_VERIFIED":
       return "La session Stripe n'est pas encore vérifiée côté serveur. Réessayez dans quelques instants.";
     case "CHECKOUT_CONTEXT_NOT_FOUND":
-      return "Le paiement a été retrouvé, mais le job lié à ce checkout n'a pas pu être restauré. L'accès premium n'est donc pas appliqué aveuglément.";
+      return "Le paiement est reconnu, mais l'analyse à débloquer n'est pas identifiée (souvent : autre appareil, cookies bloqués, ou lien Stripe ouvert sans repasser par Attentiq). Réessayez depuis la page du rapport sur le même navigateur, ou contactez le support avec l'email de paiement et l'heure d'achat.";
     case "PREMIUM_ACTIVATION_FAILED":
     case "PREMIUM_VERIFICATION_FAILED":
     case "PREMIUM_SET_FAILED":
