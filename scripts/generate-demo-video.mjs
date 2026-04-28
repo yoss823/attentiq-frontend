@@ -118,8 +118,14 @@ async function buildVideo() {
     "0",
     "-i",
     concatFile,
-    "-c",
-    "copy",
+    "-pix_fmt",
+    "yuv420p",
+    "-r",
+    "30",
+    "-c:v",
+    "libx264",
+    "-preset",
+    "veryfast",
     OUTPUT_VIDEO
   );
 }
