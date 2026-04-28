@@ -28,12 +28,12 @@ type ChatMessage = ChatTurn & {
 };
 
 const SUGGESTED_PROMPTS = [
-  "Pourquoi les gens décrochent si vite ?",
-  "Par quoi commencer ?",
-  "C'est grave ou normal ?",
-  "Quel est mon problème principal ?",
-  "Donne-moi un plan en 3 points",
-  "Exemple concret de ce que je peux changer",
+  "D'après ce rapport, où je perds l'attention en premier ?",
+  "Quelle est la correction à plus fort impact pour le peu d'effort ?",
+  "Le score et les chutes sont-ils cohérents entre eux ?",
+  "Qu'est-ce qui est critique vs ce que je peux ignorer pour l'instant ?",
+  "Donne un plan en 3 étapes strictement ancré dans ce diagnostic",
+  "Un exemple concret de reformulation ou de coupe, basé sur ce contenu",
 ];
 
 function createMessage(

@@ -344,30 +344,30 @@ function buildAssistantPrompts(
 
   if (isPremiumUnlocked) {
     return [
-      `Que corriger en premier vers ${firstTimestamp} ?`,
-      `Comment traiter le point ${primaryCategory} sans casser le reste ?`,
-      "Résumons le diagnostic structurel en 3 décisions",
-      "Transforme le plan d'action en check-list de tournage",
+      `Si je n'ai qu'une prise à refaire, laquelle autour de ${firstTimestamp} ?`,
+      `Comment adresser le levier « ${primaryCategory} » sans tout réécrire ?`,
+      "Synthétise ce rapport en 3 décisions nettes (pas plus)",
+      "Convertis le plan d'action en ordre de montage / tournage",
       isLikelyMusicOnly
-        ? "Que peut-on conclure avec une piste surtout musicale ?"
+        ? "Avec une piste surtout musicale, qu'est-ce que ce diagnostic peut encore affirmer prudemment ?"
         : isAudioOnly
-        ? "Que peut-on encore conclure avec l'audio uniquement ?"
-        : "Quel test visuel ferais-tu en premier ?",
-      "Qu'est-ce qui est critique vs secondaire ?",
+        ? "Avec l'audio seul, quelles hypothèses visuelles éviter ?"
+        : "Quel micro-test visuel validerait ou infirmerait la première chute ?",
+      "Classe ce qui est bloquant pour la rétention vs cosmétique",
     ];
   }
 
   return [
-    "Quel est le probleme principal visible ici ?",
-    `Que veut dire la chute vers ${firstTimestamp} ?`,
-    "Le teaser suffit-il pour payer le complet ?",
+    "Quel est le levier le plus fragile dans ce teaser ?",
+    `Concrètement, que dit la chute vers ${firstTimestamp} pour un spectateur pressé ?`,
+    "Ce teaser donne-t-il assez de signal pour décider du rapport complet ?",
     isLikelyMusicOnly
-      ? "Ce diagnostic est-il fiable sur une piste surtout musicale ?"
+      ? "Sur une piste surtout musicale, où est la limite de ce diagnostic ?"
       : isAudioOnly
-      ? "Que peut-on conclure malgre le mode audio-only ?"
-      : "Qu'est-ce qui semble surtout verbal, rythme ou visuel ?",
-    "Par quoi commencer si je ne change qu'une chose ?",
-    "Resumons ce teaser en 3 points",
+      ? "En audio-only, qu'est-ce qui reste solide vs hypothétique ?"
+      : "Ici, le problème vient surtout du verbal, du rythme ou du visuel ?",
+    "Une seule modification prioritaire : laquelle d'après ce teaser ?",
+    "Résume ce teaser en 3 phrases sans jargon",
   ];
 }
 

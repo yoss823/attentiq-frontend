@@ -13,12 +13,12 @@ type ChatMessage = ChatTurn & {
 };
 
 const SUGGESTED_PROMPTS = [
-  "Pourquoi les gens décrochent si vite ?",
-  "Par où commencer ?",
-  "C'est grave ou normal ?",
-  "Quel est mon problème principal ?",
-  "Donne-moi un plan en 3 points",
-  "Exemple concret de ce que je peux changer",
+  "D'après ce rapport, où je perds l'attention en premier ?",
+  "Quelle correction a le meilleur rapport impact / effort ?",
+  "Le score reflète-t-il bien ce que décrivent les chutes ?",
+  "Qu'est-ce qui est critique vs secondaire ici ?",
+  "Plan en 3 étapes, uniquement à partir de ce diagnostic",
+  "Un exemple de changement concret (texte, plan ou rythme) pour ce contenu",
 ];
 
 function createMessage(role: ChatMessage["role"], content: string): ChatMessage {

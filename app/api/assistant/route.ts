@@ -21,10 +21,14 @@ function getGroqClient(): Groq | null {
 }
 
 const intentMap: Record<string, string> = {
-  clarify: 'Clarifie le point principal de ce diagnostic en 5 lignes max.',
-  explain: "Explique pourquoi l'attention chute à ces moments précis selon ce diagnostic.",
-  expand: 'Développe les recommandations principales avec des exemples concrets.',
-  prioritize: 'Priorise les 3 actions les plus importantes et explique pourquoi.',
+  clarify:
+    "Synthétise le diagnostic en 5 lignes max : levier principal, score, ce qui tient déjà — sans répéter le JSON brut.",
+  explain:
+    "Explique pourquoi l'attention chute aux timestamps ou étapes cités dans le diagnostic ; relie parole, image et CTA quand c'est dans le rapport.",
+  expand:
+    "Transforme chaque action prioritaire en micro-plan (quoi changer, où, en une phrase) — exemples ancrés dans ce contenu, pas de conseils génériques.",
+  prioritize:
+    "Classe les 3 actions du diagnostic par impact effort (1 = à faire en premier) et justifie en une phrase chacune, toujours à partir du rapport.",
 };
 
 async function tryOpenAiAssistant(
@@ -48,7 +52,7 @@ async function tryOpenAiAssistant(
           { role: 'system', content: systemPrompt },
           { role: 'user', content: userMessage },
         ],
-        max_tokens: 300,
+        max_tokens: 420,
         temperature: 0.35,
       }),
     });
@@ -79,14 +83,14 @@ export async function POST(req: NextRequest) {
       });
     }
 
-    const systemPrompt = `Tu es l'assistant Attentiq. Tu réponds UNIQUEMENT à partir du diagnostic de rétention fourni ci-dessous.
+    const systemPrompt = `Tu es l'assistant Attentiq : expert en attention pour formats courts, ton calme et chirurgical.
+Tu réponds UNIQUEMENT à partir du diagnostic ci-dessous (chiffres, labels, chutes d'attention, actions).
 Règles strictes :
-- Réponses 5 à 7 lignes maximum
-- Orientées action uniquement
-- Toujours partir du diagnostic fourni — jamais de généralités
-- Si le contexte est une vidéo courte, ancre-toi sur hook, rythme, chutes d'attention et CTA du diagnostic
-- Zéro jargon marketing, zéro promesses garanties
-- Si la question sort du périmètre, refuser poliment
+- 5 à 7 lignes maximum ; chaque ligne doit apporter une décision ou une lecture nette du rapport.
+- Zéro généralité (« sois authentique », « améliore le hook » sans lien au diagnostic) ; cite implicitement ce que dit déjà le rapport (sans inventer de timestamps absents).
+- Vidéo / texte / image : relie hook, rythme ou hiérarchie, chutes d'attention, CTA — comme un consultant qui a déjà vu le matériel.
+- Zéro jargon marketing, zéro promesse de vues ou de viralité ; si l'info manque dans le diagnostic, dis-le en une courte phrase.
+- Hors périmètre (autre URL, autre contenu, avis médical/légal) : refus poli en 2 lignes.
 DIAGNOSTIC :
 ${context}`;
 
@@ -104,7 +108,7 @@ ${context}`;
             { role: 'system', content: systemPrompt },
             { role: 'user', content: userMessage },
           ],
-          max_tokens: 300,
+          max_tokens: 420,
         });
         responseText =
           completion.choices[0]?.message?.content?.trim() || null;
