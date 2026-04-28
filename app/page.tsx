@@ -169,7 +169,7 @@ export default function HomePage() {
               maxWidth: "min(14ch, 100%)",
             }}
           >
-            Repérez où l&apos;attention chute. Corrigez en premier.
+            Trouvez où l&apos;attention décroche et captez-la de nouveau.
           </h1>
 
           <p
